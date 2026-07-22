@@ -1,49 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>WilCo Guide Events - Leander + Cedar Park</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WilCo Guide · Events</title>
 
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Source+Serif+4:opsz,wght@8..60,400..600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
 <!-- MapLibre GL -->
 <link href="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.css" rel="stylesheet" />
+<script src="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.js"></script>
 
 <style>
-/* ============================================================
-   WilCo Guide Events - design tokens (matches directory grammar)
-   ============================================================ */
 :root{
-  --wg-cream:#faf6ee;
-  --paper:#f5efe3;        /* page background */
-  --cream-dark:#eee7db;   /* card fill */
+  --paper:#f5efe3;
+  --cream:#faf6ee;
+  --cream-dark:#eee7db;
   --navy:#123260;
   --navy-dark:#0b1624;
   --rust:#a84e30;
+  --rust-deep:#8f3f24;
   --gold:#e6bf4a;
   --ink:#171717;
   --muted:#68635b;
   --border:#ddd2ba;
+  --border-soft:#e5dcc8;
 
-  --serif:'Fraunces','Source Serif 4',Georgia,serif;
-  --body:'Source Serif 4',Georgia,'Times New Roman',serif;
-  --sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
-  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --serif:"Fraunces",Georgia,serif;
+  --body:"Source Serif 4",Georgia,serif;
+  --sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
 
-  /* category accents - distinct, harmonious, mid-dark on cream */
-  --cat-family:#123260;
-  --cat-music:#6b4a86;
-  --cat-markets:#8a6d1f;
-  --cat-food:#a84e30;
-  --cat-garage:#2f6b4f;
-  --cat-estate:#4a5a7a;
-  --cat-kids:#2f6f7a;
-  --cat-city:#3a3f52;
-  --cat-outdoors:#3d7040;
+  --shadow-sm:0 1px 2px rgba(11,22,36,.06);
+  --shadow-lift:0 18px 40px -18px rgba(11,22,36,.45),0 2px 6px rgba(11,22,36,.08);
+}
+
+/* Category colors */
+:root{
+  --c-family:#ba6f5e;
+  --c-music:#a84e30;
+  --c-markets:#b5852a;
+  --c-food:#2a7f8f;
+  --c-garage:#8a7f6a;
+  --c-estate:#8a5a6a;
+  --c-kids:#123260;
+  --c-city:#4a5a72;
+  --c-outdoors:#2d6a4f;
 }
 
 *{box-sizing:border-box;}
@@ -52,943 +57,1197 @@ body{
   background:var(--paper);
   color:var(--ink);
   font-family:var(--body);
+  font-size:16px;
+  line-height:1.55;
   -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
   overflow-x:hidden;
 }
-img{max-width:100%;display:block;}
-button{font-family:inherit;cursor:pointer;}
 a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+img{display:block;max-width:100%;}
+::selection{background:var(--rust);color:var(--cream);}
 
-/* ---------- Top nav ---------- */
-.topnav{
-  display:flex;align-items:center;justify-content:space-between;gap:16px;
-  padding:12px 28px;
-  background:var(--paper);
+.mono{font-family:var(--mono);}
+.wrap{max-width:1220px;margin:0 auto;padding:0 28px;}
+
+/* ============ HEADER ============ */
+.header{
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+  padding:15px 28px;
+  background:var(--cream-dark);
   border-bottom:1px solid var(--border);
-  position:sticky;top:0;z-index:40;
+  position:relative;z-index:40;
 }
-.wordmark{font-family:var(--serif);font-size:21px;font-weight:600;color:var(--navy);line-height:1;}
-.wordmark .dot{color:var(--rust);}
-.wordmark small{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.14em;font-weight:600;color:var(--muted);margin-top:3px;text-transform:uppercase;}
-.navlinks{display:flex;gap:22px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--muted);}
-.navlinks a.active{color:var(--navy);border-bottom:2px solid var(--rust);padding-bottom:3px;}
-.nav-right{display:flex;align-items:center;gap:16px;}
-.subscribe{font-family:var(--sans);font-size:13px;font-weight:700;color:var(--rust);letter-spacing:.01em;}
+.brand{display:flex;flex-direction:column;line-height:1;}
+.brand .wordmark{font-family:var(--serif);font-weight:900;font-size:25px;color:var(--navy);letter-spacing:-.01em;}
+.brand .wordmark em{color:var(--rust);font-style:normal;}
+.brand .sub{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.22em;color:var(--muted);margin-top:5px;}
 
-/* ---------- Hero ---------- */
-.hero{max-width:1376px;margin:0 auto;padding:30px 28px 14px;}
-.hero .kicker{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--rust);}
-.hero h1{font-family:var(--serif);font-size:44px;font-weight:600;color:var(--navy);margin:6px 0 6px;letter-spacing:-.02em;}
-.hero .dek{font-family:var(--body);font-size:16px;color:var(--muted);margin:0;max-width:640px;}
+.nav{display:flex;align-items:center;gap:26px;font-family:var(--sans);font-size:14px;font-weight:600;}
+.nav a{color:var(--muted);padding-bottom:3px;transition:color .18s;}
+.nav a:hover{color:var(--navy);}
+.nav a.active{color:var(--navy);border-bottom:2px solid var(--rust);}
 
-/* ---------- Control bar ---------- */
+.header-actions{display:flex;align-items:center;gap:12px;}
+.header-search{position:relative;}
+.header-search input{
+  font-family:var(--sans);font-size:13px;
+  border:1px solid var(--border);background:var(--cream);
+  border-radius:3px;padding:9px 12px 9px 32px;width:210px;color:var(--ink);
+  transition:border-color .18s,box-shadow .18s;
+}
+.header-search input:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(18,50,96,.1);}
+.header-search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);}
+.btn-subscribe{
+  font-family:var(--sans);font-size:13px;font-weight:600;
+  background:var(--navy);color:var(--cream);
+  border-radius:3px;padding:9px 17px;transition:background .18s,transform .1s;
+}
+.btn-subscribe:hover{background:var(--navy-dark);}
+.btn-subscribe:active{transform:translateY(1px);}
+
+/* ============ NAVY RIBBON ============ */
+.ribbon{
+  background:var(--navy);color:var(--cream);
+  display:flex;align-items:center;gap:18px;
+  padding:10px 28px;
+  font-family:var(--mono);font-size:11.5px;font-weight:600;letter-spacing:.05em;
+  position:relative;z-index:30;
+}
+.ribbon .r-label{color:var(--gold);letter-spacing:.14em;}
+.ribbon .chip{
+  border:1px solid rgba(230,191,74,.4);border-radius:3px;
+  padding:4px 9px;letter-spacing:.06em;color:#f3ead2;
+}
+.ribbon .weather{opacity:.85;display:flex;align-items:center;gap:6px;}
+.ribbon .weather .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);}
+.ribbon .r-cta{margin-left:auto;color:#f0c96a;transition:color .18s;}
+.ribbon .r-cta:hover{color:#fff;}
+
+/* ============ MASTHEAD ============ */
+.masthead{text-align:center;padding:52px 28px 30px;}
+.masthead .kicker{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.24em;color:var(--rust);text-transform:uppercase;}
+.masthead h1{
+  font-family:var(--serif);font-weight:900;font-size:88px;line-height:.92;
+  color:var(--navy);margin:14px 0 10px;letter-spacing:-.03em;
+}
+.masthead .dek{font-family:var(--body);font-style:italic;font-size:19px;color:var(--muted);margin:0 auto 18px;max-width:620px;}
+.masthead .meta{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.11em;color:var(--muted);text-transform:uppercase;}
+.masthead .meta b{color:var(--ink);}
+
+/* ============ CONTROL BAR ============ */
+.controls-rule{border:0;border-top:1px solid var(--border);max-width:1220px;margin:0 auto;}
 .controls{
-  max-width:1376px;margin:16px auto 0;padding:0 28px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  padding:16px 0;
 }
-.controlbar{
-  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
-  padding:12px 0 16px;
-  border-top:1px solid var(--border);
-  border-bottom:1px solid var(--border);
-}
-/* view switcher */
-.viewswitch{display:flex;gap:0;border:1px solid var(--border);border-radius:4px;overflow:hidden;background:var(--cream-dark);}
-.viewbtn{
+.view-switch{display:flex;border:1px solid var(--border);border-radius:3px;overflow:hidden;background:var(--cream);}
+.view-switch button{
   width:38px;height:36px;display:flex;align-items:center;justify-content:center;
-  background:transparent;border:none;border-right:1px solid var(--border);color:var(--navy);
+  color:var(--muted);border-right:1px solid var(--border);transition:background .16s,color .16s;
 }
-.viewbtn:last-child{border-right:none;}
-.viewbtn svg{width:17px;height:17px;}
-.viewbtn.active{background:var(--ink);color:var(--wg-cream);}
-.viewbtn:not(.active):hover{background:#e4dccb;}
+.view-switch button:last-child{border-right:none;}
+.view-switch button:hover{background:var(--cream-dark);color:var(--navy);}
+.view-switch button.active{background:var(--ink);color:var(--cream);}
 
-/* search */
-.searchwrap{display:flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:4px;background:var(--wg-cream);padding:0 10px;height:36px;min-width:190px;flex:1 1 190px;max-width:280px;}
-.searchwrap svg{width:15px;height:15px;color:var(--muted);flex:0 0 auto;}
-.searchwrap input{border:none;background:transparent;outline:none;font-family:var(--sans);font-size:13px;color:var(--ink);width:100%;}
+.ctrl-search{position:relative;flex:0 1 auto;}
+.ctrl-search input{
+  font-family:var(--sans);font-size:13px;
+  border:1px solid var(--border);background:var(--cream);border-radius:3px;
+  padding:9px 12px 9px 32px;width:190px;color:var(--ink);transition:border-color .18s,box-shadow .18s;
+}
+.ctrl-search input:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(18,50,96,.1);}
+.ctrl-search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);}
 
-/* custom squared dropdown */
+/* custom dropdown */
 .dd{position:relative;font-family:var(--sans);}
 .dd-btn{
-  display:flex;align-items:center;gap:8px;height:36px;padding:0 11px;
-  border:1px solid var(--border);border-radius:4px;background:var(--wg-cream);
-  font-size:13px;font-weight:600;color:var(--navy);white-space:nowrap;
+  display:flex;align-items:center;gap:10px;
+  border:1px solid var(--border);background:var(--cream);border-radius:3px;
+  padding:9px 12px;font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap;
+  transition:border-color .18s,background .16s;
 }
-.dd-btn .chev{width:12px;height:12px;color:var(--muted);}
-.dd-btn .swatch{width:9px;height:9px;border-radius:2px;flex:0 0 auto;}
-.dd-menu{
-  position:absolute;top:calc(100% + 5px);left:0;z-index:60;
-  min-width:190px;background:var(--wg-cream);border:1px solid var(--border);border-radius:4px;
-  box-shadow:0 6px 22px rgba(11,22,36,.14);padding:5px;display:none;
+.dd-btn:hover{border-color:var(--navy);}
+.dd-btn .dd-lead{color:var(--muted);font-size:10px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;}
+.dd-btn .chev{margin-left:auto;transition:transform .2s;color:var(--muted);}
+.dd.open .dd-btn{border-color:var(--navy);background:var(--cream-dark);}
+.dd.open .chev{transform:rotate(180deg);}
+.dd-panel{
+  position:absolute;top:calc(100% + 6px);left:0;min-width:100%;z-index:60;
+  background:var(--cream);border:1px solid var(--border);border-radius:3px;
+  box-shadow:var(--shadow-lift);padding:5px;
+  opacity:0;transform:translateY(-4px);pointer-events:none;transition:opacity .16s,transform .16s;
 }
-.dd-menu.open{display:block;}
-.dd-item{
-  display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:3px;
-  font-size:13px;font-weight:500;color:var(--ink);
+.dd.open .dd-panel{opacity:1;transform:translateY(0);pointer-events:auto;}
+.dd-opt{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 10px;font-size:13px;border-radius:2px;white-space:nowrap;color:var(--ink);
+  transition:background .12s;
 }
-.dd-item:hover{background:var(--cream-dark);}
-.dd-item.sel{color:var(--rust);font-weight:700;}
+.dd-opt:hover{background:var(--cream-dark);}
+.dd-opt.sel{background:var(--ink);color:var(--cream);}
+.dd-opt .swatch{width:8px;height:8px;border-radius:2px;flex:none;}
 
-.spacer{flex:1 1 auto;}
-.add-event{
-  height:36px;padding:0 16px;border:none;border-radius:4px;background:var(--rust);color:#fff;
-  font-family:var(--sans);font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px;
+.controls .spacer{margin-left:auto;}
+.btn-add{
+  font-family:var(--sans);font-size:13px;font-weight:600;
+  background:var(--rust);color:var(--cream);border-radius:3px;padding:10px 16px;
+  display:flex;align-items:center;gap:7px;transition:background .18s,transform .1s;
 }
-.add-event svg{width:14px;height:14px;}
-.add-event:hover{background:#93442a;}
+.btn-add:hover{background:var(--rust-deep);}
+.btn-add:active{transform:translateY(1px);}
 
-/* ---------- Body layout ---------- */
-.layout{max-width:1376px;margin:20px auto 0;padding:0 28px 60px;display:grid;grid-template-columns:1fr 300px;gap:26px;align-items:start;}
-.layout.no-rail{grid-template-columns:1fr;}
-.viewarea{min-width:0;}
-.resultline{font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--muted);margin:0 0 14px;}
+.btn-filters{display:none;}
 
-/* ---------- Card grid view ---------- */
-.cardgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));gap:18px;}
-.evcard{
-  background:var(--cream-dark);border:1px solid var(--border);border-radius:4px;overflow:hidden;
-  display:flex;flex-direction:column;text-align:left;padding:0;transition:transform .12s ease,box-shadow .12s ease;
+/* ============ LAYOUT ============ */
+.layout{
+  display:grid;grid-template-columns:1fr 320px;gap:36px;
+  max-width:1220px;margin:0 auto;padding:22px 28px 60px;align-items:start;
 }
-.evcard:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(11,22,36,.09);}
-.evcard.premium{grid-column:span 2;}
-.evcard.premium .cardtop{border-top:3px solid var(--navy);}
-.cardtop{position:relative;}
-.card-img-wrap{position:relative;aspect-ratio:4/3;background:var(--border);overflow:hidden;}
-.card-img-wrap img{width:100%;height:100%;object-fit:cover;}
-.featbadge{
-  position:absolute;top:8px;left:8px;z-index:2;
-  background:var(--gold);color:#3a2f0a;font-family:var(--mono);font-size:9px;font-weight:700;
-  letter-spacing:.08em;text-transform:uppercase;padding:3px 6px;border-radius:3px;display:flex;align-items:center;gap:3px;
-}
-.premtag{
-  position:absolute;top:8px;right:8px;z-index:2;
-  background:var(--navy);color:#fff;font-family:var(--mono);font-size:9px;font-weight:700;
-  letter-spacing:.08em;text-transform:uppercase;padding:3px 6px;border-radius:3px;
-}
-.cardbody{padding:11px 13px 13px;display:flex;flex-direction:column;gap:5px;}
-.cat-kicker{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
-.card-title{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--navy);line-height:1.2;margin:0;}
-.card-meta{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.04em;color:var(--ink);text-transform:uppercase;}
-.card-place{font-family:var(--body);font-size:12.5px;color:var(--muted);}
+body.view-map .layout{display:none;}
+.view-area{min-width:0;}
 
-/* interstitials in feed (mobile only) */
-.interstitial{display:none;}
+/* view visibility */
+.view{display:none;animation:fadeIn .3s ease;}
+.view.active{display:block;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
 
-/* ---------- List view ---------- */
-.listview{display:flex;flex-direction:column;gap:12px;}
-.listrow{
-  display:flex;gap:14px;align-items:stretch;background:var(--cream-dark);border:1px solid var(--border);
-  border-radius:4px;overflow:hidden;padding:0;text-align:left;
+@keyframes reveal{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.reveal{opacity:0;animation:reveal .5s cubic-bezier(.2,.7,.3,1) forwards;}
+
+/* ============ CARD VIEW: HERO ROW ============ */
+.hero-row{
+  display:grid;grid-template-columns:1.62fr 1fr;gap:14px;margin-bottom:40px;
 }
-.listrow:hover{border-color:#cdbf9f;}
-.listthumb{width:120px;flex:0 0 120px;aspect-ratio:4/3;background:var(--border);overflow:hidden;}
-.listthumb img{width:100%;height:100%;object-fit:cover;}
-.listmid{flex:1 1 auto;min-width:0;padding:12px 6px 12px 2px;display:flex;flex-direction:column;gap:4px;justify-content:center;}
-.listmeta{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.03em;color:var(--muted);text-transform:uppercase;}
-.listright{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:10px;padding:12px 14px;}
-.dist{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--navy);}
-.savebtn{width:34px;height:34px;border:1px solid var(--border);border-radius:4px;background:var(--wg-cream);display:flex;align-items:center;justify-content:center;color:var(--muted);}
-.savebtn svg{width:16px;height:16px;}
-.savebtn.saved{color:var(--rust);border-color:var(--rust);}
-
-/* ---------- Calendar view ---------- */
-.calwrap{background:var(--cream-dark);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
-.calhead{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);}
-.calhead h2{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--navy);margin:0;}
-.calhead .mono{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
-.calgrid{display:grid;grid-template-columns:repeat(7,1fr);}
-.caldow{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center;padding:8px 0;border-bottom:1px solid var(--border);border-right:1px solid var(--border);}
-.caldow:nth-child(7){border-right:none;}
-.calcell{min-height:104px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:6px;display:flex;flex-direction:column;gap:4px;}
-.calcell:nth-child(7n){border-right:none;}
-.calcell.empty{background:repeating-linear-gradient(45deg,transparent,transparent 6px,rgba(221,210,186,.25) 6px,rgba(221,210,186,.25) 7px);}
-.caldate{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--muted);}
-.calcell.today .caldate{color:#fff;background:var(--rust);border-radius:3px;padding:1px 5px;align-self:flex-start;}
-.calchip{
-  border:none;border-radius:3px;padding:3px 5px;font-family:var(--sans);font-size:10.5px;font-weight:600;
-  color:#fff;text-align:left;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+.hero-big{position:relative;border-radius:4px;overflow:hidden;cursor:pointer;min-height:420px;background:var(--border);}
+.hero-big img,.hero-side img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;transition:transform .8s cubic-bezier(.2,.7,.3,1);}
+.hero-big:hover img,.hero-side:hover img{transform:scale(1.045);}
+.hero-scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(11,22,36,.9),rgba(11,22,36,.15) 52%,rgba(11,22,36,0) 78%);}
+.hero-big .hero-content{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:28px;color:#fff;}
+.tag-featured{
+  align-self:flex-start;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.1em;
+  background:var(--gold);color:var(--navy-dark);border-radius:3px;padding:4px 9px;margin-bottom:auto;
+  box-shadow:0 2px 8px rgba(11,22,36,.35);
 }
-.calchip .t{opacity:.85;font-family:var(--mono);font-size:9px;}
+.hero-big .h-kicker{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#f0e6cf;margin-bottom:8px;}
+.hero-big h2{font-family:var(--serif);font-weight:800;font-size:40px;line-height:1.02;margin:0 0 12px;letter-spacing:-.02em;}
+.hero-big .h-date{font-family:var(--mono);font-size:12.5px;font-weight:500;letter-spacing:.04em;color:#e9e2d2;display:flex;align-items:center;gap:8px;}
+.hero-side-col{display:grid;grid-template-rows:1fr 1fr;gap:14px;}
+.hero-side{position:relative;border-radius:4px;overflow:hidden;cursor:pointer;background:var(--border);}
+.hero-side .hero-scrim{background:linear-gradient(to top,rgba(11,22,36,.88),rgba(11,22,36,.1) 60%);}
+.hero-side .hero-content{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:18px;color:#fff;}
+.hero-side .h-kicker{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#f0e6cf;margin-bottom:5px;}
+.hero-side h3{font-family:var(--serif);font-weight:700;font-size:21px;line-height:1.05;margin:0 0 5px;}
+.hero-side .h-date{font-family:var(--mono);font-size:10.5px;color:#e0d9c9;}
+.hero-side .tag-featured{position:absolute;top:14px;left:14px;margin:0;}
 
-/* ---------- Map view ---------- */
-.mapview{display:none;}
-.mapshell{position:relative;height:640px;border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+/* ============ SECTION HEADER ============ */
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:14px;border-top:1px solid var(--border);padding-top:18px;margin-bottom:22px;flex-wrap:wrap;}
+.section-head .s-kicker{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.14em;color:var(--rust);text-transform:uppercase;display:block;margin-bottom:6px;}
+.section-head h2{font-family:var(--serif);font-weight:800;font-size:30px;color:var(--navy);margin:0;letter-spacing:-.01em;}
+.section-head .s-count{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--muted);letter-spacing:.04em;}
+
+/* ============ CARD GRID ============ */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(288px,1fr));gap:26px 24px;}
+.ev-card{cursor:pointer;display:flex;flex-direction:column;transition:transform .28s cubic-bezier(.2,.7,.3,1);}
+.ev-card:hover{transform:translateY(-6px);}
+.ev-imgwrap{position:relative;aspect-ratio:4/3;border-radius:4px;overflow:hidden;background:var(--border);box-shadow:var(--shadow-sm);transition:box-shadow .28s;}
+.ev-card:hover .ev-imgwrap{box-shadow:var(--shadow-lift);}
+.ev-imgwrap img{width:100%;height:100%;object-fit:cover;transition:transform .7s cubic-bezier(.2,.7,.3,1);}
+.ev-card:hover .ev-imgwrap img{transform:scale(1.06);}
+.ev-imgwrap .tag-featured{position:absolute;top:11px;left:11px;}
+.ev-imgwrap .tag-premium{position:absolute;top:11px;left:11px;font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.08em;background:var(--navy);color:#f0e6cf;border-radius:3px;padding:4px 8px;box-shadow:0 2px 8px rgba(11,22,36,.3);}
+.ev-save{position:absolute;top:9px;right:9px;width:32px;height:32px;border-radius:3px;background:rgba(250,246,238,.9);display:flex;align-items:center;justify-content:center;color:var(--navy);backdrop-filter:blur(4px);transition:background .16s,transform .1s;box-shadow:var(--shadow-sm);}
+.ev-save:hover{background:var(--cream);}
+.ev-save:active{transform:scale(.9);}
+.ev-save.saved{background:var(--rust);color:var(--cream);}
+.ev-body{padding:12px 2px 0;font-family:var(--sans);}
+.ev-kicker{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);}
+.ev-title{font-family:var(--serif);font-weight:600;font-size:20px;line-height:1.14;color:var(--navy);margin:7px 0 8px;letter-spacing:-.01em;}
+.ev-meta{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.02em;line-height:1.5;}
+.ev-foot{display:flex;align-items:center;justify-content:space-between;margin-top:11px;padding-top:11px;border-top:1px solid var(--border-soft);}
+.ev-cat{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:600;color:var(--muted);font-family:var(--sans);}
+.ev-cat .dot{width:8px;height:8px;border-radius:2px;flex:none;}
+.ev-details{font-family:var(--sans);font-size:12px;font-weight:600;color:var(--rust);display:flex;align-items:center;gap:4px;transition:gap .18s;}
+.ev-card:hover .ev-details{gap:8px;}
+
+/* ============ LIST VIEW ============ */
+.day-block{margin-bottom:38px;}
+.day-head{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:6px;}
+.day-head h2{font-family:var(--serif);font-weight:800;font-size:28px;color:var(--navy);margin:0;letter-spacing:-.01em;}
+.day-head .d-count{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;}
+.list-row{display:flex;align-items:center;gap:18px;padding:16px 6px;border-bottom:1px solid var(--border-soft);cursor:pointer;transition:background .16s,padding-left .2s;}
+.list-row:hover{background:var(--cream);padding-left:12px;}
+.list-thumb{width:96px;height:72px;border-radius:4px;overflow:hidden;flex:none;background:var(--border);position:relative;}
+.list-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .6s;}
+.list-row:hover .list-thumb img{transform:scale(1.07);}
+.list-main{flex:1;min-width:0;}
+.list-kicker{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:7px;}
+.list-kicker .dot{width:7px;height:7px;border-radius:2px;}
+.list-title{font-family:var(--serif);font-weight:600;font-size:21px;color:var(--navy);margin:4px 0 4px;line-height:1.1;}
+.list-sub{font-family:var(--mono);font-size:11.5px;color:var(--muted);letter-spacing:.02em;}
+.list-right{display:flex;align-items:center;gap:16px;flex:none;}
+.list-dist{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink);text-align:right;}
+.list-dist span{display:block;font-weight:400;color:var(--muted);font-size:9.5px;letter-spacing:.06em;}
+.list-save{width:36px;height:36px;border-radius:3px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--navy);transition:background .16s,border-color .16s;}
+.list-save:hover{background:var(--cream-dark);}
+.list-save.saved{background:var(--rust);color:var(--cream);border-color:var(--rust);}
+
+/* ============ CALENDAR VIEW ============ */
+.cal-head{display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:2px;}
+.cal-head h2{font-family:var(--serif);font-weight:800;font-size:30px;color:var(--navy);margin:0;letter-spacing:-.01em;}
+.cal-head .c-sub{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);border-left:1px solid var(--border);}
+.cal-weekdays div{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;padding:12px 10px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);text-align:left;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);border-left:1px solid var(--border);}
+.cal-cell{min-height:120px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:8px;position:relative;background:var(--cream);transition:background .16s;}
+.cal-cell.out{background:var(--paper);}
+.cal-cell .c-num{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;}
+.cal-cell.out .c-num{opacity:.4;}
+.cal-cell.today .c-num{background:var(--rust);color:var(--cream);width:24px;height:24px;border-radius:3px;display:flex;align-items:center;justify-content:center;}
+.cal-chip{display:flex;align-items:center;gap:6px;font-family:var(--sans);font-size:11px;font-weight:500;color:var(--ink);background:var(--cream-dark);border-left:3px solid var(--muted);border-radius:2px;padding:3px 6px;margin-bottom:4px;cursor:pointer;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;transition:background .14s,transform .1s;}
+.cal-chip:hover{background:var(--border);transform:translateX(2px);}
+.cal-chip span{overflow:hidden;text-overflow:ellipsis;}
+.cal-chip .c-time{font-family:var(--mono);font-size:9.5px;color:var(--muted);flex:none;}
+.cal-more{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--rust);cursor:pointer;padding:2px 6px;}
+
+/* ============ RIGHT RAIL ============ */
+.rail{display:flex;flex-direction:column;gap:22px;position:sticky;top:20px;}
+.rail-card{border:1px solid var(--border);border-radius:4px;background:var(--cream);overflow:hidden;}
+.sponsor .sp-head{display:flex;align-items:center;gap:12px;padding:16px 16px 12px;}
+.sp-mono{width:46px;height:46px;border-radius:3px;background:var(--navy);color:var(--gold);font-family:var(--serif);font-weight:800;font-size:19px;display:flex;align-items:center;justify-content:center;flex:none;letter-spacing:-.02em;}
+.sp-kicker{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.16em;color:var(--muted);text-transform:uppercase;}
+.sp-name{font-family:var(--serif);font-weight:700;font-size:17px;color:var(--navy);line-height:1.1;margin-top:3px;}
+.sponsor .sp-body{padding:0 16px 16px;}
+.sp-copy{font-family:var(--body);font-size:13.5px;color:var(--ink);line-height:1.5;margin:0 0 12px;}
+.sp-cta{font-family:var(--sans);font-size:12px;font-weight:600;color:var(--rust);display:inline-flex;align-items:center;gap:5px;transition:gap .18s;}
+.rail-card:hover .sp-cta{gap:9px;}
+.sp-foot{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;border-top:1px solid var(--border-soft);padding:9px 16px;background:var(--cream-dark);}
+
+.giveaway{border-color:var(--gold);position:relative;}
+.giveaway::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--gold),#d4a72c);}
+.giveaway .g-body{padding:20px 16px 16px;}
+.g-kicker{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.14em;color:#a8842a;text-transform:uppercase;display:flex;align-items:center;gap:7px;}
+.g-title{font-family:var(--serif);font-weight:700;font-size:19px;color:var(--navy);line-height:1.15;margin:9px 0 12px;}
+.g-form{display:flex;gap:7px;}
+.g-form input{flex:1;min-width:0;font-family:var(--sans);font-size:13px;border:1px solid var(--border);background:var(--cream);border-radius:3px;padding:9px 11px;color:var(--ink);}
+.g-form input:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(18,50,96,.1);}
+.g-form button{font-family:var(--sans);font-size:13px;font-weight:600;background:var(--rust);color:var(--cream);border-radius:3px;padding:9px 15px;transition:background .18s;}
+.g-form button:hover{background:var(--rust-deep);}
+.g-powered{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;margin-top:10px;}
+
+.news .n-body{padding:18px 16px;}
+.n-kicker{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.14em;color:var(--rust);text-transform:uppercase;}
+.n-title{font-family:var(--serif);font-weight:700;font-size:18px;color:var(--navy);line-height:1.15;margin:8px 0 6px;}
+.n-copy{font-family:var(--body);font-size:13px;color:var(--muted);margin:0 0 12px;line-height:1.45;}
+.n-form{display:flex;gap:7px;}
+.n-form input{flex:1;min-width:0;font-family:var(--sans);font-size:13px;border:1px solid var(--border);background:var(--cream);border-radius:3px;padding:9px 11px;}
+.n-form input:focus{outline:none;border-color:var(--navy);}
+.n-form button{font-family:var(--sans);font-size:13px;font-weight:600;background:var(--navy);color:var(--cream);border-radius:3px;padding:9px 15px;}
+
+/* ============ MAP VIEW ============ */
+.map-shell{display:none;position:relative;height:calc(100vh - 148px);min-height:520px;background:var(--paper);}
+body.view-map .map-shell{display:block;}
 #map{position:absolute;inset:0;}
-.maplibregl-canvas{filter:sepia(.12) saturate(.9) brightness(1.02);}
-.map-legend{
-  position:absolute;left:14px;bottom:14px;z-index:5;background:var(--wg-cream);border:1px solid var(--border);
-  border-radius:4px;padding:11px 13px;font-family:var(--sans);box-shadow:0 4px 16px rgba(11,22,36,.16);max-width:190px;
-}
-.map-legend h4{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--navy);margin:0 0 8px;}
-.legrow{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--ink);margin-bottom:5px;}
-.legdiamond{width:10px;height:10px;transform:rotate(45deg);border:1px solid rgba(0,0,0,.15);}
-.map-toggle{position:absolute;right:14px;top:14px;z-index:5;display:flex;border:1px solid var(--border);border-radius:4px;overflow:hidden;background:var(--wg-cream);box-shadow:0 4px 16px rgba(11,22,36,.16);}
-.map-toggle button{padding:8px 12px;border:none;background:transparent;font-family:var(--sans);font-size:12px;font-weight:600;color:var(--navy);border-right:1px solid var(--border);}
-.map-toggle button:last-child{border-right:none;}
-.map-toggle button.active{background:var(--rust);color:#fff;}
-/* mobile map chips bar */
-.mapchips{display:none;}
+.maplibregl-ctrl-attrib{font-family:var(--sans);font-size:9px;background:rgba(250,246,238,.75)!important;}
+
+.map-float{position:absolute;background:var(--cream);border:1px solid var(--border);box-shadow:var(--shadow-lift);z-index:5;}
+.map-title{top:18px;left:18px;padding:12px 15px;border-radius:3px;}
+.map-title .mt-mark{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.16em;color:var(--rust);text-transform:uppercase;}
+.map-title .mt-name{font-family:var(--serif);font-weight:700;font-size:17px;color:var(--navy);line-height:1.1;margin-top:3px;}
+.map-title .mt-sub{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.04em;margin-top:2px;}
+
+.map-days{top:18px;left:50%;transform:translateX(-50%);display:flex;border-radius:3px;overflow:hidden;}
+.map-days button{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.08em;padding:9px 15px;color:var(--muted);border-right:1px solid var(--border);background:var(--cream);transition:background .14s,color .14s;}
+.map-days button:last-child{border-right:none;}
+.map-days button.active{background:var(--ink);color:var(--cream);}
+
+.map-legend{bottom:24px;left:18px;padding:14px 16px;border-radius:3px;width:236px;}
+.map-legend .ml-head{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.16em;color:var(--muted);text-transform:uppercase;margin-bottom:10px;}
+.ml-row{display:flex;align-items:center;gap:9px;padding:5px 0;cursor:pointer;font-family:var(--sans);font-size:12.5px;color:var(--ink);user-select:none;}
+.ml-row .ml-check{width:15px;height:15px;border:1px solid var(--border);border-radius:2px;display:flex;align-items:center;justify-content:center;flex:none;background:var(--cream);transition:background .14s,border-color .14s;}
+.ml-row.on .ml-check{background:var(--navy);border-color:var(--navy);}
+.ml-row .ml-check svg{opacity:0;transition:opacity .14s;}
+.ml-row.on .ml-check svg{opacity:1;}
+.ml-row .ml-dot{width:9px;height:9px;border-radius:2px;flex:none;}
+.ml-row .ml-label{flex:1;}
+.ml-row .ml-count{font-family:var(--mono);font-size:10px;color:var(--muted);font-weight:600;}
+.ml-row.off{opacity:.42;}
+.map-legend .ml-divider{border-top:1px solid var(--border-soft);margin:10px 0;}
+.ml-toggle{display:flex;align-items:center;justify-content:space-between;font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;}
+.toggle-sw{width:38px;height:21px;border-radius:11px;background:var(--border);position:relative;transition:background .18s;flex:none;}
+.toggle-sw::after{content:"";position:absolute;top:2px;left:2px;width:17px;height:17px;border-radius:50%;background:var(--cream);transition:transform .18s;box-shadow:var(--shadow-sm);}
+.ml-toggle.on .toggle-sw{background:var(--rust);}
+.ml-toggle.on .toggle-sw::after{transform:translateX(17px);}
 
 /* map markers */
-.pin{cursor:pointer;}
-.pin .diamond{width:18px;height:18px;transform:rotate(45deg);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35);}
-.pin.big .diamond{width:24px;height:24px;box-shadow:0 0 0 3px var(--gold),0 1px 5px rgba(0,0,0,.4);}
-.pin.closure .diamond{width:16px;height:16px;transform:rotate(0deg);border-radius:3px;background:var(--rust);border:2px solid #fff;display:flex;align-items:center;justify-content:center;}
-.pin.closure .bang{transform:none;color:#fff;font-family:var(--sans);font-weight:800;font-size:12px;line-height:16px;}
-/* maplibre popup on-brand */
-.maplibregl-popup-content{background:var(--cream-dark);border:1px solid var(--border);border-radius:4px;padding:0;overflow:hidden;box-shadow:0 8px 26px rgba(11,22,36,.24);width:230px;}
-.maplibregl-popup-close-button{color:var(--muted);font-size:18px;padding:2px 7px;}
-.maplibregl-popup-tip{border-top-color:var(--border)!important;border-bottom-color:var(--border)!important;}
-.popcard img{width:100%;aspect-ratio:16/9;object-fit:cover;}
-.popcard .pcbody{padding:9px 11px 11px;}
-.popcard .cat-kicker{margin-bottom:3px;}
-.popcard h3{font-family:var(--serif);font-size:15px;color:var(--navy);margin:2px 0 4px;line-height:1.15;}
-.popcard .pcmeta{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.03em;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
-.popcard .pcbtn{display:block;text-align:center;background:var(--rust);color:#fff;font-family:var(--sans);font-size:11.5px;font-weight:700;padding:7px;border-radius:3px;border:none;width:100%;}
+.mk{cursor:pointer;transform-origin:center bottom;transition:transform .18s;}
+.mk:hover{transform:scale(1.18);z-index:10;}
+.mk svg{filter:drop-shadow(0 3px 5px rgba(11,22,36,.4));}
 
-/* ---------- Right rail ---------- */
-.rail{display:flex;flex-direction:column;gap:18px;position:sticky;top:78px;}
-.railcard{background:var(--cream-dark);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
-.railcard .sponsor-tag{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:9px 13px 0;}
-.railcard img{width:100%;aspect-ratio:16/9;object-fit:cover;}
-.railcard .rc-body{padding:11px 13px 14px;}
-.railcard .rc-name{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--navy);margin:0 0 4px;}
-.railcard .rc-copy{font-family:var(--body);font-size:12.5px;color:var(--muted);margin:0 0 9px;line-height:1.4;}
-.railcard .rc-link{font-family:var(--sans);font-size:12px;font-weight:700;color:var(--rust);}
-/* greetform card */
-.greetcard{background:var(--navy);border:1px solid var(--navy);color:var(--wg-cream);border-radius:4px;overflow:hidden;position:relative;}
-.greetcard .goldbar{height:4px;background:var(--gold);}
-.greetcard .gc-body{padding:14px 15px 15px;}
-.greetcard .gc-kick{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);}
-.greetcard h3{font-family:var(--serif);font-size:18px;font-weight:600;color:#fff;margin:6px 0 8px;line-height:1.2;}
-.greetcard p{font-family:var(--body);font-size:12.5px;color:#cdd6e2;margin:0 0 11px;line-height:1.4;}
-.greetform{display:flex;gap:7px;}
-.greetform input{flex:1;min-width:0;height:36px;border:1px solid #2a4670;border-radius:4px;background:#0d2547;color:#fff;padding:0 10px;font-family:var(--sans);font-size:12.5px;outline:none;}
-.greetform input::placeholder{color:#8aa0bd;}
-.greetform button{height:36px;padding:0 14px;border:none;border-radius:4px;background:var(--rust);color:#fff;font-family:var(--sans);font-size:12.5px;font-weight:700;}
-.greetpow{font-family:var(--mono);font-size:9px;letter-spacing:.06em;color:#7d93b0;margin:9px 0 0;text-transform:uppercase;}
-/* newsletter signup card */
-.signupcard{background:var(--cream-dark);border:1px solid var(--border);border-radius:4px;padding:14px 15px 15px;}
-.signupcard .su-kick{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--rust);}
-.signupcard h3{font-family:var(--serif);font-size:17px;font-weight:600;color:var(--navy);margin:6px 0 4px;}
-.signupcard p{font-family:var(--body);font-size:12.5px;color:var(--muted);margin:0 0 11px;line-height:1.4;}
-.signupcard .su-form{display:flex;gap:7px;}
-.signupcard input{flex:1;min-width:0;height:36px;border:1px solid var(--border);border-radius:4px;background:var(--wg-cream);padding:0 10px;font-family:var(--sans);font-size:12.5px;outline:none;}
-.signupcard button{height:36px;padding:0 14px;border:none;border-radius:4px;background:var(--navy);color:#fff;font-family:var(--sans);font-size:12.5px;font-weight:700;}
-
-/* ---------- Own-event-page drawer ---------- */
-.scrim{position:fixed;inset:0;background:rgba(11,22,36,.5);z-index:80;opacity:0;pointer-events:none;transition:opacity .2s ease;}
-.scrim.open{opacity:1;pointer-events:auto;}
+/* ============ DRAWER ============ */
+.overlay{position:fixed;inset:0;background:rgba(11,22,36,.5);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .3s;z-index:80;}
+.overlay.open{opacity:1;pointer-events:auto;}
 .drawer{
-  position:fixed;top:0;right:0;height:100vh;width:440px;max-width:92vw;background:var(--wg-cream);z-index:90;
-  transform:translateX(100%);transition:transform .26s cubic-bezier(.4,0,.2,1);overflow-y:auto;
-  box-shadow:-10px 0 40px rgba(11,22,36,.25);
+  position:fixed;top:0;right:0;height:100vh;width:min(480px,100vw);
+  background:var(--cream);z-index:90;transform:translateX(100%);
+  transition:transform .38s cubic-bezier(.2,.7,.3,1);overflow-y:auto;
+  box-shadow:-20px 0 50px -20px rgba(11,22,36,.5);
 }
 .drawer.open{transform:translateX(0);}
-.drawer-close{position:absolute;top:14px;right:14px;z-index:3;width:36px;height:36px;border:1px solid var(--border);border-radius:4px;background:rgba(250,246,238,.92);display:flex;align-items:center;justify-content:center;color:var(--navy);}
-.drawer-close svg{width:16px;height:16px;}
-.drawer-hero{aspect-ratio:4/3;background:var(--border);overflow:hidden;}
-.drawer-hero img{width:100%;height:100%;object-fit:cover;}
-.drawer-body{padding:20px 24px 40px;}
-.drawer-body .cat-kicker{font-size:11px;letter-spacing:.12em;}
-.drawer-body h1{font-family:var(--serif);font-size:29px;font-weight:600;color:var(--navy);margin:8px 0 12px;line-height:1.12;letter-spacing:-.01em;}
-.drawer-datebar{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:13px 0;margin-bottom:16px;}
-.drawer-datebar .drow{display:flex;align-items:center;gap:9px;font-family:var(--sans);font-size:13.5px;color:var(--ink);font-weight:500;}
-.drawer-datebar .drow svg{width:15px;height:15px;color:var(--rust);flex:0 0 auto;}
-.drawer-desc{font-family:var(--body);font-size:15px;line-height:1.6;color:var(--ink);margin:0 0 22px;}
-.drawer-actions{display:flex;flex-direction:column;gap:9px;margin-bottom:18px;}
-.btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;height:46px;border:none;border-radius:4px;background:var(--rust);color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;}
-.btn-primary svg{width:16px;height:16px;}
-.btn-secondary{display:flex;align-items:center;justify-content:center;gap:8px;height:46px;border:1px solid var(--navy);border-radius:4px;background:transparent;color:var(--navy);font-family:var(--sans);font-size:14px;font-weight:700;}
-.btn-secondary svg{width:16px;height:16px;}
-.seo-note{font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:var(--muted);line-height:1.5;border-left:2px solid var(--gold);padding-left:11px;}
+.dr-close{position:absolute;top:16px;right:16px;z-index:3;width:38px;height:38px;border-radius:3px;background:rgba(250,246,238,.9);display:flex;align-items:center;justify-content:center;color:var(--navy);backdrop-filter:blur(4px);box-shadow:var(--shadow-sm);transition:background .16s;}
+.dr-close:hover{background:var(--cream);}
+.dr-img{position:relative;aspect-ratio:16/9;background:var(--border);overflow:hidden;}
+.dr-img img{width:100%;height:100%;object-fit:cover;}
+.dr-img .tag-featured{position:absolute;top:16px;left:16px;}
+.dr-body{padding:24px 26px 40px;}
+.dr-kicker{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;color:var(--rust);display:flex;align-items:center;gap:8px;}
+.dr-kicker .dot{width:8px;height:8px;border-radius:2px;}
+.dr-title{font-family:var(--serif);font-weight:800;font-size:34px;line-height:1.05;color:var(--navy);margin:12px 0 16px;letter-spacing:-.02em;}
+.dr-facts{display:flex;flex-direction:column;gap:10px;padding:16px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:18px;}
+.dr-fact{display:flex;align-items:center;gap:12px;font-family:var(--sans);font-size:14px;color:var(--ink);}
+.dr-fact svg{color:var(--muted);flex:none;}
+.dr-fact b{font-weight:600;}
+.dr-desc{font-family:var(--body);font-size:15.5px;line-height:1.6;color:var(--ink);margin:0 0 24px;}
+.dr-actions{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.dr-primary{font-family:var(--sans);font-size:15px;font-weight:600;background:var(--rust);color:var(--cream);border-radius:3px;padding:14px;text-align:center;transition:background .18s;}
+.dr-primary:hover{background:var(--rust-deep);}
+.dr-secondary{display:flex;gap:10px;}
+.dr-secondary button{flex:1;font-family:var(--sans);font-size:14px;font-weight:600;border:1px solid var(--border);background:var(--cream);color:var(--navy);border-radius:3px;padding:12px;display:flex;align-items:center;justify-content:center;gap:7px;transition:background .16s,border-color .16s;}
+.dr-secondary button:hover{background:var(--cream-dark);border-color:var(--navy);}
+.dr-secondary button.saved{background:var(--rust);color:var(--cream);border-color:var(--rust);}
+.dr-note{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.04em;color:var(--muted);text-transform:uppercase;text-align:center;line-height:1.6;padding-top:6px;}
 
-/* ---------- Sticky bottom sponsor (mobile) ---------- */
-.mobile-sponsor{display:none;}
+/* ============ MOBILE STICKY SPONSOR BAR ============ */
+.sticky-sponsor{display:none;position:fixed;bottom:0;left:0;right:0;z-index:70;background:var(--navy);color:var(--cream);align-items:center;gap:12px;padding:10px 16px;box-shadow:0 -6px 20px rgba(11,22,36,.3);}
+.sticky-sponsor .ss-mono{width:34px;height:34px;border-radius:3px;background:var(--cream);color:var(--navy);font-family:var(--serif);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex:none;}
+.sticky-sponsor .ss-text{flex:1;min-width:0;}
+.sticky-sponsor .ss-kicker{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.14em;color:var(--gold);text-transform:uppercase;}
+.sticky-sponsor .ss-name{font-family:var(--sans);font-size:13px;font-weight:600;}
+.sticky-sponsor .ss-cta{font-family:var(--sans);font-size:12px;font-weight:600;color:var(--gold);flex:none;}
+.sticky-sponsor .ss-x{flex:none;color:#8fa2bd;padding:4px;}
 
-/* ---------- Footer ---------- */
-.foot{max-width:1376px;margin:0 auto;padding:22px 28px 34px;border-top:1px solid var(--border);}
-.foot .fm{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+/* rail interstitial (mobile only) */
+.rail-inline{display:none;}
 
-/* desktop filter cluster */
-.desktop-filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+/* ============ FOOTER ============ */
+.footer{background:var(--navy-dark);color:#b0b8c1;font-family:var(--sans);padding:44px 28px 26px;}
+.footer-inner{max-width:1220px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:30px;}
+.footer .f-logo{font-family:var(--serif);font-weight:900;font-size:22px;color:#fff;margin-bottom:8px;}
+.footer .f-logo em{color:var(--gold);font-style:normal;}
+.footer .f-tag{font-size:13px;max-width:300px;line-height:1.55;margin-bottom:14px;}
+.footer .f-col h4{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#fff;margin:0 0 12px;}
+.footer .f-col a{display:block;font-size:13px;margin-bottom:8px;color:#b0b8c1;transition:color .16s;}
+.footer .f-col a:hover{color:#fff;}
+.footer .f-meta{grid-column:1/-1;margin-top:28px;padding-top:16px;border-top:1px solid #24304a;font-size:11px;font-family:var(--mono);letter-spacing:.04em;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
 
-/* filter-toggle (mobile only) */
-.filter-toggle{display:none;height:36px;padding:0 13px;border:1px solid var(--border);border-radius:4px;background:var(--wg-cream);
-  font-family:var(--sans);font-size:13px;font-weight:600;color:var(--navy);align-items:center;gap:7px;}
-.filter-toggle svg{width:15px;height:15px;}
-
-/* ============================================================
-   Responsive
-   ============================================================ */
-@media (max-width:1100px){
-  .cardgrid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));}
-}
-@media (max-width:900px){
+/* ============ RESPONSIVE ============ */
+@media (max-width:1080px){
   .layout{grid-template-columns:1fr;}
-  .rail{display:none;}
-  .interstitial{display:block;grid-column:1/-1;}
-  .cardgrid{grid-template-columns:repeat(2,1fr);}
-  .evcard.premium{grid-column:span 2;}
+  .rail{position:static;flex-direction:row;flex-wrap:wrap;}
+  .rail-card{flex:1;min-width:280px;}
+  .masthead h1{font-size:72px;}
+}
+@media (max-width:820px){
+  .nav{display:none;}
+  .header-search{display:none;}
+  .footer-inner{grid-template-columns:1fr 1fr;}
 }
 @media (max-width:640px){
-  .topnav{padding:11px 16px;}
-  .navlinks{display:none;}
-  .hero{padding:22px 16px 10px;}
-  .hero h1{font-size:34px;}
-  .controls{padding:0 16px;}
-  .controlbar{gap:8px;}
-  .viewswitch{order:1;}
-  .controlbar .spacer{order:2;display:block;}
-  .add-event{order:3;}
-  .searchwrap{order:4;flex:1 1 100%;max-width:none;}
-  .filter-toggle{display:flex;order:5;}
-  .desktop-filters{display:none;}
-  .add-event span{display:none;}
-  .add-event{padding:0 12px;}
-  .layout{padding:0 16px 40px;margin-top:16px;}
-  .cardgrid{grid-template-columns:1fr;}
-  .evcard.premium{grid-column:span 1;}
-  .listthumb{width:96px;flex:0 0 96px;}
-  .drawer{width:100vw;max-width:100vw;transform:translateY(100%);border-radius:14px 14px 0 0;height:96vh;top:auto;bottom:0;}
-  .drawer.open{transform:translateY(0);}
-  .mapshell{height:calc(100vh - 230px);min-height:400px;border-radius:0;border-left:none;border-right:none;}
+  .wrap,.layout{padding-left:16px;padding-right:16px;}
+  .header{padding:13px 16px;}
+  .ribbon{padding:9px 16px;font-size:10px;gap:10px;flex-wrap:wrap;}
+  .ribbon .weather{display:none;}
+  .ribbon .r-cta{margin-left:0;}
+  .masthead{padding:34px 16px 22px;}
+  .masthead h1{font-size:52px;}
+  .masthead .dek{font-size:16px;}
+  .controls{padding:14px 16px;gap:10px;}
+  .controls-rule{margin:0 16px;}
+  .btn-filters{display:flex;align-items:center;gap:8px;font-family:var(--sans);font-size:13px;font-weight:600;border:1px solid var(--border);background:var(--cream);border-radius:3px;padding:9px 14px;color:var(--navy);}
+  .ctrl-search,.dd,.controls .spacer{display:none;}
+  .controls.filters-open .ctrl-search,.controls.filters-open .dd{display:flex;width:100%;}
+  .controls.filters-open .ctrl-search input{width:100%;}
+  .controls.filters-open .dd-btn{width:100%;}
+  .btn-add span.lbl{display:none;}
+  .layout{grid-template-columns:1fr;gap:0;padding-top:18px;}
+  .rail{display:none;}
+  .hero-row{grid-template-columns:1fr;}
+  .hero-big{min-height:340px;}
+  .hero-big h2{font-size:30px;}
+  .hero-side-col{grid-template-rows:200px 200px;}
+  .card-grid{grid-template-columns:1fr;gap:22px;}
+  .rail-inline{display:block;margin:26px 0;}
+  .section-head h2{font-size:24px;}
+  .cal-cell{min-height:78px;padding:5px;}
+  .cal-cell .c-num{font-size:10px;}
+  .cal-chip{font-size:9px;padding:2px 4px;}
+  .cal-chip .c-time{display:none;}
+  .cal-weekdays div{padding:8px 5px;font-size:8px;}
+  .list-thumb{width:72px;height:56px;}
+  .list-title{font-size:18px;}
+  .list-right .list-dist{display:none;}
+  .map-shell{height:calc(100vh - 118px);}
+  .map-title{display:none;}
   .map-legend{display:none;}
-  .mapchips{
-    display:flex;gap:7px;overflow-x:auto;padding:11px 16px;margin:0 -16px;
-    -webkit-overflow-scrolling:touch;scrollbar-width:none;
-  }
-  .mapchips::-webkit-scrollbar{display:none;}
-  .mapchip{flex:0 0 auto;height:32px;padding:0 12px;border:1px solid var(--border);border-radius:4px;background:var(--cream-dark);
-    font-family:var(--sans);font-size:12px;font-weight:600;color:var(--navy);display:flex;align-items:center;gap:6px;white-space:nowrap;}
-  .mapchip .swatch{width:8px;height:8px;border-radius:2px;}
-  /* mobile sticky sponsor */
-  .mobile-sponsor{
-    display:flex;position:fixed;left:0;right:0;bottom:0;z-index:70;align-items:center;gap:11px;
-    background:var(--navy);color:var(--wg-cream);padding:10px 14px;border-top:2px solid var(--gold);
-  }
-  .mobile-sponsor.hidden{display:none;}
-  .mobile-sponsor .ms-tag{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;}
-  .mobile-sponsor .ms-name{font-family:var(--serif);font-size:14px;color:#fff;}
-  .mobile-sponsor .ms-sub{font-family:var(--sans);font-size:11px;color:#b9c6d6;}
-  .mobile-sponsor .ms-close{margin-left:auto;background:transparent;border:none;color:#9fb0c6;font-size:20px;line-height:1;padding:0 4px;}
-  .foot{padding-bottom:80px;}
+  .map-days{width:calc(100% - 36px);left:18px;transform:none;justify-content:center;}
+  .sticky-sponsor{display:flex;}
+  body.view-map .sticky-sponsor{display:none;}
+  .drawer{width:100vw;}
+  .dr-title{font-size:28px;}
+  .footer-inner{grid-template-columns:1fr;gap:22px;}
+}
+
+/* mobile map bottom category bar */
+.map-mobile-bar{display:none;}
+@media (max-width:640px){
+  .map-mobile-bar{display:flex;position:absolute;bottom:16px;left:0;right:0;gap:8px;padding:0 14px;overflow-x:auto;z-index:6;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .map-mobile-bar::-webkit-scrollbar{display:none;}
+  .mmb-chip{font-family:var(--mono);font-size:11px;font-weight:600;white-space:nowrap;background:var(--cream);border:1px solid var(--border);border-radius:3px;padding:8px 12px;display:flex;align-items:center;gap:7px;color:var(--ink);box-shadow:var(--shadow-sm);}
+  .mmb-chip.off{opacity:.45;}
+  .mmb-chip .dot{width:8px;height:8px;border-radius:2px;}
 }
 </style>
 </head>
-<body>
+<body class="view-card">
 
-<!-- ===================== TOP NAV ===================== -->
-<nav class="topnav">
-  <div class="wordmark">WilCo Guide<small>Williamson County TX</small></div>
-  <div class="navlinks">
+<!-- HEADER -->
+<header class="header">
+  <div class="brand">
+    <div class="wordmark">WilCo <em>Guide</em></div>
+    <div class="sub">WILLIAMSON COUNTY, TX</div>
+  </div>
+  <nav class="nav">
     <a href="#">Directory</a>
     <a href="#" class="active">Events</a>
     <a href="#">Newsletter</a>
-    <a href="#">For Business</a>
+  </nav>
+  <div class="header-actions">
+    <div class="header-search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input type="text" placeholder="Search WilCo" aria-label="Search" />
+    </div>
+    <button class="btn-subscribe">Subscribe</button>
   </div>
-  <div class="nav-right">
-    <a href="#" class="subscribe">Subscribe</a>
-  </div>
-</nav>
-
-<!-- ===================== HERO ===================== -->
-<header class="hero">
-  <div class="kicker">Leander + Cedar Park</div>
-  <h1>Events</h1>
-  <p class="dek">Every local happening in one place: markets, music, garage sales, school games and more, updated for the week ahead.</p>
 </header>
 
-<!-- ===================== CONTROL BAR ===================== -->
-<div class="controls">
-  <div class="controlbar">
-    <!-- view switcher -->
-    <div class="viewswitch" id="viewswitch">
-      <button class="viewbtn active" data-view="card" title="Card view" aria-label="Card view">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+<!-- NAVY RIBBON -->
+<div class="ribbon">
+  <span class="r-label">THIS WEEKEND IN WILCO</span>
+  <span class="chip">FRI JUL 24 - SUN JUL 26</span>
+  <span class="weather"><span class="dot"></span>94&deg; · Sunny</span>
+  <a href="#" class="r-cta">Submit an event &rarr;</a>
+</div>
+
+<!-- MASTHEAD -->
+<div class="masthead">
+  <div class="kicker">LEANDER + CEDAR PARK</div>
+  <h1>Events</h1>
+  <p class="dek">Everything worth leaving the house for this weekend, gathered and vetted by neighbors who actually live here.</p>
+  <div class="meta"><b>16 EVENTS</b> THIS WEEKEND · <b>9 CATEGORIES</b> · UPDATED EVERY FRIDAY</div>
+</div>
+
+<!-- CONTROL BAR -->
+<hr class="controls-rule" />
+<div class="wrap">
+  <div class="controls" id="controls">
+    <div class="view-switch" id="viewSwitch">
+      <button data-view="card" class="active" title="Card grid" aria-label="Card grid">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       </button>
-      <button class="viewbtn" data-view="list" title="List view" aria-label="List view">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3.5" cy="6" r="1.3" fill="currentColor" stroke="none"/><circle cx="3.5" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="3.5" cy="18" r="1.3" fill="currentColor" stroke="none"/></svg>
+      <button data-view="list" title="List" aria-label="List">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3.5" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="3.5" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="3.5" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>
       </button>
-      <button class="viewbtn" data-view="calendar" title="Calendar view" aria-label="Calendar view">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+      <button data-view="calendar" title="Calendar" aria-label="Calendar">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
       </button>
-      <button class="viewbtn" data-view="map" title="Map view" aria-label="Map view">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
+      <button data-view="map" title="Map" aria-label="Map">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3L3 5v16l6-2 6 2 6-2V3l-6 2-6-2z"/><line x1="9" y1="3" x2="9" y2="19"/><line x1="15" y1="5" x2="15" y2="21"/></svg>
       </button>
     </div>
 
-    <!-- search -->
-    <div class="searchwrap">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input id="search" type="text" placeholder="Search events, venues..." autocomplete="off" />
-    </div>
-
-    <!-- desktop filters -->
-    <div class="desktop-filters">
-      <div class="dd" id="dd-type">
-        <button class="dd-btn" data-dd="type"><span id="type-label">All Events</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
-        <div class="dd-menu"></div>
-      </div>
-      <div class="dd" id="dd-sort">
-        <button class="dd-btn" data-dd="sort"><span id="sort-label">Soonest</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
-        <div class="dd-menu"></div>
-      </div>
-      <div class="dd" id="dd-date">
-        <button class="dd-btn" data-dd="date"><span id="date-label">Any Date</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
-        <div class="dd-menu"></div>
-      </div>
-      <div class="dd" id="dd-radius">
-        <button class="dd-btn" data-dd="radius"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--rust)"><path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.4"/></svg><span id="radius-label">Within 25 miles</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
-        <div class="dd-menu"></div>
-      </div>
-    </div>
-
-    <!-- mobile filter toggle -->
-    <button class="filter-toggle" id="filterToggle">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+    <button class="btn-filters" id="btnFilters">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
       Filters
     </button>
 
+    <div class="ctrl-search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input type="text" id="searchInput" placeholder="Search events" aria-label="Search events" />
+    </div>
+
+    <div class="dd" id="ddType"></div>
+    <div class="dd" id="ddSort"></div>
+    <div class="dd" id="ddDate"></div>
+    <div class="dd" id="ddRadius"></div>
+
     <div class="spacer"></div>
-    <button class="add-event"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>Add Event</span></button>
+    <button class="btn-add">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span class="lbl">Add Event</span>
+    </button>
   </div>
 </div>
 
-<!-- ===================== BODY LAYOUT ===================== -->
-<div class="layout" id="layout">
-  <div class="viewarea">
-    <p class="resultline" id="resultline">16 events</p>
-
-    <!-- CARD VIEW -->
-    <div class="cardgrid" id="cardview"></div>
-
-    <!-- LIST VIEW -->
-    <div class="listview" id="listview" style="display:none;"></div>
-
-    <!-- CALENDAR VIEW -->
-    <div class="calwrap" id="calview" style="display:none;">
-      <div class="calhead">
-        <h2>July 2026</h2>
-        <span class="mono">Leander + Cedar Park</span>
-      </div>
-      <div class="calgrid" id="calgrid"></div>
-    </div>
-
-    <!-- MAP VIEW -->
-    <div class="mapview" id="mapview">
-      <div class="mapshell">
-        <div id="map"></div>
-        <div class="map-toggle" id="mapToggle">
-          <button class="active" data-layer="events">Events</button>
-          <button data-layer="closures">Road Closures</button>
-        </div>
-        <div class="map-legend">
-          <h4>Filter Map</h4>
-          <div id="legendRows"></div>
-        </div>
-      </div>
-      <div class="mapchips" id="mapchips"></div>
-    </div>
+<!-- LAYOUT (card/list/calendar) -->
+<div class="layout">
+  <div class="view-area">
+    <div class="view active" id="view-card"></div>
+    <div class="view" id="view-list"></div>
+    <div class="view" id="view-calendar"></div>
   </div>
 
-  <!-- RIGHT RAIL -->
-  <aside class="rail" id="rail">
-    <div class="railcard">
-      <div class="sponsor-tag">Sponsor</div>
-      <img src="https://picsum.photos/seed/hill-country-bank/480/270" alt="Hill Country Bank" />
-      <div class="rc-body">
-        <p class="rc-name">Hill Country Bank</p>
-        <p class="rc-copy">Local banking built for Williamson County families since 1974. No-fee checking for new neighbors.</p>
-        <a href="#" class="rc-link">Open an account &rarr;</a>
-      </div>
-    </div>
-    <div class="greetcard">
-      <div class="goldbar"></div>
-      <div class="gc-body">
-        <div class="gc-kick">&#9733; Local Giveaway</div>
-        <h3>Enter to win Leander Summer Concert tickets</h3>
-        <p>Two front-row seats plus parking. Drawn Friday. Free to enter.</p>
-        <form class="greetform" onsubmit="return greetSubmit(event)">
-          <input type="email" placeholder="you@email.com" required />
-          <button type="submit">Enter</button>
-        </form>
-        <p class="greetpow">Powered by greetform</p>
-      </div>
-    </div>
-    <div class="signupcard">
-      <div class="su-kick">The Weekly Scoop</div>
-      <h3>Never miss a local event</h3>
-      <p>Get the WilCo Guide events roundup every Thursday morning.</p>
-      <form class="su-form" onsubmit="return greetSubmit(event)">
-        <input type="email" placeholder="you@email.com" required />
-        <button type="submit">Join</button>
-      </form>
-    </div>
-    <div class="railcard">
-      <div class="sponsor-tag">Sponsor</div>
-      <img src="https://picsum.photos/seed/rail-house-eats/480/270" alt="The Rail House" />
-      <div class="rc-body">
-        <p class="rc-name">The Rail House Kitchen</p>
-        <p class="rc-copy">Live jazz brunch every Sunday in Old Town Leander. Reserve a patio table this weekend.</p>
-        <a href="#" class="rc-link">See the menu &rarr;</a>
-      </div>
-    </div>
-  </aside>
+  <aside class="rail" id="rail"></aside>
 </div>
 
-<!-- ===================== FOOTER ===================== -->
-<footer class="foot">
-  <span class="fm">PROTOTYPE v2 &middot; mock data &middot; lightbreak x WilCo Guide</span>
+<!-- MAP SHELL -->
+<div class="map-shell">
+  <div id="map"></div>
+  <div class="map-float map-title">
+    <div class="mt-mark">WILCO EVENT MAP</div>
+    <div class="mt-name">This Weekend</div>
+    <div class="mt-sub">Jul 24 to 26 · 16 events</div>
+  </div>
+  <div class="map-float map-days" id="mapDays">
+    <button data-day="all" class="active">ALL</button>
+    <button data-day="Fri">FRI</button>
+    <button data-day="Sat">SAT</button>
+    <button data-day="Sun">SUN</button>
+  </div>
+  <div class="map-float map-legend" id="mapLegend"></div>
+  <div class="map-mobile-bar" id="mapMobileBar"></div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="f-col">
+      <div class="f-logo">WilCo <em>Guide</em></div>
+      <p class="f-tag">The local record for Williamson County. Directory, events, and a weekly newsletter for the people who live here.</p>
+    </div>
+    <div class="f-col">
+      <h4>Explore</h4>
+      <a href="#">Directory</a><a href="#">Events</a><a href="#">Newsletter</a><a href="#">Submit an event</a>
+    </div>
+    <div class="f-col">
+      <h4>Places</h4>
+      <a href="#">Leander</a><a href="#">Cedar Park</a><a href="#">Liberty Hill</a><a href="#">Georgetown</a>
+    </div>
+    <div class="f-col">
+      <h4>For Business</h4>
+      <a href="#">Advertise</a><a href="#">Sponsorships</a><a href="#">Claim a listing</a>
+    </div>
+    <div class="f-meta">
+      <span>&copy; 2026 WilCo Guide · Liberty Hill, TX</span>
+      <span>Updated every Friday morning</span>
+    </div>
+  </div>
 </footer>
 
-<!-- ===================== DRAWER (own event page) ===================== -->
-<div class="scrim" id="scrim" onclick="closeDrawer()"></div>
-<div class="drawer" id="drawer" role="dialog" aria-modal="true">
-  <button class="drawer-close" onclick="closeDrawer()" aria-label="Close">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+<!-- STICKY MOBILE SPONSOR -->
+<div class="sticky-sponsor" id="stickySponsor">
+  <div class="ss-mono">HC</div>
+  <div class="ss-text">
+    <div class="ss-kicker">SPONSOR</div>
+    <div class="ss-name">Hill Country Bank</div>
+  </div>
+  <a href="#" class="ss-cta">Open account &rarr;</a>
+  <button class="ss-x" id="ssClose" aria-label="Dismiss">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
   </button>
-  <div class="drawer-hero"><img id="d-img" src="" alt="" /></div>
-  <div class="drawer-body">
-    <div class="cat-kicker" id="d-cat"></div>
-    <h1 id="d-title"></h1>
-    <div class="drawer-datebar">
-      <div class="drow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg><span id="d-date"></span></div>
-      <div class="drow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg><span id="d-time"></span></div>
-      <div class="drow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.4"/></svg><span id="d-place"></span></div>
-    </div>
-    <p class="drawer-desc" id="d-desc"></p>
-    <div class="drawer-actions">
-      <button class="btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>Get tickets / View original</button>
-      <button class="btn-secondary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="12" y1="13" x2="12" y2="17"/><line x1="10" y1="15" x2="14" y2="15"/></svg>Add to calendar</button>
-    </div>
-    <p class="seo-note">This is your WilCo Guide event page &middot; a real indexable page we host, great for local SEO. We turn every event into our own page instead of linking away.</p>
-  </div>
 </div>
 
-<!-- ===================== MOBILE STICKY SPONSOR ===================== -->
-<div class="mobile-sponsor" id="mobileSponsor">
-  <span class="ms-tag">Sponsor</span>
-  <div>
-    <div class="ms-name">Hill Country Bank</div>
-    <div class="ms-sub">No-fee checking for neighbors</div>
-  </div>
-  <button class="ms-close" aria-label="Dismiss">&times;</button>
-</div>
+<!-- DRAWER -->
+<div class="overlay" id="overlay"></div>
+<div class="drawer" id="drawer"></div>
 
-<script src="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.js"></script>
 <script>
-/* ============================================================
-   DATA
-   ============================================================ */
-const CAT = {
-  'Family':        {color:'var(--cat-family)',  hex:'#123260'},
-  'Music':         {color:'var(--cat-music)',   hex:'#6b4a86'},
-  'Markets':       {color:'var(--cat-markets)', hex:'#8a6d1f'},
-  'Food & Drink':  {color:'var(--cat-food)',    hex:'#a84e30'},
-  'Garage Sales':  {color:'var(--cat-garage)',  hex:'#2f6b4f'},
-  'Estate Sales':  {color:'var(--cat-estate)',  hex:'#4a5a7a'},
-  'Kids & School': {color:'var(--cat-kids)',    hex:'#2f6f7a'},
-  'City & Gov':    {color:'var(--cat-city)',    hex:'#3a3f52'},
-  'Outdoors':      {color:'var(--cat-outdoors)',hex:'#3d7040'}
+/* ================= DATA ================= */
+const CATS = {
+  "Family":       {hex:"#ba6f5e"},
+  "Music":        {hex:"#a84e30"},
+  "Markets":      {hex:"#b5852a"},
+  "Food & Drink": {hex:"#2a7f8f"},
+  "Garage Sales": {hex:"#8a7f6a"},
+  "Estate Sales": {hex:"#8a5a6a"},
+  "Kids & School":{hex:"#123260"},
+  "City & Gov":   {hex:"#4a5a72"},
+  "Outdoors":     {hex:"#2d6a4f"}
 };
 
 const EVENTS = [
-  {title:"Leander Farmers Market", category:"Markets", date:"2026-07-25", time:"9:00 AM", city:"Leander", venue:"Sarah's Market, Old Town", lat:30.5744, lng:-97.8530, tier:"featured", desc:"Fresh Hill Country produce, local honey, handmade goods and food trucks fill Old Town Leander every Saturday morning. Live acoustic music from 10am and a kids corner with face painting. Rain or shine under the pavilion.", slug:"leander-farmers-market"},
-  {title:"Summer Concert Series", category:"Music", date:"2026-07-25", time:"7:30 PM", city:"Leander", venue:"Robin Bledsoe Park", lat:30.5090, lng:-97.8230, tier:"premium", desc:"The City of Leander closes out July with a full band under the stars at Robin Bledsoe Park. Bring lawn chairs and blankets. Food and drink vendors on site. Free admission, VIP front-row seating available.", slug:"summer-concert-series"},
-  {title:"Old Town Leander Garage Sale", category:"Garage Sales", date:"2026-07-25", time:"8:00 AM", city:"Leander", venue:"200 W Willis St", lat:30.5810, lng:-97.8590, tier:"standard", desc:"Neighborhood-wide garage sale across Old Town. Furniture, tools, kids gear, vintage finds and more across 20-plus homes. Early birds welcome, cash preferred.", slug:"old-town-garage-sale"},
-  {title:"Estate Sale on Crystal Falls", category:"Estate Sales", date:"2026-07-25", time:"10:00 AM", city:"Leander", venue:"Crystal Falls Pkwy", lat:30.5960, lng:-97.8700, tier:"standard", desc:"Full-house estate sale featuring mid-century furniture, fine china, tools, patio sets and collectibles. Professionally managed, numbers handed out at 9:30am.", slug:"estate-sale-crystal-falls"},
-  {title:"Leander HS Football vs Rouse", category:"Kids & School", date:"2026-07-24", time:"7:00 PM", city:"Leander", venue:"Leander HS Stadium", lat:30.5730, lng:-97.8600, tier:"standard", desc:"The Lions host the Rouse Raiders in a preseason scrimmage. Concessions and spirit gear on site. Gates open at 6pm, students free with ID.", slug:"leander-hs-football"},
-  {title:"Toddler Storytime", category:"Kids & School", date:"2026-07-24", time:"10:30 AM", city:"Cedar Park", venue:"Cedar Park Library", lat:30.5217, lng:-97.8200, tier:"standard", desc:"Songs, rhymes and picture books for ages 1 to 3 with a caregiver. Free, no registration needed. Stay after for open playtime in the childrens area.", slug:"toddler-storytime"},
-  {title:"Food Truck Friday", category:"Food & Drink", date:"2026-07-24", time:"5:00 PM", city:"Cedar Park", venue:"Lakeline lot", lat:30.4680, lng:-97.7960, tier:"featured", desc:"A dozen of Central Texas best food trucks gather at the Lakeline lot every Friday evening. Live music, cold local beer, and picnic seating. Family and dog friendly.", slug:"food-truck-friday"},
-  {title:"Trivia Night", category:"Food & Drink", date:"2026-07-24", time:"8:00 PM", city:"Cedar Park", venue:"Growler USA", lat:30.5150, lng:-97.8180, tier:"standard", desc:"Team trivia every Friday at Growler USA. Six rounds, prizes for the top three teams. Arrive early to grab a booth, teams up to six.", slug:"trivia-night"},
-  {title:"City Council Meeting", category:"City & Gov", date:"2026-07-24", time:"6:30 PM", city:"Leander", venue:"Leander City Hall", lat:30.5788, lng:-97.8531, tier:"standard", desc:"Regular session of the Leander City Council. Public comment opens the agenda. Livestreamed and open to all residents. Agenda posted 72 hours in advance.", slug:"city-council-meeting"},
-  {title:"Brushy Creek Trail Cleanup", category:"Outdoors", date:"2026-07-25", time:"8:00 AM", city:"Cedar Park", venue:"Brushy Creek Lake Park", lat:30.5100, lng:-97.7900, tier:"standard", desc:"Volunteer morning to keep the Brushy Creek trail system clean. Gloves, bags and water provided. Meet at the main pavilion, great for scout and service hours.", slug:"brushy-creek-cleanup"},
-  {title:"Vintage Market Days", category:"Markets", date:"2026-07-26", time:"10:00 AM", city:"Cedar Park", venue:"Cedar Park Center", lat:30.4700, lng:-97.8020, tier:"featured", desc:"A curated indoor market of antiques, repurposed decor, artisan goods and vintage clothing from 80-plus vendors. Air conditioned, food court on site.", slug:"vintage-market-days"},
-  {title:"Yard Sale on Bagdad Rd", category:"Garage Sales", date:"2026-07-25", time:"7:30 AM", city:"Leander", venue:"Bagdad Rd", lat:30.5600, lng:-97.8700, tier:"standard", desc:"Multi-family yard sale on Bagdad Road. Baby gear, sporting goods, home decor and a few pieces of furniture. Everything priced to move by noon.", slug:"yard-sale-bagdad"},
-  {title:"Sculpture Garden Walk", category:"Outdoors", date:"2026-07-26", time:"2:00 PM", city:"Liberty Hill", venue:"Liberty Hill", lat:30.6649, lng:-97.9247, tier:"standard", desc:"A guided afternoon walk through Liberty Hills outdoor sculpture collection. Free docent-led tour departs from the visitor center. Wear comfortable shoes.", slug:"sculpture-garden-walk"},
-  {title:"Family Movie in the Park", category:"Family", date:"2026-07-26", time:"8:30 PM", city:"Leander", venue:"Devine Lake Park", lat:30.5800, lng:-97.8400, tier:"featured", desc:"An outdoor family film on the big inflatable screen at Devine Lake Park. Bring blankets and low chairs. Popcorn and snow cones from local vendors. Free admission.", slug:"family-movie-park"},
-  {title:"Farmers Market Yoga", category:"Family", date:"2026-07-26", time:"9:00 AM", city:"Cedar Park", venue:"Elizabeth Milburn Park", lat:30.5050, lng:-97.8250, tier:"standard", desc:"All-levels outdoor yoga on the green at Elizabeth Milburn Park. Bring your own mat and water. Instructor-led, donation based, kids welcome to join.", slug:"farmers-market-yoga"},
-  {title:"Live Jazz Brunch", category:"Music", date:"2026-07-26", time:"11:00 AM", city:"Leander", venue:"The Rail House", lat:30.5720, lng:-97.8560, tier:"standard", desc:"Sunday jazz brunch at The Rail House in Old Town Leander. A rotating trio, bottomless mimosas and a Southern brunch menu. Reservations recommended.", slug:"live-jazz-brunch"}
+  {id:1, title:"Leander Farmers Market", cat:"Markets", date:"2026-07-25", time:"9:00 AM", city:"Leander", venue:"Sarah's Market, Old Town", lat:30.5744, lng:-97.8530, tier:"featured", seed:"farmers-market-leander", desc:"Sixty local growers, bakers, and makers fill Old Town every Saturday morning. Peaches from the Hill Country, fresh tortillas, cut flowers, and live acoustic music while you shop. Bring a tote and cash for the smaller stalls."},
+  {id:2, title:"Summer Concert Series", cat:"Music", date:"2026-07-25", time:"7:30 PM", city:"Leander", venue:"Robin Bledsoe Park", lat:30.5090, lng:-97.8230, tier:"premium", seed:"summer-concert-stage", desc:"The city's free outdoor concert returns with a nine-piece soul and funk band under the pavilion. Food trucks open at six, music at seven thirty. Pack a blanket and low chairs. Kids and leashed dogs welcome."},
+  {id:3, title:"Old Town Garage Sale", cat:"Garage Sales", date:"2026-07-25", time:"8:00 AM", city:"Leander", venue:"200 W Willis St", lat:30.5810, lng:-97.8590, tier:"standard", seed:"garage-sale-oldtown", desc:"A whole block of neighbors clearing out closets, garages, and attics. Tools, furniture, vinyl, kids gear, and the occasional real find. Early birds welcome, most stalls run cash only."},
+  {id:4, title:"Estate Sale on Crystal Falls", cat:"Estate Sales", date:"2026-07-25", time:"10:00 AM", city:"Leander", venue:"Crystal Falls Pkwy", lat:30.5960, lng:-97.8700, tier:"standard", seed:"estate-sale-house", desc:"A carefully cataloged estate sale featuring mid-century furniture, fine china, garden tools, and a small library of first editions. Numbered entry starts at ten. Everything must go by Sunday afternoon."},
+  {id:5, title:"Leander HS Football vs Rouse", cat:"Kids & School", date:"2026-07-24", time:"7:00 PM", city:"Leander", venue:"Leander HS Stadium", lat:30.5730, lng:-97.8600, tier:"standard", seed:"friday-night-football", desc:"The first scrimmage of the season under the Friday night lights. Gates open at six, band and drumline at six forty five. Concessions benefit the booster club. Wear blue and white."},
+  {id:6, title:"Toddler Storytime", cat:"Kids & School", date:"2026-07-24", time:"10:30 AM", city:"Cedar Park", venue:"Cedar Park Library", lat:30.5217, lng:-97.8200, tier:"standard", seed:"toddler-storytime", desc:"Songs, puppets, and picture books for little ones up to age four, led by the children's librarian. Free and no registration needed. Stay after for the play mats and craft table."},
+  {id:7, title:"Food Truck Friday", cat:"Food & Drink", date:"2026-07-24", time:"5:00 PM", city:"Cedar Park", venue:"Lakeline lot", lat:30.4680, lng:-97.7960, tier:"featured", seed:"food-truck-friday", desc:"A dozen of the area's best trucks in one lot: birria tacos, wood-fired pizza, Thai, and a rotating dessert truck. Local brewery pours on tap. Live DJ and picnic tables. Family and dog friendly."},
+  {id:8, title:"Trivia Night", cat:"Food & Drink", date:"2026-07-24", time:"8:00 PM", city:"Cedar Park", venue:"Growler USA", lat:30.5150, lng:-97.8180, tier:"standard", seed:"trivia-night-bar", desc:"Six rounds of pub trivia with a rotating host. Teams up to six, gift card prizes for the top three. Arrive by seven forty five to grab a table. Kitchen open late."},
+  {id:9, title:"City Council Meeting", cat:"City & Gov", date:"2026-07-24", time:"6:30 PM", city:"Leander", venue:"Leander City Hall", lat:30.5788, lng:-97.8531, tier:"standard", seed:"city-council-hall", desc:"Regular session of the Leander City Council. Agenda includes the parks bond update, a rezoning request on Bagdad Road, and public comment. Open to all residents, livestream available."},
+  {id:10, title:"Brushy Creek Trail Cleanup", cat:"Outdoors", date:"2026-07-25", time:"8:00 AM", city:"Cedar Park", venue:"Brushy Creek Lake Park", lat:30.5100, lng:-97.7900, tier:"standard", seed:"creek-trail-cleanup", desc:"Join the friends of Brushy Creek for a morning of trail cleanup and native planting. Gloves, bags, and water provided. Meet at the main pavilion. Great for scouts and service hours."},
+  {id:11, title:"Vintage Market Days", cat:"Markets", date:"2026-07-26", time:"10:00 AM", city:"Cedar Park", venue:"Cedar Park Center", lat:30.4700, lng:-97.8020, tier:"featured", seed:"vintage-market-days", desc:"An indoor curated vintage and handmade market with more than eighty vendors: antiques, restored furniture, candles, and small-batch goods. Coffee bar on site. Weekend pass covers all three days."},
+  {id:12, title:"Yard Sale on Bagdad Rd", cat:"Garage Sales", date:"2026-07-25", time:"7:30 AM", city:"Leander", venue:"Bagdad Rd", lat:30.5600, lng:-97.8700, tier:"standard", seed:"yard-sale-bagdad", desc:"A multi-family yard sale with tools, baby gear, bikes, and household goods. Priced to move, cash preferred. Signs posted from the main road. Rain moves it to Sunday."},
+  {id:13, title:"Sculpture Garden Walk", cat:"Outdoors", date:"2026-07-26", time:"2:00 PM", city:"Liberty Hill", venue:"Liberty Hill", lat:30.6649, lng:-97.9247, tier:"standard", seed:"sculpture-garden", desc:"A guided afternoon walk through Liberty Hill's outdoor sculpture collection, one of the oldest in Texas. The docent shares the story behind each piece. Wear a hat and comfortable shoes."},
+  {id:14, title:"Family Movie in the Park", cat:"Family", date:"2026-07-26", time:"8:30 PM", city:"Leander", venue:"Devine Lake Park", lat:30.5800, lng:-97.8400, tier:"featured", seed:"movie-in-park", desc:"A free outdoor screening on the big inflatable screen at dusk. Popcorn and snow cones for sale, proceeds to the parks fund. Bring blankets and bug spray. Feature starts once the sun is fully down."},
+  {id:15, title:"Farmers Market Yoga", cat:"Family", date:"2026-07-26", time:"9:00 AM", city:"Cedar Park", venue:"Elizabeth Milburn Park", lat:30.5050, lng:-97.8250, tier:"standard", seed:"park-yoga", desc:"An all-levels outdoor flow on the shaded lawn, led by a local studio. Mats and water encouraged. Donation based, benefits the parks department. Stay for the smoothie cart afterward."},
+  {id:16, title:"Live Jazz Brunch", cat:"Music", date:"2026-07-26", time:"11:00 AM", city:"Leander", venue:"The Rail House", lat:30.5720, lng:-97.8560, tier:"standard", seed:"jazz-brunch", desc:"A relaxed Sunday brunch with a live jazz trio, bottomless coffee, and a Southern-leaning menu. Patio seating fills fast, reservations recommended. Music runs eleven to two."}
 ];
 
-const CLOSURES = [
+const ROAD_CLOSURES = [
   {label:"US-183A ramp closure", lat:30.5850, lng:-97.8650},
   {label:"Bagdad Rd lane closure", lat:30.5600, lng:-97.8650}
 ];
 
-/* rough distance from Leander City Hall center for a "distance" value */
 const CENTER = {lat:30.5788, lng:-97.8531};
-function miles(a){
-  const dx=(a.lng-CENTER.lng)*54.6, dy=(a.lat-CENTER.lat)*69;
-  return Math.sqrt(dx*dx+dy*dy);
+
+function haversine(a,b){
+  const R=3958.8, toRad=x=>x*Math.PI/180;
+  const dLat=toRad(b.lat-a.lat), dLng=toRad(b.lng-a.lng);
+  const s=Math.sin(dLat/2)**2+Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*Math.sin(dLng/2)**2;
+  return R*2*Math.asin(Math.sqrt(s));
 }
-EVENTS.forEach(e=>{ e.dist = miles(e); e.saved=false; });
+EVENTS.forEach(e=>{
+  e.dist=haversine(CENTER,{lat:e.lat,lng:e.lng});
+  e.img=`https://picsum.photos/seed/${e.seed}/640/480`;
+  e.imgWide=`https://picsum.photos/seed/${e.seed}/960/540`;
+  const d=new Date(e.date+"T12:00:00");
+  e.dayName=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()];
+  e.dateShort=d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"}).toUpperCase();
+  e.dateLong=d.toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric",year:"numeric"});
+  e.dayNum=d.getDate();
+});
 
-/* ============================================================
-   STATE
-   ============================================================ */
-const state = { view:'card', search:'', type:'All Events', sort:'Soonest', date:'Any Date', radius:25 };
+/* ================= STATE ================= */
+const state={
+  view:"card", search:"", type:"All Events", sort:"Soonest",
+  date:"This Weekend", radius:"Within 25 miles",
+  saved:new Set(), mapDay:"all", catOn:new Set(Object.keys(CATS)), closures:false
+};
 
-const DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-const MONTH = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-function fmtDate(iso){ const d=new Date(iso+'T12:00:00'); return DOW[d.getDay()].toUpperCase()+', '+MONTH[d.getMonth()].toUpperCase()+' '+d.getDate(); }
-function fmtDateLong(iso){ const full=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']; const mf=['January','February','March','April','May','June','July','August','September','October','November','December']; const d=new Date(iso+'T12:00:00'); return full[d.getDay()]+', '+mf[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear(); }
-
-/* ============================================================
-   FILTER + SORT
-   ============================================================ */
+function timeMin(t){
+  const m=t.match(/(\d+):(\d+)\s*(AM|PM)/i);
+  let h=+m[1]%12; if(/PM/i.test(m[3]))h+=12;
+  return h*60+ +m[2];
+}
+function eventSortKey(e){
+  const order={"Fri":0,"Sat":1,"Sun":2};
+  return order[e.dayName]*10000+timeMin(e.time);
+}
 function getFiltered(){
-  let out = EVENTS.slice();
-  const q = state.search.trim().toLowerCase();
-  if(q){ out = out.filter(e => (e.title+' '+e.venue+' '+e.city+' '+e.category).toLowerCase().includes(q)); }
-  if(state.type!=='All Events'){ out = out.filter(e => e.category===state.type); }
-  if(state.date==='This Weekend'){ out = out.filter(e => ['2026-07-24','2026-07-25','2026-07-26'].includes(e.date)); }
-  if(state.date==='This Month'){ out = out.filter(e => e.date.startsWith('2026-07')); }
-  out = out.filter(e => e.dist <= state.radius);
-  if(state.sort==='Distance'){ out.sort((a,b)=>a.dist-b.dist); }
-  else { out.sort((a,b)=> a.date===b.date ? to24(a.time)-to24(b.time) : a.date.localeCompare(b.date)); }
-  return out;
-}
-function to24(t){ const m=t.match(/(\d+):(\d+)\s*(AM|PM)/i); let h=+m[1]%12; if(/pm/i.test(m[3]))h+=12; return h*60+ +m[2]; }
-
-/* ============================================================
-   RENDER: CARD VIEW
-   ============================================================ */
-function tierBadge(e){
-  if(e.tier==='featured') return '<div class="featbadge">&#9733; Featured</div>';
-  if(e.tier==='premium')  return '<div class="premtag">Premium</div>';
-  return '';
-}
-function renderCards(list){
-  const el = document.getElementById('cardview');
-  let html = '';
-  list.forEach((e,i)=>{
-    html += `<button class="evcard ${e.tier==='premium'?'premium':''}" onclick="openDrawer('${e.slug}')">
-      <div class="cardtop">
-        <div class="card-img-wrap">${tierBadge(e)}<img src="https://picsum.photos/seed/${e.slug}/480/360" alt="${e.title}" loading="lazy"/></div>
-      </div>
-      <div class="cardbody">
-        <span class="cat-kicker" style="color:${CAT[e.category].color}">${e.category}</span>
-        <h3 class="card-title">${e.title}</h3>
-        <span class="card-meta">${fmtDate(e.date)} &middot; ${e.time}</span>
-        <span class="card-place">${e.city} &middot; ${e.venue}</span>
-      </div>
-    </button>`;
-    if(i===2) html += interstitialSponsor();
-    if(i===7) html += interstitialGreet();
-  });
-  el.innerHTML = html;
-}
-function interstitialSponsor(){
-  return `<div class="interstitial railcard">
-    <div class="sponsor-tag">Sponsor</div>
-    <img src="https://picsum.photos/seed/hill-country-bank/480/270" alt="Hill Country Bank"/>
-    <div class="rc-body"><p class="rc-name">Hill Country Bank</p>
-    <p class="rc-copy">No-fee checking for Williamson County families since 1974.</p>
-    <a href="#" class="rc-link">Open an account &rarr;</a></div></div>`;
-}
-function interstitialGreet(){
-  return `<div class="interstitial greetcard"><div class="goldbar"></div>
-    <div class="gc-body"><div class="gc-kick">&#9733; Local Giveaway</div>
-    <h3>Win Leander Summer Concert tickets</h3>
-    <p>Two front-row seats plus parking. Free to enter.</p>
-    <form class="greetform" onsubmit="return greetSubmit(event)"><input type="email" placeholder="you@email.com" required/><button type="submit">Enter</button></form>
-    <p class="greetpow">Powered by greetform</p></div></div>`;
-}
-
-/* ============================================================
-   RENDER: LIST VIEW
-   ============================================================ */
-function renderList(list){
-  const el = document.getElementById('listview');
-  el.innerHTML = list.map(e=>`
-    <div class="listrow">
-      <button class="listthumb" onclick="openDrawer('${e.slug}')" style="border:none;padding:0;background:var(--border)">
-        <img src="https://picsum.photos/seed/${e.slug}/240/180" alt="${e.title}" loading="lazy"/>
-      </button>
-      <button class="listmid" onclick="openDrawer('${e.slug}')" style="border:none;background:transparent;">
-        <span class="cat-kicker" style="color:${CAT[e.category].color}">${e.category}</span>
-        <span class="card-title" style="font-size:17px">${e.title}</span>
-        <span class="listmeta">${fmtDate(e.date)} &middot; ${e.time} &middot; ${e.city} &middot; ${e.venue}</span>
-      </button>
-      <div class="listright">
-        <span class="dist">${e.dist.toFixed(1)} mi</span>
-        <button class="savebtn ${e.saved?'saved':''}" onclick="toggleSave(event,'${e.slug}',this)" aria-label="Save">
-          <svg viewBox="0 0 24 24" fill="${e.saved?'currentColor':'none'}" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-        </button>
-      </div>
-    </div>`).join('');
-}
-function toggleSave(ev, slug, btn){
-  ev.stopPropagation();
-  const e = EVENTS.find(x=>x.slug===slug); e.saved=!e.saved;
-  btn.classList.toggle('saved', e.saved);
-  btn.querySelector('svg').setAttribute('fill', e.saved?'currentColor':'none');
-}
-
-/* ============================================================
-   RENDER: CALENDAR VIEW (July 2026)
-   ============================================================ */
-function renderCalendar(list){
-  const grid = document.getElementById('calgrid');
-  let html = DOW.map(d=>`<div class="caldow">${d}</div>`).join('');
-  const first = new Date(2026,6,1).getDay(); // July=6
-  const daysIn = 31;
-  const byDay = {};
-  list.forEach(e=>{ const d=+e.date.slice(-2); (byDay[d]=byDay[d]||[]).push(e); });
-  for(let i=0;i<first;i++){ html += `<div class="calcell empty"></div>`; }
-  for(let d=1; d<=daysIn; d++){
-    const evs = byDay[d]||[];
-    const chips = evs.map(e=>`<button class="calchip" style="background:${CAT[e.category].color}" onclick="openDrawer('${e.slug}')" title="${e.title}">${e.title.length>16?e.title.slice(0,15)+'…':e.title} <span class="t">${e.time.replace(':00','')}</span></button>`).join('');
-    html += `<div class="calcell ${d===21?'today':''}"><span class="caldate">${d}</span>${chips}</div>`;
+  let list=EVENTS.slice();
+  if(state.type!=="All Events") list=list.filter(e=>e.cat===state.type);
+  if(state.search.trim()){
+    const q=state.search.toLowerCase();
+    list=list.filter(e=>(e.title+" "+e.cat+" "+e.city+" "+e.venue).toLowerCase().includes(q));
   }
-  const total = first + daysIn;
-  const trail = (7 - (total%7))%7;
-  for(let i=0;i<trail;i++){ html += `<div class="calcell empty"></div>`; }
-  grid.innerHTML = html;
+  if(state.date!=="This Weekend"){
+    const map={"Fri Jul 24":"Fri","Sat Jul 25":"Sat","Sun Jul 26":"Sun"};
+    list=list.filter(e=>e.dayName===map[state.date]);
+  }
+  const rad={"Within 10 miles":10,"Within 25 miles":25,"Within 50 miles":50}[state.radius];
+  if(rad) list=list.filter(e=>e.dist<=rad);
+  if(state.sort==="Distance") list.sort((a,b)=>a.dist-b.dist);
+  else list.sort((a,b)=>eventSortKey(a)-eventSortKey(b));
+  return list;
 }
 
-/* ============================================================
-   MAP VIEW (lazy init + resize on show)
-   ============================================================ */
-let map=null, markers=[], closureMarkers=[], mapLayer='events';
-function initMap(){
-  if(map) return;
-  map = new maplibregl.Map({
-    container:'map',
-    style:{
-      version:8,
-      sources:{ carto:{ type:'raster',
-        tiles:['https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png','https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png','https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'],
-        tileSize:256, attribution:'&copy; OpenStreetMap &copy; CARTO'} },
-      layers:[{id:'carto',type:'raster',source:'carto'}]
-    },
-    center:[-97.8531,30.5788], zoom:12, attributionControl:false
-  });
-  map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-left');
-  map.on('load', ()=>{ buildEventMarkers(); map.resize(); });
-}
-function markerEl(e){
-  const wrap=document.createElement('div');
-  const big = e.tier!=='standard';
-  wrap.className='pin'+(big?' big':'');
-  const dia=document.createElement('div');
-  dia.className='diamond';
-  dia.style.background=CAT[e.category].hex;
-  wrap.appendChild(dia);
-  wrap.addEventListener('click',()=>{
-    if(window.innerWidth<=640){ openDrawer(e.slug); return; }
-    new maplibregl.Popup({offset:16,closeButton:true})
-      .setLngLat([e.lng,e.lat])
-      .setHTML(popCard(e))
-      .addTo(map);
-  });
-  return wrap;
-}
-function popCard(e){
-  return `<div class="popcard">
-    <img src="https://picsum.photos/seed/${e.slug}/320/180" alt="${e.title}"/>
-    <div class="pcbody">
-      <span class="cat-kicker" style="color:${CAT[e.category].color}">${e.category}</span>
-      <h3>${e.title}</h3>
-      <div class="pcmeta">${fmtDate(e.date)} &middot; ${e.time} &middot; ${e.city}</div>
-      <button class="pcbtn" onclick="openDrawer('${e.slug}')">View event page</button>
-    </div></div>`;
-}
-function buildEventMarkers(){
-  markers.forEach(m=>m.remove()); markers=[];
-  getFiltered().forEach(e=>{
-    const m=new maplibregl.Marker({element:markerEl(e)}).setLngLat([e.lng,e.lat]).addTo(map);
-    markers.push(m);
-  });
-}
-function buildClosureMarkers(){
-  closureMarkers.forEach(m=>m.remove()); closureMarkers=[];
-  CLOSURES.forEach(c=>{
-    const wrap=document.createElement('div'); wrap.className='pin closure';
-    const d=document.createElement('div'); d.className='diamond';
-    const b=document.createElement('span'); b.className='bang'; b.textContent='!';
-    d.appendChild(b); wrap.appendChild(d);
-    wrap.addEventListener('click',()=>{
-      new maplibregl.Popup({offset:14}).setLngLat([c.lng,c.lat])
-        .setHTML(`<div class="popcard"><div class="pcbody"><span class="cat-kicker" style="color:var(--rust)">Road Closure</span><h3>${c.label}</h3><div class="pcmeta">Active this weekend</div></div></div>`).addTo(map);
+/* ================= DROPDOWNS ================= */
+function buildDropdown(el, lead, options, key, onSelect, withSwatch){
+  function render(){
+    const sel=state[key];
+    el.innerHTML=`
+      <button class="dd-btn">
+        <span class="dd-lead">${lead}</span>
+        <span class="dd-val">${sel}</span>
+        <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="dd-panel">
+        ${options.map(o=>`<div class="dd-opt${o===sel?" sel":""}" data-v="${o}">${withSwatch&&CATS[o]?`<span class="swatch" style="background:${CATS[o].hex}"></span>`:""}${o}</div>`).join("")}
+      </div>`;
+    el.querySelector(".dd-btn").onclick=e=>{e.stopPropagation();document.querySelectorAll(".dd.open").forEach(d=>{if(d!==el)d.classList.remove("open");});el.classList.toggle("open");};
+    el.querySelectorAll(".dd-opt").forEach(opt=>{
+      opt.onclick=()=>{state[key]=opt.dataset.v;el.classList.remove("open");render();onSelect();};
     });
-    closureMarkers.push(new maplibregl.Marker({element:wrap}).setLngLat([c.lng,c.lat]).addTo(map));
-  });
+  }
+  render();
 }
-function setMapLayer(layer){
-  mapLayer=layer;
-  if(layer==='events'){ markers.forEach(m=>m.getElement().style.display=''); closureMarkers.forEach(m=>m.remove()); closureMarkers=[]; }
-  else { buildClosureMarkers(); }
+document.addEventListener("click",()=>document.querySelectorAll(".dd.open").forEach(d=>d.classList.remove("open")));
+
+/* ================= SHARED ================= */
+function catDot(cat){return `<span class="dot" style="background:${CATS[cat].hex}"></span>`;}
+
+function cardHTML(e,idx){
+  const tag = e.tier==="featured" ? `<span class="tag-featured">&#9733; FEATURED</span>`
+            : e.tier==="premium" ? `<span class="tag-premium">PREMIUM</span>` : "";
+  const saved=state.saved.has(e.id)?"saved":"";
+  return `
+  <article class="ev-card reveal" style="animation-delay:${idx*45}ms" data-id="${e.id}">
+    <div class="ev-imgwrap">
+      <img src="${e.img}" alt="${e.title}" loading="lazy" />
+      ${tag}
+      <button class="ev-save ${saved}" data-save="${e.id}" aria-label="Save event">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="${saved?"currentColor":"none"}" stroke="currentColor" stroke-width="2"><path d="M5 3v18l7-5 7 5V3z"/></svg>
+      </button>
+    </div>
+    <div class="ev-body">
+      <div class="ev-kicker">${e.cat} · ${e.city}</div>
+      <h3 class="ev-title">${e.title}</h3>
+      <div class="ev-meta">${e.dateShort} · ${e.time} · ${e.venue}</div>
+      <div class="ev-foot">
+        <span class="ev-cat">${catDot(e.cat)}${e.cat}</span>
+        <span class="ev-details">Details &rarr;</span>
+      </div>
+    </div>
+  </article>`;
 }
 
-/* ============================================================
-   DRAWER
-   ============================================================ */
-function openDrawer(slug){
-  const e = EVENTS.find(x=>x.slug===slug); if(!e) return;
-  document.getElementById('d-img').src = `https://picsum.photos/seed/${e.slug}/640/480`;
-  document.getElementById('d-img').alt = e.title;
-  const c=document.getElementById('d-cat'); c.textContent=e.category; c.style.color=CAT[e.category].color;
-  document.getElementById('d-title').textContent=e.title;
-  document.getElementById('d-date').textContent=fmtDateLong(e.date);
-  document.getElementById('d-time').textContent=e.time;
-  document.getElementById('d-place').textContent=`${e.venue}, ${e.city}`;
-  document.getElementById('d-desc').textContent=e.desc;
-  document.getElementById('drawer').classList.add('open');
-  document.getElementById('scrim').classList.add('open');
-  document.body.style.overflow='hidden';
+/* ================= CARD VIEW ================= */
+function renderCard(){
+  const list=getFiltered();
+  const el=document.getElementById("view-card");
+  if(!list.length){el.innerHTML=`<div style="text-align:center;padding:80px 20px;font-family:var(--sans);color:var(--muted);">No events match those filters.</div>`;return;}
+
+  const big=list.find(e=>e.tier==="premium")||list.find(e=>e.tier==="featured")||list[0];
+  const sides=list.filter(e=>e.id!==big.id&&(e.tier==="featured"||e.tier==="premium")).slice(0,2);
+  while(sides.length<2){const f=list.find(e=>e.id!==big.id&&!sides.includes(e));if(!f)break;sides.push(f);}
+
+  const heroHTML = `
+    <div class="hero-row">
+      <div class="hero-big reveal" data-id="${big.id}">
+        <img src="${big.imgWide}" alt="${big.title}" />
+        <div class="hero-scrim"></div>
+        <div class="hero-content">
+          <span class="tag-featured">&#9733; ${big.tier==="premium"?"FEATURED · PREMIUM":"FEATURED"}</span>
+          <div class="h-kicker">${big.cat} · ${big.city}</div>
+          <h2>${big.title}</h2>
+          <div class="h-date">${catDot(big.cat)} ${big.dateShort} · ${big.time} · ${big.venue}</div>
+        </div>
+      </div>
+      <div class="hero-side-col">
+        ${sides.map((s,i)=>`
+          <div class="hero-side reveal" style="animation-delay:${(i+1)*70}ms" data-id="${s.id}">
+            <img src="${s.img}" alt="${s.title}" />
+            <div class="hero-scrim"></div>
+            ${s.tier==="featured"?`<span class="tag-featured">&#9733; FEATURED</span>`:""}
+            <div class="hero-content">
+              <div class="h-kicker">${s.cat} · ${s.city}</div>
+              <h3>${s.title}</h3>
+              <div class="h-date">${s.dateShort} · ${s.time}</div>
+            </div>
+          </div>`).join("")}
+      </div>
+    </div>`;
+
+  const gridHTML = `
+    <div class="section-head">
+      <div>
+        <span class="s-kicker">FRI JUL 24 - SUN JUL 26</span>
+        <h2>This Weekend</h2>
+      </div>
+      <span class="s-count">${list.length} EVENTS · ${new Set(list.map(e=>e.cat)).size} CATEGORIES</span>
+    </div>
+    <div class="card-grid">${list.map((e,i)=>cardHTML(e,i)).join("")}</div>`;
+
+  el.innerHTML=heroHTML+gridHTML;
+}
+
+/* ================= LIST VIEW ================= */
+function renderList(){
+  const list=getFiltered();
+  const el=document.getElementById("view-list");
+  if(!list.length){el.innerHTML=`<div style="text-align:center;padding:80px 20px;font-family:var(--sans);color:var(--muted);">No events match those filters.</div>`;return;}
+  const days=["Fri","Sat","Sun"];
+  let idx=0;
+  el.innerHTML=days.map(dn=>{
+    const evs=list.filter(e=>e.dayName===dn).sort((a,b)=>timeMin(a.time)-timeMin(b.time));
+    if(!evs.length)return "";
+    const full=evs[0].dateLong.replace(/, \d{4}$/,"");
+    return `
+      <div class="day-block">
+        <div class="day-head reveal">
+          <h2>${full}</h2>
+          <span class="d-count">${evs.length} EVENT${evs.length>1?"S":""}</span>
+        </div>
+        ${evs.map(e=>{
+          const saved=state.saved.has(e.id)?"saved":"";
+          return `
+          <div class="list-row reveal" style="animation-delay:${(idx++)*30}ms" data-id="${e.id}">
+            <div class="list-thumb"><img src="${e.img}" alt="${e.title}" loading="lazy"/></div>
+            <div class="list-main">
+              <div class="list-kicker">${catDot(e.cat)} ${e.cat} · ${e.city}</div>
+              <div class="list-title">${e.title}</div>
+              <div class="list-sub">${e.time} · ${e.city} · ${e.venue}</div>
+            </div>
+            <div class="list-right">
+              <div class="list-dist">${e.dist.toFixed(1)} mi<span>AWAY</span></div>
+              <button class="list-save ${saved}" data-save="${e.id}" aria-label="Save">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="${saved?"currentColor":"none"}" stroke="currentColor" stroke-width="2"><path d="M5 3v18l7-5 7 5V3z"/></svg>
+              </button>
+            </div>
+          </div>`;
+        }).join("")}
+      </div>`;
+  }).join("");
+}
+
+/* ================= CALENDAR VIEW ================= */
+function renderCalendar(){
+  const list=getFiltered();
+  const el=document.getElementById("view-calendar");
+  const year=2026, month=6;
+  const first=new Date(year,month,1);
+  const startDay=first.getDay();
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const today=21;
+
+  const byDate={};
+  list.forEach(e=>{(byDate[e.dayNum]=byDate[e.dayNum]||[]).push(e);});
+
+  let cells="";
+  const prevDays=new Date(year,month,0).getDate();
+  for(let i=startDay-1;i>=0;i--){cells+=`<div class="cal-cell out"><div class="c-num">${prevDays-i}</div></div>`;}
+  for(let d=1;d<=daysInMonth;d++){
+    const evs=(byDate[d]||[]).sort((a,b)=>timeMin(a.time)-timeMin(b.time));
+    const shown=evs.slice(0,3);
+    const more=evs.length-shown.length;
+    cells+=`<div class="cal-cell${d===today?" today":""}">
+      <div class="c-num">${d}</div>
+      ${shown.map(e=>`<div class="cal-chip" data-id="${e.id}" style="border-left-color:${CATS[e.cat].hex}"><span>${e.title}</span><span class="c-time">${e.time.replace(/:00/,"").replace(" ","")}</span></div>`).join("")}
+      ${more>0?`<div class="cal-more" data-day="${d}">+${more} more</div>`:""}
+    </div>`;
+  }
+  const total=startDay+daysInMonth;
+  const trail=(7-(total%7))%7;
+  for(let i=1;i<=trail;i++){cells+=`<div class="cal-cell out"><div class="c-num">${i}</div></div>`;}
+
+  el.innerHTML=`
+    <div class="cal-head">
+      <h2>July 2026</h2>
+      <span class="c-sub">${list.length} EVENTS THIS MONTH</span>
+    </div>
+    <div class="cal-weekdays">${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d=>`<div>${d}</div>`).join("")}</div>
+    <div class="cal-grid">${cells}</div>`;
+
+  el.querySelectorAll(".cal-more").forEach(m=>{
+    m.onclick=()=>{const d=+m.dataset.day;const evs=byDate[d];if(evs&&evs.length)openDrawer(evs[0].id);};
+  });
+}
+
+/* ================= RIGHT RAIL ================= */
+function railCards(){
+  return `
+  <div class="rail-card sponsor">
+    <div class="sp-head">
+      <div class="sp-mono">HC</div>
+      <div><div class="sp-kicker">SPONSOR</div><div class="sp-name">Hill Country Bank</div></div>
+    </div>
+    <div class="sp-body">
+      <p class="sp-copy">Banking built for Williamson County families since 1974. Open a free checking account at any of our five local branches.</p>
+      <a href="#" class="sp-cta">Find a branch near you &rarr;</a>
+    </div>
+    <div class="sp-foot">Local business · Member FDIC</div>
+  </div>
+
+  <div class="rail-card giveaway">
+    <div class="g-body">
+      <div class="g-kicker">&#9733; WEEKLY GIVEAWAY</div>
+      <div class="g-title">Win 2 tickets to the Leander Summer Concert</div>
+      <div class="g-form">
+        <input type="email" placeholder="you@email.com" aria-label="Email" />
+        <button>Enter</button>
+      </div>
+      <div class="g-powered">Powered by greetform</div>
+    </div>
+  </div>
+
+  <div class="rail-card news">
+    <div class="n-body">
+      <div class="n-kicker">THE WEEKEND WIRE</div>
+      <div class="n-title">Every event, in your inbox each Friday</div>
+      <p class="n-copy">Join 8,400 neighbors who get the WilCo weekend rundown before it happens.</p>
+      <div class="n-form">
+        <input type="email" placeholder="you@email.com" aria-label="Email" />
+        <button>Join</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="rail-card sponsor">
+    <div class="sp-head">
+      <div class="sp-mono">RB</div>
+      <div><div class="sp-kicker">SPONSOR</div><div class="sp-name">Reveille Barbecue Co.</div></div>
+    </div>
+    <div class="sp-body">
+      <p class="sp-copy">Central Texas brisket, smoked low and slow on Bagdad Road. Show this listing for a free side with any plate.</p>
+      <a href="#" class="sp-cta">See the menu &rarr;</a>
+    </div>
+    <div class="sp-foot">Local business · Leander, TX</div>
+  </div>`;
+}
+function renderRail(){document.getElementById("rail").innerHTML=railCards();}
+
+/* ================= DRAWER ================= */
+function openDrawer(id){
+  const e=EVENTS.find(x=>x.id===id);
+  if(!e)return;
+  const saved=state.saved.has(e.id);
+  const tag=e.tier==="featured"?`<span class="tag-featured">&#9733; FEATURED</span>`:e.tier==="premium"?`<span class="tag-premium" style="position:absolute;top:16px;left:16px;">PREMIUM</span>`:"";
+  document.getElementById("drawer").innerHTML=`
+    <button class="dr-close" id="drClose" aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+    </button>
+    <div class="dr-img"><img src="${e.imgWide}" alt="${e.title}"/>${tag}</div>
+    <div class="dr-body">
+      <div class="dr-kicker">${catDot(e.cat)} ${e.cat} · ${e.city}</div>
+      <h1 class="dr-title">${e.title}</h1>
+      <div class="dr-facts">
+        <div class="dr-fact"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg><span><b>${e.dateLong}</b></span></div>
+        <div class="dr-fact"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg><span>${e.time}</span></div>
+        <div class="dr-fact"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>${e.venue}, ${e.city} · ${e.dist.toFixed(1)} mi away</span></div>
+      </div>
+      <p class="dr-desc">${e.desc}</p>
+      <div class="dr-actions">
+        <a href="#" class="dr-primary">Get tickets / View original</a>
+        <div class="dr-secondary">
+          <button><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="12" y1="13" x2="12" y2="17"/><line x1="10" y1="15" x2="14" y2="15"/></svg>Add to calendar</button>
+          <button class="${saved?"saved":""}" id="drSave"><svg width="16" height="16" viewBox="0 0 24 24" fill="${saved?"currentColor":"none"}" stroke="currentColor" stroke-width="2"><path d="M5 3v18l7-5 7 5V3z"/></svg>${saved?"Saved":"Save"}</button>
+        </div>
+      </div>
+      <div class="dr-note">This is your WilCo Guide event page<br/>built for local SEO</div>
+    </div>`;
+  document.getElementById("drClose").onclick=closeDrawer;
+  document.getElementById("drSave").onclick=()=>{toggleSave(e.id);openDrawer(e.id);};
+  document.getElementById("overlay").classList.add("open");
+  document.getElementById("drawer").classList.add("open");
 }
 function closeDrawer(){
-  document.getElementById('drawer').classList.remove('open');
-  document.getElementById('scrim').classList.remove('open');
-  document.body.style.overflow='';
+  document.getElementById("overlay").classList.remove("open");
+  document.getElementById("drawer").classList.remove("open");
 }
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDrawer(); });
+document.getElementById("overlay").onclick=closeDrawer;
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDrawer();});
 
-/* ============================================================
-   VIEW SWITCH + RENDER ORCHESTRATION
-   ============================================================ */
-function render(){
-  const list = getFiltered();
-  document.getElementById('resultline').textContent = list.length+ ' event'+(list.length===1?'':'s');
-
-  const cardEl=document.getElementById('cardview');
-  const listEl=document.getElementById('listview');
-  const calEl=document.getElementById('calview');
-  const mapEl=document.getElementById('mapview');
-  const layout=document.getElementById('layout');
-
-  cardEl.style.display = state.view==='card'?'grid':'none';
-  listEl.style.display = state.view==='list'?'flex':'none';
-  calEl.style.display  = state.view==='calendar'?'block':'none';
-  mapEl.style.display  = state.view==='map'?'block':'none';
-  document.getElementById('resultline').style.display = state.view==='map'?'none':'block';
-
-  layout.classList.toggle('no-rail', state.view==='map');
-  document.getElementById('rail').style.display = state.view==='map'?'none':'';
-
-  const ms=document.getElementById('mobileSponsor');
-  if(state.view==='map'){ ms.classList.add('hidden'); } else if(!ms.dataset.dismissed){ ms.classList.remove('hidden'); }
-
-  if(state.view==='card') renderCards(list);
-  else if(state.view==='list') renderList(list);
-  else if(state.view==='calendar') renderCalendar(list);
-  else if(state.view==='map'){
-    initMap();
-    setTimeout(()=>{ if(map){ map.resize(); if(map.loaded()){ buildEventMarkers(); if(mapLayer==='closures') buildClosureMarkers(); } } }, 60);
-  }
+/* ================= SAVE ================= */
+function toggleSave(id){
+  if(state.saved.has(id))state.saved.delete(id);else state.saved.add(id);
+  renderActive();
 }
 
-document.getElementById('viewswitch').addEventListener('click',e=>{
-  const btn=e.target.closest('.viewbtn'); if(!btn) return;
-  document.querySelectorAll('.viewbtn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  state.view=btn.dataset.view;
-  render();
+/* ================= VIEW SWITCH ================= */
+function renderActive(){
+  if(state.view==="card")renderCard();
+  else if(state.view==="list")renderList();
+  else if(state.view==="calendar")renderCalendar();
+  else if(state.view==="map")refreshMarkers();
+}
+function setView(v){
+  state.view=v;
+  document.body.className="view-"+v;
+  document.querySelectorAll("#viewSwitch button").forEach(b=>b.classList.toggle("active",b.dataset.view===v));
+  document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));
+  if(v!=="map"){document.getElementById("view-"+v).classList.add("active");renderActive();}
+  else{initMap();}
+}
+document.querySelectorAll("#viewSwitch button").forEach(b=>{b.onclick=()=>setView(b.dataset.view);});
+
+/* ================= EVENT DELEGATION ================= */
+document.body.addEventListener("click",ev=>{
+  const save=ev.target.closest("[data-save]");
+  if(save){ev.stopPropagation();toggleSave(+save.dataset.save);return;}
+  const card=ev.target.closest("[data-id]");
+  if(card){openDrawer(+card.dataset.id);}
 });
 
-document.getElementById('mapToggle').addEventListener('click',e=>{
-  const b=e.target.closest('button'); if(!b) return;
-  document.querySelectorAll('#mapToggle button').forEach(x=>x.classList.remove('active'));
-  b.classList.add('active');
-  setMapLayer(b.dataset.layer);
+/* ================= FILTER WIRING ================= */
+function onFilterChange(){renderActive();refreshMarkers();}
+document.getElementById("searchInput").addEventListener("input",e=>{state.search=e.target.value;onFilterChange();});
+document.querySelector(".header-search input").addEventListener("input",e=>{
+  state.search=e.target.value;
+  document.getElementById("searchInput").value=e.target.value;
+  onFilterChange();
 });
+buildDropdown(document.getElementById("ddType"),"TYPE",
+  ["All Events","Family","Music","Markets","Food & Drink","Garage Sales","Estate Sales","Kids & School","City & Gov","Outdoors"],
+  "type",onFilterChange,true);
+buildDropdown(document.getElementById("ddSort"),"SORT",["Soonest","Distance"],"sort",onFilterChange,false);
+buildDropdown(document.getElementById("ddDate"),"WHEN",["This Weekend","Fri Jul 24","Sat Jul 25","Sun Jul 26"],"date",onFilterChange,false);
+buildDropdown(document.getElementById("ddRadius"),"NEAR",["Within 10 miles","Within 25 miles","Within 50 miles"],"radius",onFilterChange,false);
+document.getElementById("btnFilters").onclick=()=>document.getElementById("controls").classList.toggle("filters-open");
+document.getElementById("ssClose").onclick=()=>document.getElementById("stickySponsor").style.display="none";
 
-/* ============================================================
-   SEARCH
-   ============================================================ */
-document.getElementById('search').addEventListener('input',e=>{ state.search=e.target.value; render(); });
+/* ================= MAP ================= */
+let map=null, mapReady=false, markers=[], closureMarkers=[];
 
-/* ============================================================
-   CUSTOM DROPDOWNS
-   ============================================================ */
-const DD_OPTS = {
-  type:{label:'type-label', field:'type', items:['All Events','Family','Music','Markets','Food & Drink','Garage Sales','Estate Sales','Kids & School','City & Gov','Outdoors'], swatch:true},
-  sort:{label:'sort-label', field:'sort', items:['Soonest','Distance']},
-  date:{label:'date-label', field:'date', items:['Any Date','This Weekend','This Month']},
-  radius:{label:'radius-label', field:'radius', items:['Within 10 miles','Within 25 miles','Within 50 miles']}
-};
-function buildDropdowns(){
-  Object.keys(DD_OPTS).forEach(key=>{
-    const cfg=DD_OPTS[key];
-    const menu=document.querySelector('#dd-'+key+' .dd-menu');
-    menu.innerHTML = cfg.items.map(it=>{
-      const sw = (cfg.swatch && CAT[it]) ? `<span class="swatch" style="background:${CAT[it].color}"></span>` : (cfg.swatch?'<span class="swatch" style="background:var(--muted)"></span>':'');
-      return `<div class="dd-item" data-val="${it}">${sw}${it}</div>`;
-    }).join('');
-    menu.addEventListener('click',ev=>{
-      const item=ev.target.closest('.dd-item'); if(!item) return;
-      const val=item.dataset.val;
-      menu.querySelectorAll('.dd-item').forEach(x=>x.classList.remove('sel'));
-      item.classList.add('sel');
-      if(key==='radius'){ state.radius=parseInt(val.match(/\d+/)[0],10); document.getElementById(cfg.label).textContent=val; }
-      else { state[cfg.field]=val; document.getElementById(cfg.label).textContent = val; }
-      menu.classList.remove('open');
-      render();
+function diamondSVG(hex,big,ring){
+  const s=big?30:22;
+  return `<svg width="${s}" height="${s+6}" viewBox="0 0 ${s} ${s+6}">
+    ${ring?`<path d="M${s/2} ${s+4} L${s*0.14} ${s*0.5} L${s/2} ${s*0.02} L${s*0.86} ${s*0.5} Z" fill="none" stroke="#e6bf4a" stroke-width="2.5"/>`:""}
+    <path d="M${s/2} ${s+2} L${s*0.2} ${s*0.5} L${s/2} ${s*0.08} L${s*0.8} ${s*0.5} Z" fill="${hex}" stroke="#faf6ee" stroke-width="1.5"/>
+    <circle cx="${s/2}" cy="${s*0.5}" r="${s*0.13}" fill="#faf6ee"/>
+  </svg>`;
+}
+function closureSVG(){
+  return `<svg width="26" height="30" viewBox="0 0 26 30"><path d="M13 28 L4 12 L13 3 L22 12 Z" fill="#a84e30" stroke="#faf6ee" stroke-width="1.5"/><text x="13" y="16" text-anchor="middle" font-size="12" font-family="monospace" font-weight="700" fill="#faf6ee">!</text></svg>`;
+}
+
+function recolorMap(){
+  if(!map)return;
+  try{
+    const layers=map.getStyle().layers||[];
+    layers.forEach(l=>{
+      try{
+        if(l.type==="background"){map.setPaintProperty(l.id,"background-color","#f5efe3");}
+        else if(l.type==="fill"){
+          if(/water|ocean|sea|lake|river/i.test(l.id)){map.setPaintProperty(l.id,"fill-color","#9aabc2");}
+          else if(/landcover|landuse|park|wood|grass|forest/i.test(l.id)){map.setPaintProperty(l.id,"fill-color","#eee7db");}
+          else {map.setPaintProperty(l.id,"fill-color","#f5efe3");}
+        }
+        else if(l.type==="line"){
+          if(/water|river|waterway/i.test(l.id)){map.setPaintProperty(l.id,"line-color","#9aabc2");}
+          else {map.setPaintProperty(l.id,"line-color","#e0d5bd");map.setPaintProperty(l.id,"line-width",0.6);}
+        }
+        else if(l.type==="symbol"){
+          if(!/place|city|town|settlement/i.test(l.id)){map.setLayoutProperty(l.id,"visibility","none");}
+          else{try{map.setPaintProperty(l.id,"text-color","#68635b");map.setPaintProperty(l.id,"text-halo-color","#f5efe3");}catch(_){}}
+        }
+      }catch(_){}
     });
+  }catch(_){}
+}
+
+function buildMarkers(){
+  markers.forEach(m=>m.marker.remove());markers=[];
+  EVENTS.forEach(e=>{
+    const el=document.createElement("div");
+    el.className="mk";
+    const big=e.tier!=="standard";
+    el.innerHTML=diamondSVG(CATS[e.cat].hex,big,big);
+    el.onclick=()=>openDrawer(e.id);
+    const marker=new maplibregl.Marker({element:el,anchor:"bottom"}).setLngLat([e.lng,e.lat]).addTo(map);
+    markers.push({e,marker,el});
   });
 }
-document.querySelectorAll('.dd-btn').forEach(btn=>{
-  btn.addEventListener('click',e=>{
-    e.stopPropagation();
-    const key=btn.dataset.dd;
-    const menu=document.querySelector('#dd-'+key+' .dd-menu');
-    const wasOpen=menu.classList.contains('open');
-    document.querySelectorAll('.dd-menu').forEach(m=>m.classList.remove('open'));
-    if(!wasOpen) menu.classList.add('open');
+function buildClosures(){
+  closureMarkers.forEach(m=>m.remove());closureMarkers=[];
+  if(!state.closures||!mapReady)return;
+  ROAD_CLOSURES.forEach(c=>{
+    const el=document.createElement("div");el.className="mk";el.innerHTML=closureSVG();el.title=c.label;
+    const m=new maplibregl.Marker({element:el,anchor:"bottom"}).setLngLat([c.lng,c.lat]).addTo(map);
+    closureMarkers.push(m);
   });
-});
-document.addEventListener('click',()=>document.querySelectorAll('.dd-menu').forEach(m=>m.classList.remove('open')));
-
-/* mobile filter toggle - reveal desktop-filters inline */
-document.getElementById('filterToggle').addEventListener('click',()=>{
-  const df=document.querySelector('.desktop-filters');
-  if(df.dataset.mobileShown==='1'){ df.style.display=''; df.dataset.mobileShown='0'; }
-  else { df.style.display='flex'; df.style.flexBasis='100%'; df.style.flexWrap='wrap'; df.dataset.mobileShown='1'; }
-});
-
-/* ============================================================
-   MOBILE MAP CHIPS + LEGEND
-   ============================================================ */
-function buildMapChips(){
-  const wrap=document.getElementById('mapchips');
-  wrap.innerHTML = '<button class="mapchip" style="background:var(--ink);color:var(--wg-cream)">All events</button>' +
-    Object.keys(CAT).map(c=>`<button class="mapchip"><span class="swatch" style="background:${CAT[c].color}"></span>${c}</button>`).join('');
 }
-function buildLegend(){
-  document.getElementById('legendRows').innerHTML =
-    Object.keys(CAT).map(c=>`<div class="legrow"><span class="legdiamond" style="background:${CAT[c].hex}"></span>${c}</div>`).join('') +
-    `<div class="legrow" style="margin-top:6px"><span class="legdiamond" style="background:var(--rust);transform:none;border-radius:3px"></span>Road closure</div>`;
+function refreshMarkers(){
+  if(!mapReady)return;
+  markers.forEach(({e,el})=>{
+    const dayOK=state.mapDay==="all"||e.dayName===state.mapDay;
+    const catOK=state.catOn.has(e.cat);
+    const typeOK=state.type==="All Events"||e.cat===state.type;
+    const searchOK=!state.search.trim()||(e.title+e.cat+e.city+e.venue).toLowerCase().includes(state.search.toLowerCase());
+    el.style.display=(dayOK&&catOK&&typeOK&&searchOK)?"block":"none";
+  });
+  buildClosures();
 }
 
-/* ============================================================
-   MISC
-   ============================================================ */
-function greetSubmit(e){
-  e.preventDefault();
-  const btn=e.target.querySelector('button'); const t=btn.textContent;
-  btn.textContent='Done'; btn.style.background='#2f6b4f';
-  setTimeout(()=>{btn.textContent=t;btn.style.background='';},1600);
-  e.target.querySelector('input').value='';
-  return false;
+function countByCat(){const c={};Object.keys(CATS).forEach(k=>c[k]=0);EVENTS.forEach(e=>c[e.cat]++);return c;}
+function renderLegend(){
+  const counts=countByCat();
+  const rows=Object.keys(CATS).map(cat=>`
+    <div class="ml-row ${state.catOn.has(cat)?"on":"off"}" data-cat="${cat}">
+      <span class="ml-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#faf6ee" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+      <span class="ml-dot" style="background:${CATS[cat].hex}"></span>
+      <span class="ml-label">${cat}</span>
+      <span class="ml-count">${counts[cat]}</span>
+    </div>`).join("");
+  document.getElementById("mapLegend").innerHTML=`
+    <div class="ml-head">ON THE MAP</div>
+    ${rows}
+    <div class="ml-divider"></div>
+    <div class="ml-toggle ${state.closures?"on":""}" id="closureToggle">
+      <span>Road Closures</span><span class="toggle-sw"></span>
+    </div>`;
+  document.querySelectorAll("#mapLegend .ml-row").forEach(r=>{
+    r.onclick=()=>{
+      const c=r.dataset.cat;
+      if(state.catOn.has(c))state.catOn.delete(c);else state.catOn.add(c);
+      r.classList.toggle("on");r.classList.toggle("off");
+      refreshMarkers();syncMobileBar();
+    };
+  });
+  document.getElementById("closureToggle").onclick=()=>{
+    state.closures=!state.closures;
+    document.getElementById("closureToggle").classList.toggle("on");
+    buildClosures();
+  };
+  const bar=document.getElementById("mapMobileBar");
+  bar.innerHTML=Object.keys(CATS).map(cat=>`<button class="mmb-chip ${state.catOn.has(cat)?"":"off"}" data-cat="${cat}"><span class="dot" style="background:${CATS[cat].hex}"></span>${cat}</button>`).join("");
+  bar.querySelectorAll(".mmb-chip").forEach(ch=>{
+    ch.onclick=()=>{
+      const c=ch.dataset.cat;
+      if(state.catOn.has(c))state.catOn.delete(c);else state.catOn.add(c);
+      ch.classList.toggle("off");refreshMarkers();syncLegend();
+    };
+  });
 }
-document.querySelector('#mobileSponsor .ms-close').addEventListener('click',()=>{
-  const ms=document.getElementById('mobileSponsor'); ms.dataset.dismissed='1'; ms.classList.add('hidden');
+function syncMobileBar(){document.querySelectorAll("#mapMobileBar .mmb-chip").forEach(ch=>{ch.classList.toggle("off",!state.catOn.has(ch.dataset.cat));});}
+function syncLegend(){document.querySelectorAll("#mapLegend .ml-row").forEach(r=>{const on=state.catOn.has(r.dataset.cat);r.classList.toggle("on",on);r.classList.toggle("off",!on);});}
+
+document.querySelectorAll("#mapDays button").forEach(b=>{
+  b.onclick=()=>{
+    state.mapDay=b.dataset.day;
+    document.querySelectorAll("#mapDays button").forEach(x=>x.classList.toggle("active",x===b));
+    refreshMarkers();
+  };
 });
 
-/* ============================================================
-   INIT
-   ============================================================ */
-buildDropdowns();
-buildLegend();
-buildMapChips();
-document.querySelector('#dd-type .dd-item[data-val="All Events"]').classList.add('sel');
-document.querySelector('#dd-sort .dd-item[data-val="Soonest"]').classList.add('sel');
-document.querySelector('#dd-date .dd-item[data-val="Any Date"]').classList.add('sel');
-document.querySelector('#dd-radius .dd-item[data-val="Within 25 miles"]').classList.add('sel');
-render();
+function initMap(){
+  if(map){setTimeout(()=>map.resize(),60);return;}
+  renderLegend();
+  try{
+    map=new maplibregl.Map({
+      container:"map",
+      style:"https://tiles.openfreemap.org/styles/positron",
+      center:[-97.8531,30.5788],
+      zoom:12,
+      attributionControl:{compact:true}
+    });
+    map.addControl(new maplibregl.NavigationControl({showCompass:false}),"top-right");
+    map.on("load",()=>{
+      recolorMap();
+      buildMarkers();
+      mapReady=true;
+      refreshMarkers();
+      setTimeout(()=>map.resize(),80);
+    });
+    map.on("error",()=>{});
+  }catch(err){fallbackMap();}
+}
+
+function fallbackMap(){
+  const el=document.getElementById("map");
+  el.style.background="var(--paper)";
+  mapReady=true;
+  const bbox={minLng:-97.95,maxLng:-97.75,minLat:30.44,maxLat:30.68};
+  function proj(lng,lat){
+    const x=(lng-bbox.minLng)/(bbox.maxLng-bbox.minLng)*el.clientWidth;
+    const y=(1-(lat-bbox.minLat)/(bbox.maxLat-bbox.minLat))*el.clientHeight;
+    return {x,y};
+  }
+  EVENTS.forEach(e=>{
+    const p=proj(e.lng,e.lat);
+    const d=document.createElement("div");d.className="mk";d.style.position="absolute";
+    d.style.left=p.x+"px";d.style.top=p.y+"px";d.style.transform="translate(-50%,-100%)";
+    const big=e.tier!=="standard";
+    d.innerHTML=diamondSVG(CATS[e.cat].hex,big,big);
+    d.onclick=()=>openDrawer(e.id);
+    el.appendChild(d);
+  });
+}
+
+/* ================= INIT ================= */
+renderRail();
+renderCard();
 </script>
 </body>
 </html>
