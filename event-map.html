@@ -1,850 +1,994 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>WilCo Guide - This Weekend in Leander</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>WilCo Guide Events - Leander + Cedar Park</title>
 
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Source+Serif+4:opsz,wght@8..60,400..600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
 <!-- MapLibre GL -->
 <link href="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.css" rel="stylesheet" />
-<script src="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.js"></script>
 
 <style>
+/* ============================================================
+   WilCo Guide Events - design tokens (matches directory grammar)
+   ============================================================ */
 :root{
+  --wg-cream:#faf6ee;
+  --paper:#f5efe3;        /* page background */
+  --cream-dark:#eee7db;   /* card fill */
   --navy:#123260;
-  --rust:#c24c32;
-  --paper:#f5efe3;
-  --paper-2:#ede5d4;
-  --cream-dark:#eee7db;
+  --navy-dark:#0b1624;
+  --rust:#a84e30;
   --gold:#e6bf4a;
   --ink:#171717;
-  --ink-3:#68635b;
+  --muted:#68635b;
   --border:#ddd2ba;
-  --navy-dark:#0b1624;
 
-  /* category colors (earthy, harmonious) */
-  --c-music:#c24c32;
-  --c-markets:#2d6a4f;
-  --c-garage:#8a6d3b;
-  --c-estate:#ba6f5e;
-  --c-kids:#123260;
-  --c-gov:#3a7a7a;
-  --c-food:#b5622a;
-  --c-outdoors:#5c7a3a;
+  --serif:'Fraunces','Source Serif 4',Georgia,serif;
+  --body:'Source Serif 4',Georgia,'Times New Roman',serif;
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+
+  /* category accents - distinct, harmonious, mid-dark on cream */
+  --cat-family:#123260;
+  --cat-music:#6b4a86;
+  --cat-markets:#8a6d1f;
+  --cat-food:#a84e30;
+  --cat-garage:#2f6b4f;
+  --cat-estate:#4a5a7a;
+  --cat-kids:#2f6f7a;
+  --cat-city:#3a3f52;
+  --cat-outdoors:#3d7040;
 }
 
-*{box-sizing:border-box}
-html,body{margin:0;padding:0}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
 body{
   background:var(--paper);
   color:var(--ink);
-  font-family:"Source Serif 4",Georgia,serif;
-  font-size:16px;
-  line-height:1.5;
+  font-family:var(--body);
   -webkit-font-smoothing:antialiased;
-  text-rendering:optimizeLegibility;
+  overflow-x:hidden;
 }
-a{color:inherit}
+img{max-width:100%;display:block;}
+button{font-family:inherit;cursor:pointer;}
+a{color:inherit;text-decoration:none;}
 
-/* ---------- typography helpers ---------- */
-.mono{font-family:"JetBrains Mono",ui-monospace,monospace;text-transform:uppercase;letter-spacing:.09em;font-size:11px;font-weight:600}
-.serif-display{font-family:"Fraunces",Georgia,serif}
-.ui{font-family:"Inter",system-ui,sans-serif}
-
-/* ---------- top nav ---------- */
-.nav{
-  position:sticky;top:0;z-index:50;
+/* ---------- Top nav ---------- */
+.topnav{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:12px 28px;
   background:var(--paper);
   border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 20px;
-  gap:16px;
+  position:sticky;top:0;z-index:40;
 }
-.wordmark{font-family:"Fraunces",serif;font-weight:900;font-size:22px;color:var(--navy);letter-spacing:-.01em;white-space:nowrap}
-.wordmark small{display:block;font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:.16em;color:var(--ink-3);font-weight:600;margin-top:-2px;text-transform:uppercase}
-.topsearch{flex:1;max-width:280px}
-.topsearch input{width:100%}
+.wordmark{font-family:var(--serif);font-size:21px;font-weight:600;color:var(--navy);line-height:1;}
+.wordmark .dot{color:var(--rust);}
+.wordmark small{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.14em;font-weight:600;color:var(--muted);margin-top:3px;text-transform:uppercase;}
+.navlinks{display:flex;gap:22px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--muted);}
+.navlinks a.active{color:var(--navy);border-bottom:2px solid var(--rust);padding-bottom:3px;}
+.nav-right{display:flex;align-items:center;gap:16px;}
+.subscribe{font-family:var(--sans);font-size:13px;font-weight:700;color:var(--rust);letter-spacing:.01em;}
 
-/* two-tab toggle Events / Map */
-.tabs{display:flex;border:1px solid var(--navy);background:var(--paper-2);border-radius:3px;overflow:hidden;flex-shrink:0}
-.tabs button{
-  font-family:"Inter",sans-serif;font-weight:600;font-size:13px;
-  border:0;background:transparent;color:var(--navy);
-  padding:8px 18px;cursor:pointer;letter-spacing:.01em;
+/* ---------- Hero ---------- */
+.hero{max-width:1376px;margin:0 auto;padding:30px 28px 14px;}
+.hero .kicker{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--rust);}
+.hero h1{font-family:var(--serif);font-size:44px;font-weight:600;color:var(--navy);margin:6px 0 6px;letter-spacing:-.02em;}
+.hero .dek{font-family:var(--body);font-size:16px;color:var(--muted);margin:0;max-width:640px;}
+
+/* ---------- Control bar ---------- */
+.controls{
+  max-width:1376px;margin:16px auto 0;padding:0 28px;
 }
-.tabs button.active{background:var(--navy);color:var(--paper)}
-
-/* ---------- sponsor strip ---------- */
-.sponsor-strip{
-  max-width:1200px;margin:14px auto 0;padding:0 20px;
+.controlbar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:12px 0 16px;
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
 }
-.sponsor-strip .unit{
-  background:var(--cream-dark);border:1px solid var(--border);border-radius:3px;
-  display:flex;align-items:center;gap:16px;padding:10px 16px;
+/* view switcher */
+.viewswitch{display:flex;gap:0;border:1px solid var(--border);border-radius:4px;overflow:hidden;background:var(--cream-dark);}
+.viewbtn{
+  width:38px;height:36px;display:flex;align-items:center;justify-content:center;
+  background:transparent;border:none;border-right:1px solid var(--border);color:var(--navy);
 }
-.sponsor-strip .kick{color:var(--ink-3);flex-shrink:0}
-.sponsor-strip .logo-block{flex-shrink:0}
-.sponsor-strip .msg{font-family:"Inter",sans-serif;font-size:14px;color:var(--ink);flex:1}
-.sponsor-strip .msg b{color:var(--navy);font-weight:600}
-.sponsor-strip .msg .dek{color:var(--ink-3);font-size:13px}
+.viewbtn:last-child{border-right:none;}
+.viewbtn svg{width:17px;height:17px;}
+.viewbtn.active{background:var(--ink);color:var(--wg-cream);}
+.viewbtn:not(.active):hover{background:#e4dccb;}
 
-/* monogram logo block */
-.logo-block{
-  width:44px;height:44px;border-radius:3px;background:var(--navy);color:var(--paper);
-  display:flex;align-items:center;justify-content:center;
-  font-family:"Fraunces",serif;font-weight:700;font-size:17px;letter-spacing:.02em;
+/* search */
+.searchwrap{display:flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:4px;background:var(--wg-cream);padding:0 10px;height:36px;min-width:190px;flex:1 1 190px;max-width:280px;}
+.searchwrap svg{width:15px;height:15px;color:var(--muted);flex:0 0 auto;}
+.searchwrap input{border:none;background:transparent;outline:none;font-family:var(--sans);font-size:13px;color:var(--ink);width:100%;}
+
+/* custom squared dropdown */
+.dd{position:relative;font-family:var(--sans);}
+.dd-btn{
+  display:flex;align-items:center;gap:8px;height:36px;padding:0 11px;
+  border:1px solid var(--border);border-radius:4px;background:var(--wg-cream);
+  font-size:13px;font-weight:600;color:var(--navy);white-space:nowrap;
 }
-.logo-block.rust{background:var(--rust)}
-.logo-block.gold{background:var(--gold);color:var(--navy-dark)}
-.logo-block.green{background:var(--c-markets)}
-
-/* ---------- hero ---------- */
-.hero{max-width:1200px;margin:16px auto 0;padding:0 20px}
-.hero .kick{color:var(--rust)}
-.hero h1{font-family:"Fraunces",serif;font-weight:900;font-size:40px;line-height:1.02;color:var(--navy);margin:6px 0 6px;letter-spacing:-.015em}
-.hero .dek{color:var(--ink-3);font-size:16px;max-width:640px}
-.hero-rule{max-width:1200px;margin:16px auto 0;padding:0 20px}
-.hero-rule hr{border:0;border-top:1px solid var(--border);margin:0}
-
-/* ---------- main layout ---------- */
-.shell{max-width:1200px;margin:16px auto 40px;padding:0 20px;display:grid;grid-template-columns:1fr 300px;gap:26px;align-items:start}
-.main-col{min-width:0}
-.rail{display:flex;flex-direction:column;gap:16px;position:sticky;top:70px}
-
-/* segmented control */
-.viewbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
-.segmented{display:inline-flex;border:1px solid var(--border);border-radius:3px;overflow:hidden;background:var(--cream-dark)}
-.segmented button{
-  font-family:"Inter",sans-serif;font-weight:600;font-size:12.5px;
-  border:0;background:transparent;color:var(--ink-3);padding:7px 14px;cursor:pointer;
-  border-right:1px solid var(--border);display:flex;align-items:center;gap:6px;
+.dd-btn .chev{width:12px;height:12px;color:var(--muted);}
+.dd-btn .swatch{width:9px;height:9px;border-radius:2px;flex:0 0 auto;}
+.dd-menu{
+  position:absolute;top:calc(100% + 5px);left:0;z-index:60;
+  min-width:190px;background:var(--wg-cream);border:1px solid var(--border);border-radius:4px;
+  box-shadow:0 6px 22px rgba(11,22,36,.14);padding:5px;display:none;
 }
-.segmented button:last-child{border-right:0}
-.segmented button.active{background:var(--ink);color:var(--paper)}
-.viewbar .count{color:var(--ink-3)}
-
-/* filter chips */
-.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
-.chip{
-  font-family:"Inter",sans-serif;font-weight:600;font-size:12.5px;
-  border:1px solid var(--border);background:var(--paper-2);color:var(--ink);
-  padding:6px 12px;border-radius:3px;cursor:pointer;white-space:nowrap;
-  display:inline-flex;align-items:center;gap:7px;user-select:none;
+.dd-menu.open{display:block;}
+.dd-item{
+  display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:3px;
+  font-size:13px;font-weight:500;color:var(--ink);
 }
-.chip:hover{border-color:var(--navy)}
-.chip.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-.chip .dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
-.chips-cat{margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border)}
-.chips-label{color:var(--ink-3);margin:0 4px 8px 2px}
+.dd-item:hover{background:var(--cream-dark);}
+.dd-item.sel{color:var(--rust);font-weight:700;}
 
-/* ---------- event list ---------- */
-.day-group{margin-bottom:26px}
-.day-head{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
-.day-head h2{font-family:"Fraunces",serif;font-weight:700;font-size:20px;color:var(--navy);margin:0}
-.day-head .mono{color:var(--ink-3)}
-
-.card{
-  background:var(--cream-dark);border:1px solid var(--border);border-radius:4px;
-  padding:15px 16px;margin-bottom:12px;display:flex;flex-direction:column;gap:5px;
-  position:relative;
+.spacer{flex:1 1 auto;}
+.add-event{
+  height:36px;padding:0 16px;border:none;border-radius:4px;background:var(--rust);color:#fff;
+  font-family:var(--sans);font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px;
 }
-.card .toprow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.card .cat{font-family:"JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.08em;font-size:10.5px;font-weight:700}
-.card .time{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ink-3);letter-spacing:.03em}
-.card h3{font-family:"Fraunces",serif;font-weight:600;font-size:19px;line-height:1.15;color:var(--ink);margin:2px 0 0}
-.card .venue{font-family:"Inter",sans-serif;font-size:13px;color:var(--navy);font-weight:500;display:flex;align-items:center;gap:6px}
-.card .venue svg{flex-shrink:0}
-.card .desc{color:var(--ink-3);font-size:14.5px;line-height:1.45}
-.card .details{font-family:"Inter",sans-serif;font-weight:600;font-size:13px;color:var(--rust);text-decoration:none;margin-top:2px;display:inline-flex;align-items:center;gap:4px;cursor:pointer}
-.card .details:hover{text-decoration:underline}
+.add-event svg{width:14px;height:14px;}
+.add-event:hover{background:#93442a;}
 
-/* badges */
-.badge{
-  font-family:"JetBrains Mono",monospace;font-weight:700;font-size:10px;letter-spacing:.08em;
-  text-transform:uppercase;border-radius:3px;padding:3px 7px;display:inline-flex;align-items:center;gap:4px;
+/* ---------- Body layout ---------- */
+.layout{max-width:1376px;margin:20px auto 0;padding:0 28px 60px;display:grid;grid-template-columns:1fr 300px;gap:26px;align-items:start;}
+.layout.no-rail{grid-template-columns:1fr;}
+.viewarea{min-width:0;}
+.resultline{font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--muted);margin:0 0 14px;}
+
+/* ---------- Card grid view ---------- */
+.cardgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));gap:18px;}
+.evcard{
+  background:var(--cream-dark);border:1px solid var(--border);border-radius:4px;overflow:hidden;
+  display:flex;flex-direction:column;text-align:left;padding:0;transition:transform .12s ease,box-shadow .12s ease;
 }
-.badge.featured{background:var(--gold);color:var(--navy-dark)}
-.badge.premium{background:var(--navy);color:var(--paper)}
-
-/* premium treatment */
-.card.premium{
-  border-left:4px solid var(--navy);
-  background:linear-gradient(90deg,#e8e0cf 0%,var(--cream-dark) 40%);
-  padding:20px 20px;
+.evcard:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(11,22,36,.09);}
+.evcard.premium{grid-column:span 2;}
+.evcard.premium .cardtop{border-top:3px solid var(--navy);}
+.cardtop{position:relative;}
+.card-img-wrap{position:relative;aspect-ratio:4/3;background:var(--border);overflow:hidden;}
+.card-img-wrap img{width:100%;height:100%;object-fit:cover;}
+.featbadge{
+  position:absolute;top:8px;left:8px;z-index:2;
+  background:var(--gold);color:#3a2f0a;font-family:var(--mono);font-size:9px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;padding:3px 6px;border-radius:3px;display:flex;align-items:center;gap:3px;
 }
-.card.premium h3{font-size:23px}
-.card.premium .desc{font-size:15px}
-.card.featured{border-left:3px solid var(--gold)}
+.premtag{
+  position:absolute;top:8px;right:8px;z-index:2;
+  background:var(--navy);color:#fff;font-family:var(--mono);font-size:9px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;padding:3px 6px;border-radius:3px;
+}
+.cardbody{padding:11px 13px 13px;display:flex;flex-direction:column;gap:5px;}
+.cat-kicker{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
+.card-title{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--navy);line-height:1.2;margin:0;}
+.card-meta{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.04em;color:var(--ink);text-transform:uppercase;}
+.card-place{font-family:var(--body);font-size:12.5px;color:var(--muted);}
 
-/* ---------- calendar grid ---------- */
-.calgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--border);border-radius:4px;overflow:hidden;background:var(--cream-dark)}
-.calcol{border-right:1px solid var(--border);min-height:200px}
-.calcol:last-child{border-right:0}
-.calcol .colhead{background:var(--paper-2);border-bottom:1px solid var(--border);padding:9px 10px;text-align:center}
-.calcol .colhead .d{font-family:"Fraunces",serif;font-weight:700;font-size:15px;color:var(--navy)}
-.calcol .colhead .n{font-family:"JetBrains Mono",monospace;font-size:9.5px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}
-.calcol .colbody{padding:8px}
-.calev{background:var(--paper);border:1px solid var(--border);border-left-width:3px;border-radius:3px;padding:7px 8px;margin-bottom:7px;cursor:pointer}
-.calev:hover{border-color:var(--navy)}
-.calev .t{font-family:"JetBrains Mono",monospace;font-size:9.5px;color:var(--ink-3);letter-spacing:.02em}
-.calev .ti{font-family:"Fraunces",serif;font-weight:600;font-size:13.5px;color:var(--ink);line-height:1.12;margin-top:2px}
-.calev .star{color:var(--gold)}
+/* interstitials in feed (mobile only) */
+.interstitial{display:none;}
 
-/* ---------- map ---------- */
-.mapwrap{position:relative;border:1px solid var(--border);border-radius:4px;overflow:hidden;height:620px;background:var(--cream-dark)}
-#map{position:absolute;inset:0}
-.maplibregl-canvas{filter:sepia(0.12) saturate(0.9) brightness(1.02)}
+/* ---------- List view ---------- */
+.listview{display:flex;flex-direction:column;gap:12px;}
+.listrow{
+  display:flex;gap:14px;align-items:stretch;background:var(--cream-dark);border:1px solid var(--border);
+  border-radius:4px;overflow:hidden;padding:0;text-align:left;
+}
+.listrow:hover{border-color:#cdbf9f;}
+.listthumb{width:120px;flex:0 0 120px;aspect-ratio:4/3;background:var(--border);overflow:hidden;}
+.listthumb img{width:100%;height:100%;object-fit:cover;}
+.listmid{flex:1 1 auto;min-width:0;padding:12px 6px 12px 2px;display:flex;flex-direction:column;gap:4px;justify-content:center;}
+.listmeta{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.03em;color:var(--muted);text-transform:uppercase;}
+.listright{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:10px;padding:12px 14px;}
+.dist{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--navy);}
+.savebtn{width:34px;height:34px;border:1px solid var(--border);border-radius:4px;background:var(--wg-cream);display:flex;align-items:center;justify-content:center;color:var(--muted);}
+.savebtn svg{width:16px;height:16px;}
+.savebtn.saved{color:var(--rust);border-color:var(--rust);}
+
+/* ---------- Calendar view ---------- */
+.calwrap{background:var(--cream-dark);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.calhead{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);}
+.calhead h2{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--navy);margin:0;}
+.calhead .mono{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);}
+.caldow{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center;padding:8px 0;border-bottom:1px solid var(--border);border-right:1px solid var(--border);}
+.caldow:nth-child(7){border-right:none;}
+.calcell{min-height:104px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:6px;display:flex;flex-direction:column;gap:4px;}
+.calcell:nth-child(7n){border-right:none;}
+.calcell.empty{background:repeating-linear-gradient(45deg,transparent,transparent 6px,rgba(221,210,186,.25) 6px,rgba(221,210,186,.25) 7px);}
+.caldate{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--muted);}
+.calcell.today .caldate{color:#fff;background:var(--rust);border-radius:3px;padding:1px 5px;align-self:flex-start;}
+.calchip{
+  border:none;border-radius:3px;padding:3px 5px;font-family:var(--sans);font-size:10.5px;font-weight:600;
+  color:#fff;text-align:left;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.calchip .t{opacity:.85;font-family:var(--mono);font-size:9px;}
+
+/* ---------- Map view ---------- */
+.mapview{display:none;}
+.mapshell{position:relative;height:640px;border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+#map{position:absolute;inset:0;}
+.maplibregl-canvas{filter:sepia(.12) saturate(.9) brightness(1.02);}
 .map-legend{
-  position:absolute;left:12px;bottom:12px;z-index:5;
-  background:rgba(238,231,219,.95);border:1px solid var(--border);border-radius:4px;
-  padding:10px 11px;max-width:230px;backdrop-filter:blur(2px);
+  position:absolute;left:14px;bottom:14px;z-index:5;background:var(--wg-cream);border:1px solid var(--border);
+  border-radius:4px;padding:11px 13px;font-family:var(--sans);box-shadow:0 4px 16px rgba(11,22,36,.16);max-width:190px;
 }
-.map-legend .lhead{color:var(--ink-3);margin-bottom:8px;display:block}
-.map-legend .lchips{display:flex;flex-wrap:wrap;gap:5px}
-.map-legend .chip{font-size:11px;padding:4px 8px}
-.map-mode{
-  position:absolute;top:12px;left:12px;z-index:5;display:flex;gap:0;
-  border:1px solid var(--navy);border-radius:3px;overflow:hidden;background:var(--paper);
-}
-.map-mode button{font-family:"Inter",sans-serif;font-weight:600;font-size:12px;border:0;background:transparent;color:var(--navy);padding:7px 13px;cursor:pointer;border-right:1px solid var(--navy)}
-.map-mode button:last-child{border-right:0}
-.map-mode button.active{background:var(--rust);color:#fff;border-color:var(--rust)}
+.map-legend h4{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--navy);margin:0 0 8px;}
+.legrow{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--ink);margin-bottom:5px;}
+.legdiamond{width:10px;height:10px;transform:rotate(45deg);border:1px solid rgba(0,0,0,.15);}
+.map-toggle{position:absolute;right:14px;top:14px;z-index:5;display:flex;border:1px solid var(--border);border-radius:4px;overflow:hidden;background:var(--wg-cream);box-shadow:0 4px 16px rgba(11,22,36,.16);}
+.map-toggle button{padding:8px 12px;border:none;background:transparent;font-family:var(--sans);font-size:12px;font-weight:600;color:var(--navy);border-right:1px solid var(--border);}
+.map-toggle button:last-child{border-right:none;}
+.map-toggle button.active{background:var(--rust);color:#fff;}
+/* mobile map chips bar */
+.mapchips{display:none;}
 
-/* custom pins */
-.pin{
-  width:20px;height:20px;border-radius:3px;transform:rotate(45deg);
-  border:2px solid var(--paper);box-shadow:0 1px 4px rgba(0,0,0,.35);cursor:pointer;
-}
-.pin.big{width:28px;height:28px;box-shadow:0 0 0 3px var(--gold),0 1px 5px rgba(0,0,0,.4)}
-.pin-star{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--navy-dark);font-size:12px;line-height:1;pointer-events:none}
-.pin-wrap{position:relative;display:flex;align-items:center;justify-content:center}
-.pin.closure{border-radius:2px;background:var(--rust)!important;width:22px;height:22px;transform:none;border:2px solid var(--paper);position:relative}
-
+/* map markers */
+.pin{cursor:pointer;}
+.pin .diamond{width:18px;height:18px;transform:rotate(45deg);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35);}
+.pin.big .diamond{width:24px;height:24px;box-shadow:0 0 0 3px var(--gold),0 1px 5px rgba(0,0,0,.4);}
+.pin.closure .diamond{width:16px;height:16px;transform:rotate(0deg);border-radius:3px;background:var(--rust);border:2px solid #fff;display:flex;align-items:center;justify-content:center;}
+.pin.closure .bang{transform:none;color:#fff;font-family:var(--sans);font-weight:800;font-size:12px;line-height:16px;}
 /* maplibre popup on-brand */
-.maplibregl-popup-content{
-  background:var(--cream-dark)!important;border:1px solid var(--border)!important;border-radius:4px!important;
-  padding:13px 14px!important;box-shadow:0 6px 20px rgba(11,22,36,.22)!important;font-family:"Source Serif 4",serif;
+.maplibregl-popup-content{background:var(--cream-dark);border:1px solid var(--border);border-radius:4px;padding:0;overflow:hidden;box-shadow:0 8px 26px rgba(11,22,36,.24);width:230px;}
+.maplibregl-popup-close-button{color:var(--muted);font-size:18px;padding:2px 7px;}
+.maplibregl-popup-tip{border-top-color:var(--border)!important;border-bottom-color:var(--border)!important;}
+.popcard img{width:100%;aspect-ratio:16/9;object-fit:cover;}
+.popcard .pcbody{padding:9px 11px 11px;}
+.popcard .cat-kicker{margin-bottom:3px;}
+.popcard h3{font-family:var(--serif);font-size:15px;color:var(--navy);margin:2px 0 4px;line-height:1.15;}
+.popcard .pcmeta{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.03em;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
+.popcard .pcbtn{display:block;text-align:center;background:var(--rust);color:#fff;font-family:var(--sans);font-size:11.5px;font-weight:700;padding:7px;border-radius:3px;border:none;width:100%;}
+
+/* ---------- Right rail ---------- */
+.rail{display:flex;flex-direction:column;gap:18px;position:sticky;top:78px;}
+.railcard{background:var(--cream-dark);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.railcard .sponsor-tag{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:9px 13px 0;}
+.railcard img{width:100%;aspect-ratio:16/9;object-fit:cover;}
+.railcard .rc-body{padding:11px 13px 14px;}
+.railcard .rc-name{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--navy);margin:0 0 4px;}
+.railcard .rc-copy{font-family:var(--body);font-size:12.5px;color:var(--muted);margin:0 0 9px;line-height:1.4;}
+.railcard .rc-link{font-family:var(--sans);font-size:12px;font-weight:700;color:var(--rust);}
+/* greetform card */
+.greetcard{background:var(--navy);border:1px solid var(--navy);color:var(--wg-cream);border-radius:4px;overflow:hidden;position:relative;}
+.greetcard .goldbar{height:4px;background:var(--gold);}
+.greetcard .gc-body{padding:14px 15px 15px;}
+.greetcard .gc-kick{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);}
+.greetcard h3{font-family:var(--serif);font-size:18px;font-weight:600;color:#fff;margin:6px 0 8px;line-height:1.2;}
+.greetcard p{font-family:var(--body);font-size:12.5px;color:#cdd6e2;margin:0 0 11px;line-height:1.4;}
+.greetform{display:flex;gap:7px;}
+.greetform input{flex:1;min-width:0;height:36px;border:1px solid #2a4670;border-radius:4px;background:#0d2547;color:#fff;padding:0 10px;font-family:var(--sans);font-size:12.5px;outline:none;}
+.greetform input::placeholder{color:#8aa0bd;}
+.greetform button{height:36px;padding:0 14px;border:none;border-radius:4px;background:var(--rust);color:#fff;font-family:var(--sans);font-size:12.5px;font-weight:700;}
+.greetpow{font-family:var(--mono);font-size:9px;letter-spacing:.06em;color:#7d93b0;margin:9px 0 0;text-transform:uppercase;}
+/* newsletter signup card */
+.signupcard{background:var(--cream-dark);border:1px solid var(--border);border-radius:4px;padding:14px 15px 15px;}
+.signupcard .su-kick{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--rust);}
+.signupcard h3{font-family:var(--serif);font-size:17px;font-weight:600;color:var(--navy);margin:6px 0 4px;}
+.signupcard p{font-family:var(--body);font-size:12.5px;color:var(--muted);margin:0 0 11px;line-height:1.4;}
+.signupcard .su-form{display:flex;gap:7px;}
+.signupcard input{flex:1;min-width:0;height:36px;border:1px solid var(--border);border-radius:4px;background:var(--wg-cream);padding:0 10px;font-family:var(--sans);font-size:12.5px;outline:none;}
+.signupcard button{height:36px;padding:0 14px;border:none;border-radius:4px;background:var(--navy);color:#fff;font-family:var(--sans);font-size:12.5px;font-weight:700;}
+
+/* ---------- Own-event-page drawer ---------- */
+.scrim{position:fixed;inset:0;background:rgba(11,22,36,.5);z-index:80;opacity:0;pointer-events:none;transition:opacity .2s ease;}
+.scrim.open{opacity:1;pointer-events:auto;}
+.drawer{
+  position:fixed;top:0;right:0;height:100vh;width:440px;max-width:92vw;background:var(--wg-cream);z-index:90;
+  transform:translateX(100%);transition:transform .26s cubic-bezier(.4,0,.2,1);overflow-y:auto;
+  box-shadow:-10px 0 40px rgba(11,22,36,.25);
 }
-.maplibregl-popup-close-button{font-size:18px;color:var(--ink-3);padding:2px 7px}
-.maplibregl-popup-tip{border-top-color:var(--cream-dark)!important;border-bottom-color:var(--cream-dark)!important}
-.pop .cat{font-family:"JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.08em;font-size:10px;font-weight:700}
-.pop h4{font-family:"Fraunces",serif;font-weight:600;font-size:17px;margin:4px 0 3px;color:var(--ink);line-height:1.12}
-.pop .m{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--ink-3);margin-bottom:2px}
-.pop .v{font-family:"Inter",sans-serif;font-size:13px;color:var(--navy);font-weight:500}
-.pop .details{font-family:"Inter",sans-serif;font-weight:600;font-size:12.5px;color:var(--rust);margin-top:7px;display:inline-block;cursor:pointer}
+.drawer.open{transform:translateX(0);}
+.drawer-close{position:absolute;top:14px;right:14px;z-index:3;width:36px;height:36px;border:1px solid var(--border);border-radius:4px;background:rgba(250,246,238,.92);display:flex;align-items:center;justify-content:center;color:var(--navy);}
+.drawer-close svg{width:16px;height:16px;}
+.drawer-hero{aspect-ratio:4/3;background:var(--border);overflow:hidden;}
+.drawer-hero img{width:100%;height:100%;object-fit:cover;}
+.drawer-body{padding:20px 24px 40px;}
+.drawer-body .cat-kicker{font-size:11px;letter-spacing:.12em;}
+.drawer-body h1{font-family:var(--serif);font-size:29px;font-weight:600;color:var(--navy);margin:8px 0 12px;line-height:1.12;letter-spacing:-.01em;}
+.drawer-datebar{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:13px 0;margin-bottom:16px;}
+.drawer-datebar .drow{display:flex;align-items:center;gap:9px;font-family:var(--sans);font-size:13.5px;color:var(--ink);font-weight:500;}
+.drawer-datebar .drow svg{width:15px;height:15px;color:var(--rust);flex:0 0 auto;}
+.drawer-desc{font-family:var(--body);font-size:15px;line-height:1.6;color:var(--ink);margin:0 0 22px;}
+.drawer-actions{display:flex;flex-direction:column;gap:9px;margin-bottom:18px;}
+.btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;height:46px;border:none;border-radius:4px;background:var(--rust);color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;}
+.btn-primary svg{width:16px;height:16px;}
+.btn-secondary{display:flex;align-items:center;justify-content:center;gap:8px;height:46px;border:1px solid var(--navy);border-radius:4px;background:transparent;color:var(--navy);font-family:var(--sans);font-size:14px;font-weight:700;}
+.btn-secondary svg{width:16px;height:16px;}
+.seo-note{font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:var(--muted);line-height:1.5;border-left:2px solid var(--gold);padding-left:11px;}
 
-/* ---------- form inputs / buttons ---------- */
-input[type=email],input[type=text],input[type=search]{
-  font-family:"Inter",sans-serif;font-size:14px;
-  border:1px solid var(--border);background:var(--paper);color:var(--ink);
-  padding:9px 12px;border-radius:3px;width:100%;
+/* ---------- Sticky bottom sponsor (mobile) ---------- */
+.mobile-sponsor{display:none;}
+
+/* ---------- Footer ---------- */
+.foot{max-width:1376px;margin:0 auto;padding:22px 28px 34px;border-top:1px solid var(--border);}
+.foot .fm{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+
+/* desktop filter cluster */
+.desktop-filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+
+/* filter-toggle (mobile only) */
+.filter-toggle{display:none;height:36px;padding:0 13px;border:1px solid var(--border);border-radius:4px;background:var(--wg-cream);
+  font-family:var(--sans);font-size:13px;font-weight:600;color:var(--navy);align-items:center;gap:7px;}
+.filter-toggle svg{width:15px;height:15px;}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width:1100px){
+  .cardgrid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));}
 }
-input::placeholder{color:#a49c8d}
-input:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 2px rgba(18,50,96,.12)}
-.btn{
-  font-family:"Inter",sans-serif;font-weight:600;font-size:13.5px;
-  background:var(--rust);color:#fff;border:1px solid var(--rust);
-  padding:9px 16px;border-radius:3px;cursor:pointer;white-space:nowrap;
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .rail{display:none;}
+  .interstitial{display:block;grid-column:1/-1;}
+  .cardgrid{grid-template-columns:repeat(2,1fr);}
+  .evcard.premium{grid-column:span 2;}
 }
-.btn:hover{background:#a83f28;border-color:#a83f28}
-.btn.navy{background:var(--navy);border-color:var(--navy)}
-.btn.navy:hover{background:#0d2749}
-.btn.block{width:100%;display:block}
-
-/* ---------- rail cards ---------- */
-.rcard{background:var(--cream-dark);border:1px solid var(--border);border-radius:4px;padding:16px}
-.rcard .kick{color:var(--ink-3);margin-bottom:8px;display:block}
-.rcard h4{font-family:"Fraunces",serif;font-weight:600;font-size:18px;line-height:1.14;color:var(--ink);margin:0 0 6px}
-.rcard p{font-family:"Inter",sans-serif;font-size:13px;color:var(--ink-3);margin:0 0 12px}
-.rcard .sponsor-head{display:flex;align-items:center;gap:11px;margin-bottom:11px}
-.rcard .sponsor-head .name{font-family:"Fraunces",serif;font-weight:600;font-size:15px;color:var(--navy)}
-.rcard .sponsor-head .tag{font-family:"Inter",sans-serif;font-size:11.5px;color:var(--ink-3)}
-.form-row{display:flex;gap:7px}
-.form-row input{flex:1}
-.rcard.giveaway{border-color:var(--gold);border-left:3px solid var(--gold);background:linear-gradient(180deg,#f0e7cd 0%,var(--cream-dark) 55%)}
-.rcard.giveaway .kick{color:#9a7d1e}
-.powered{font-family:"JetBrains Mono",monospace;font-size:9.5px;color:var(--ink-3);letter-spacing:.06em;margin-top:9px;text-transform:none}
-.rail-ad-label{font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:.14em;color:#b3a992;text-transform:uppercase;text-align:right;margin:-4px 2px 2px 0}
-
-/* ---------- mobile interstitials (hidden desktop) ---------- */
-.interstitial{display:none}
-
-/* ---------- sticky mobile sponsor bar ---------- */
-.mobile-sponsor-bar{display:none}
-
-/* ---------- mobile map overlay ---------- */
-.mobile-sheet{display:none}
-
-/* ---------- footer ---------- */
-footer{border-top:1px solid var(--border);background:var(--paper-2);margin-top:20px}
-.footer-in{max-width:1200px;margin:0 auto;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.footer-in .mono{color:var(--ink-3)}
-.footer-in .wm{font-family:"Fraunces",serif;font-weight:700;color:var(--navy);font-size:15px}
-
-.map-view,.list-view,.calendar-view{display:none}
-.map-view.on,.list-view.on,.calendar-view.on{display:block}
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
-@media (max-width:860px){
-  .shell{grid-template-columns:1fr;gap:0}
-  .rail{display:none} /* rail collapses; cards go inline */
-  .topsearch{display:none}
-  .hero h1{font-size:30px}
-  .hero .dek{font-size:15px}
-  .nav{padding:9px 14px}
-  .wordmark{font-size:19px}
-  .sponsor-strip,.hero,.hero-rule,.shell{padding-left:14px;padding-right:14px}
-  .tabs button{padding:8px 15px}
-
-  .calgrid{grid-template-columns:1fr}
-  .calcol{border-right:0;border-bottom:1px solid var(--border);min-height:0}
-  .calcol:last-child{border-bottom:0}
-  .calcol .colhead{text-align:left;display:flex;align-items:baseline;gap:8px}
-
-  .card.premium{padding:16px}
-  .card.premium h3{font-size:20px}
-
-  /* interstitial cards appear inline in list */
-  .interstitial{display:block;margin-bottom:12px}
-
-  /* map fills screen height on mobile */
-  .mapwrap{height:calc(100vh - 210px);border-radius:4px}
-  .map-legend{left:8px;right:8px;bottom:8px;max-width:none}
-  .map-legend .lchips{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;padding-bottom:2px}
-  .map-mode{top:8px;left:8px}
-
-  /* mobile bottom sheet for pin tap */
-  .mobile-sheet{
-    display:block;position:fixed;left:0;right:0;bottom:-100%;z-index:120;
-    background:var(--cream-dark);border-top:1px solid var(--border);
-    border-radius:8px 8px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom));
-    box-shadow:0 -8px 26px rgba(11,22,36,.25);transition:bottom .28s ease;
+@media (max-width:640px){
+  .topnav{padding:11px 16px;}
+  .navlinks{display:none;}
+  .hero{padding:22px 16px 10px;}
+  .hero h1{font-size:34px;}
+  .controls{padding:0 16px;}
+  .controlbar{gap:8px;}
+  .viewswitch{order:1;}
+  .controlbar .spacer{order:2;display:block;}
+  .add-event{order:3;}
+  .searchwrap{order:4;flex:1 1 100%;max-width:none;}
+  .filter-toggle{display:flex;order:5;}
+  .desktop-filters{display:none;}
+  .add-event span{display:none;}
+  .add-event{padding:0 12px;}
+  .layout{padding:0 16px 40px;margin-top:16px;}
+  .cardgrid{grid-template-columns:1fr;}
+  .evcard.premium{grid-column:span 1;}
+  .listthumb{width:96px;flex:0 0 96px;}
+  .drawer{width:100vw;max-width:100vw;transform:translateY(100%);border-radius:14px 14px 0 0;height:96vh;top:auto;bottom:0;}
+  .drawer.open{transform:translateY(0);}
+  .mapshell{height:calc(100vh - 230px);min-height:400px;border-radius:0;border-left:none;border-right:none;}
+  .map-legend{display:none;}
+  .mapchips{
+    display:flex;gap:7px;overflow-x:auto;padding:11px 16px;margin:0 -16px;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;
   }
-  .mobile-sheet.open{bottom:0}
-  .mobile-sheet .grab{width:40px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 12px}
-  .mobile-sheet .cat{font-family:"JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.08em;font-size:10px;font-weight:700}
-  .mobile-sheet h4{font-family:"Fraunces",serif;font-weight:600;font-size:20px;margin:5px 0 4px;color:var(--ink)}
-  .mobile-sheet .m{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ink-3);margin-bottom:3px}
-  .mobile-sheet .v{font-family:"Inter",sans-serif;font-size:14px;color:var(--navy);font-weight:500;margin-bottom:12px}
-  .sheet-scrim{display:none;position:fixed;inset:0;background:rgba(11,22,36,.35);z-index:110}
-  .sheet-scrim.open{display:block}
-
-  /* sticky mobile sponsor bar */
-  .mobile-sponsor-bar{
-    display:flex;position:fixed;left:0;right:0;bottom:0;z-index:90;
-    background:var(--navy);color:var(--paper);align-items:center;gap:11px;
-    padding:9px 14px calc(9px + env(safe-area-inset-bottom));border-top:2px solid var(--gold);
+  .mapchips::-webkit-scrollbar{display:none;}
+  .mapchip{flex:0 0 auto;height:32px;padding:0 12px;border:1px solid var(--border);border-radius:4px;background:var(--cream-dark);
+    font-family:var(--sans);font-size:12px;font-weight:600;color:var(--navy);display:flex;align-items:center;gap:6px;white-space:nowrap;}
+  .mapchip .swatch{width:8px;height:8px;border-radius:2px;}
+  /* mobile sticky sponsor */
+  .mobile-sponsor{
+    display:flex;position:fixed;left:0;right:0;bottom:0;z-index:70;align-items:center;gap:11px;
+    background:var(--navy);color:var(--wg-cream);padding:10px 14px;border-top:2px solid var(--gold);
   }
-  .mobile-sponsor-bar .kk{font-family:"JetBrains Mono",monospace;font-size:8.5px;letter-spacing:.12em;color:var(--gold);text-transform:uppercase}
-  .mobile-sponsor-bar .msg{font-family:"Inter",sans-serif;font-size:12.5px;flex:1;line-height:1.25}
-  .mobile-sponsor-bar .msg b{font-weight:600}
-  .mobile-sponsor-bar .go{font-family:"Inter",sans-serif;font-weight:600;font-size:12px;background:var(--rust);color:#fff;border:0;padding:7px 12px;border-radius:3px;cursor:pointer;white-space:nowrap}
-  .mobile-sponsor-bar .x{background:transparent;border:0;color:var(--paper);opacity:.6;font-size:18px;cursor:pointer;padding:2px 4px;line-height:1}
-  body.has-bar{padding-bottom:64px}
-  body.map-active .mobile-sponsor-bar{display:none}
-  body.map-active.has-bar{padding-bottom:0}
-}
-
-@media (min-width:861px){
-  .mobile-sheet,.sheet-scrim,.mobile-sponsor-bar{display:none!important}
-}
-
-/* extra-small */
-@media (max-width:420px){
-  .hero h1{font-size:27px}
-  .sponsor-strip .unit{gap:11px;padding:9px 12px}
-  .sponsor-strip .msg .dek{display:none}
+  .mobile-sponsor.hidden{display:none;}
+  .mobile-sponsor .ms-tag{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;}
+  .mobile-sponsor .ms-name{font-family:var(--serif);font-size:14px;color:#fff;}
+  .mobile-sponsor .ms-sub{font-family:var(--sans);font-size:11px;color:#b9c6d6;}
+  .mobile-sponsor .ms-close{margin-left:auto;background:transparent;border:none;color:#9fb0c6;font-size:20px;line-height:1;padding:0 4px;}
+  .foot{padding-bottom:80px;}
 }
 </style>
 </head>
-<body class="has-bar">
+<body>
 
-<!-- ============ NAV ============ -->
-<nav class="nav">
-  <div class="wordmark">WilCo Guide<small>Williamson County</small></div>
-  <div class="topsearch"><input type="search" placeholder="Search events, venues, dates..." /></div>
-  <div class="tabs" id="topTabs">
-    <button data-view="list" class="active">Events</button>
-    <button data-view="map">Map</button>
+<!-- ===================== TOP NAV ===================== -->
+<nav class="topnav">
+  <div class="wordmark">WilCo Guide<small>Williamson County TX</small></div>
+  <div class="navlinks">
+    <a href="#">Directory</a>
+    <a href="#" class="active">Events</a>
+    <a href="#">Newsletter</a>
+    <a href="#">For Business</a>
+  </div>
+  <div class="nav-right">
+    <a href="#" class="subscribe">Subscribe</a>
   </div>
 </nav>
 
-<!-- ============ SPONSOR STRIP ============ -->
-<div class="sponsor-strip">
-  <div class="unit">
-    <span class="mono kick">Sponsor</span>
-    <div class="logo-block green">HC</div>
-    <div class="msg"><b>Presented by Hill Country Bank</b> <span class="dek">- Local roots since 1979. Banking that stays in Leander.</span></div>
-    <span class="mono" style="color:var(--rust);white-space:nowrap">Learn more &rsaquo;</span>
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="kicker">Leander + Cedar Park</div>
+  <h1>Events</h1>
+  <p class="dek">Every local happening in one place: markets, music, garage sales, school games and more, updated for the week ahead.</p>
+</header>
+
+<!-- ===================== CONTROL BAR ===================== -->
+<div class="controls">
+  <div class="controlbar">
+    <!-- view switcher -->
+    <div class="viewswitch" id="viewswitch">
+      <button class="viewbtn active" data-view="card" title="Card view" aria-label="Card view">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      </button>
+      <button class="viewbtn" data-view="list" title="List view" aria-label="List view">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3.5" cy="6" r="1.3" fill="currentColor" stroke="none"/><circle cx="3.5" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="3.5" cy="18" r="1.3" fill="currentColor" stroke="none"/></svg>
+      </button>
+      <button class="viewbtn" data-view="calendar" title="Calendar view" aria-label="Calendar view">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+      </button>
+      <button class="viewbtn" data-view="map" title="Map view" aria-label="Map view">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
+      </button>
+    </div>
+
+    <!-- search -->
+    <div class="searchwrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="search" type="text" placeholder="Search events, venues..." autocomplete="off" />
+    </div>
+
+    <!-- desktop filters -->
+    <div class="desktop-filters">
+      <div class="dd" id="dd-type">
+        <button class="dd-btn" data-dd="type"><span id="type-label">All Events</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+        <div class="dd-menu"></div>
+      </div>
+      <div class="dd" id="dd-sort">
+        <button class="dd-btn" data-dd="sort"><span id="sort-label">Soonest</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+        <div class="dd-menu"></div>
+      </div>
+      <div class="dd" id="dd-date">
+        <button class="dd-btn" data-dd="date"><span id="date-label">Any Date</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+        <div class="dd-menu"></div>
+      </div>
+      <div class="dd" id="dd-radius">
+        <button class="dd-btn" data-dd="radius"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--rust)"><path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.4"/></svg><span id="radius-label">Within 25 miles</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+        <div class="dd-menu"></div>
+      </div>
+    </div>
+
+    <!-- mobile filter toggle -->
+    <button class="filter-toggle" id="filterToggle">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+      Filters
+    </button>
+
+    <div class="spacer"></div>
+    <button class="add-event"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>Add Event</span></button>
   </div>
 </div>
 
-<!-- ============ HERO ============ -->
-<header class="hero">
-  <span class="mono kick">Fri-Sun &middot; Leander + Cedar Park</span>
-  <h1>This Weekend in Leander</h1>
-  <p class="dek">Every market, concert, garage sale, and city meeting worth your Saturday - mapped, sorted, and on one page.</p>
-</header>
-<div class="hero-rule"><hr /></div>
+<!-- ===================== BODY LAYOUT ===================== -->
+<div class="layout" id="layout">
+  <div class="viewarea">
+    <p class="resultline" id="resultline">16 events</p>
 
-<!-- ============ MAIN ============ -->
-<div class="shell">
-  <div class="main-col">
-
-    <!-- view bar -->
-    <div class="viewbar">
-      <div class="segmented" id="segmented">
-        <button data-view="list" class="active">List</button>
-        <button data-view="calendar">Calendar</button>
-        <button data-view="map">Map</button>
-      </div>
-      <span class="mono count" id="resultCount"></span>
-    </div>
-
-    <!-- day + category filters (shared for list/calendar) -->
-    <div id="filterZone">
-      <div class="chips" id="dayChips"></div>
-      <span class="mono chips-label">Categories</span>
-      <div class="chips chips-cat" id="catChips"></div>
-    </div>
+    <!-- CARD VIEW -->
+    <div class="cardgrid" id="cardview"></div>
 
     <!-- LIST VIEW -->
-    <section class="list-view on" id="listView"></section>
+    <div class="listview" id="listview" style="display:none;"></div>
 
     <!-- CALENDAR VIEW -->
-    <section class="calendar-view" id="calendarView"></section>
+    <div class="calwrap" id="calview" style="display:none;">
+      <div class="calhead">
+        <h2>July 2026</h2>
+        <span class="mono">Leander + Cedar Park</span>
+      </div>
+      <div class="calgrid" id="calgrid"></div>
+    </div>
 
     <!-- MAP VIEW -->
-    <section class="map-view" id="mapView">
-      <div class="mapwrap">
+    <div class="mapview" id="mapview">
+      <div class="mapshell">
         <div id="map"></div>
-        <div class="map-mode" id="mapMode">
-          <button data-mode="events" class="active">Events</button>
-          <button data-mode="closures">Road Closures</button>
+        <div class="map-toggle" id="mapToggle">
+          <button class="active" data-layer="events">Events</button>
+          <button data-layer="closures">Road Closures</button>
         </div>
         <div class="map-legend">
-          <span class="mono lhead" id="legendHead">Filter map</span>
-          <div class="lchips" id="mapChips"></div>
+          <h4>Filter Map</h4>
+          <div id="legendRows"></div>
         </div>
       </div>
-    </section>
-
+      <div class="mapchips" id="mapchips"></div>
+    </div>
   </div>
 
-  <!-- ============ CARD RAIL ============ -->
-  <aside class="rail">
-    <div>
-      <div class="rail-ad-label">Advertisement</div>
-      <div class="rcard">
-        <span class="mono kick">Sponsor</span>
-        <div class="sponsor-head">
-          <div class="logo-block green">HC</div>
-          <div><div class="name">Hill Country Bank</div><div class="tag">Leander &middot; Member FDIC</div></div>
-        </div>
-        <h4>Open a hometown checking account</h4>
-        <p>No monthly fees for Leander ISD families. Switch in 10 minutes at our Old Town branch.</p>
-        <button class="btn block">Learn more</button>
+  <!-- RIGHT RAIL -->
+  <aside class="rail" id="rail">
+    <div class="railcard">
+      <div class="sponsor-tag">Sponsor</div>
+      <img src="https://picsum.photos/seed/hill-country-bank/480/270" alt="Hill Country Bank" />
+      <div class="rc-body">
+        <p class="rc-name">Hill Country Bank</p>
+        <p class="rc-copy">Local banking built for Williamson County families since 1974. No-fee checking for new neighbors.</p>
+        <a href="#" class="rc-link">Open an account &rarr;</a>
       </div>
     </div>
-
-    <div class="rcard giveaway">
-      <span class="mono kick">Enter to win</span>
-      <h4>Win 2 tickets to the Leander Summer Concert</h4>
-      <p>Drop your email for a chance at front-row seats to Saturday's show at Robin Bledsoe Park.</p>
-      <form class="form-row" onsubmit="fakeSubmit(event,'You are entered. Good luck!')">
-        <input type="email" placeholder="you@email.com" required />
-        <button class="btn" type="submit">Enter</button>
-      </form>
-      <div class="powered">Powered by greetform</div>
+    <div class="greetcard">
+      <div class="goldbar"></div>
+      <div class="gc-body">
+        <div class="gc-kick">&#9733; Local Giveaway</div>
+        <h3>Enter to win Leander Summer Concert tickets</h3>
+        <p>Two front-row seats plus parking. Drawn Friday. Free to enter.</p>
+        <form class="greetform" onsubmit="return greetSubmit(event)">
+          <input type="email" placeholder="you@email.com" required />
+          <button type="submit">Enter</button>
+        </form>
+        <p class="greetpow">Powered by greetform</p>
+      </div>
     </div>
-
-    <div class="rcard">
-      <span class="mono kick">Newsletter</span>
-      <h4>Get This Weekend in your inbox</h4>
-      <p>One Thursday email. Every local event for the weekend ahead. Free.</p>
-      <form class="form-row" onsubmit="fakeSubmit(event,'Subscribed. See you Thursday.')">
+    <div class="signupcard">
+      <div class="su-kick">The Weekly Scoop</div>
+      <h3>Never miss a local event</h3>
+      <p>Get the WilCo Guide events roundup every Thursday morning.</p>
+      <form class="su-form" onsubmit="return greetSubmit(event)">
         <input type="email" placeholder="you@email.com" required />
-        <button class="btn navy" type="submit">Subscribe</button>
+        <button type="submit">Join</button>
       </form>
     </div>
-
-    <div>
-      <div class="rail-ad-label">Advertisement</div>
-      <div class="rcard">
-        <span class="mono kick">Sponsor</span>
-        <div class="sponsor-head">
-          <div class="logo-block rust">RB</div>
-          <div><div class="name">Reyna &amp; Bell Realty</div><div class="tag">Cedar Park homes</div></div>
-        </div>
-        <h4>Thinking of selling this summer?</h4>
-        <p>Free home valuation for Leander and Crystal Falls owners. Local agents, no pressure.</p>
-        <button class="btn navy block">Get my estimate</button>
+    <div class="railcard">
+      <div class="sponsor-tag">Sponsor</div>
+      <img src="https://picsum.photos/seed/rail-house-eats/480/270" alt="The Rail House" />
+      <div class="rc-body">
+        <p class="rc-name">The Rail House Kitchen</p>
+        <p class="rc-copy">Live jazz brunch every Sunday in Old Town Leander. Reserve a patio table this weekend.</p>
+        <a href="#" class="rc-link">See the menu &rarr;</a>
       </div>
     </div>
   </aside>
 </div>
 
-<!-- ============ FOOTER ============ -->
-<footer>
-  <div class="footer-in">
-    <span class="wm">WilCo Guide</span>
-    <span class="mono">Prototype &middot; mock data &middot; lightbreak x WilCo Guide</span>
-  </div>
+<!-- ===================== FOOTER ===================== -->
+<footer class="foot">
+  <span class="fm">PROTOTYPE v2 &middot; mock data &middot; lightbreak x WilCo Guide</span>
 </footer>
 
-<!-- mobile bottom sheet (pin tap) -->
-<div class="sheet-scrim" id="sheetScrim" onclick="closeSheet()"></div>
-<div class="mobile-sheet" id="mobileSheet">
-  <div class="grab"></div>
-  <div id="sheetBody"></div>
+<!-- ===================== DRAWER (own event page) ===================== -->
+<div class="scrim" id="scrim" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer" role="dialog" aria-modal="true">
+  <button class="drawer-close" onclick="closeDrawer()" aria-label="Close">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  <div class="drawer-hero"><img id="d-img" src="" alt="" /></div>
+  <div class="drawer-body">
+    <div class="cat-kicker" id="d-cat"></div>
+    <h1 id="d-title"></h1>
+    <div class="drawer-datebar">
+      <div class="drow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg><span id="d-date"></span></div>
+      <div class="drow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg><span id="d-time"></span></div>
+      <div class="drow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.4"/></svg><span id="d-place"></span></div>
+    </div>
+    <p class="drawer-desc" id="d-desc"></p>
+    <div class="drawer-actions">
+      <button class="btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>Get tickets / View original</button>
+      <button class="btn-secondary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="12" y1="13" x2="12" y2="17"/><line x1="10" y1="15" x2="14" y2="15"/></svg>Add to calendar</button>
+    </div>
+    <p class="seo-note">This is your WilCo Guide event page &middot; a real indexable page we host, great for local SEO. We turn every event into our own page instead of linking away.</p>
+  </div>
 </div>
 
-<!-- sticky mobile sponsor bar -->
-<div class="mobile-sponsor-bar" id="mobileBar">
-  <div class="logo-block gold" style="width:36px;height:36px;font-size:14px">HC</div>
-  <div class="msg"><span class="kk">Sponsor</span><br /><b>Hill Country Bank</b> - hometown checking, no fees.</div>
-  <button class="go">Learn</button>
-  <button class="x" onclick="document.getElementById('mobileBar').style.display='none';document.body.classList.remove('has-bar')" aria-label="Dismiss">&times;</button>
+<!-- ===================== MOBILE STICKY SPONSOR ===================== -->
+<div class="mobile-sponsor" id="mobileSponsor">
+  <span class="ms-tag">Sponsor</span>
+  <div>
+    <div class="ms-name">Hill Country Bank</div>
+    <div class="ms-sub">No-fee checking for neighbors</div>
+  </div>
+  <button class="ms-close" aria-label="Dismiss">&times;</button>
 </div>
 
+<script src="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.js"></script>
 <script>
-/* ============ DATA ============ */
+/* ============================================================
+   DATA
+   ============================================================ */
 const CAT = {
-  "Music":        {color:"var(--c-music)",    hex:"#c24c32"},
-  "Markets":      {color:"var(--c-markets)",  hex:"#2d6a4f"},
-  "Garage Sales": {color:"var(--c-garage)",   hex:"#8a6d3b"},
-  "Estate Sales": {color:"var(--c-estate)",   hex:"#ba6f5e"},
-  "Kids & School":{color:"var(--c-kids)",     hex:"#123260"},
-  "City & Gov":   {color:"var(--c-gov)",      hex:"#3a7a7a"},
-  "Food & Drink": {color:"var(--c-food)",     hex:"#b5622a"},
-  "Outdoors":     {color:"var(--c-outdoors)", hex:"#5c7a3a"},
+  'Family':        {color:'var(--cat-family)',  hex:'#123260'},
+  'Music':         {color:'var(--cat-music)',   hex:'#6b4a86'},
+  'Markets':       {color:'var(--cat-markets)', hex:'#8a6d1f'},
+  'Food & Drink':  {color:'var(--cat-food)',    hex:'#a84e30'},
+  'Garage Sales':  {color:'var(--cat-garage)',  hex:'#2f6b4f'},
+  'Estate Sales':  {color:'var(--cat-estate)',  hex:'#4a5a7a'},
+  'Kids & School': {color:'var(--cat-kids)',    hex:'#2f6f7a'},
+  'City & Gov':    {color:'var(--cat-city)',    hex:'#3a3f52'},
+  'Outdoors':      {color:'var(--cat-outdoors)',hex:'#3d7040'}
 };
 
 const EVENTS = [
-  {title:"Leander Farmers Market", category:"Markets", day:"Sat", time:"9:00 AM", venue:"Sarah's Market, Old Town", lat:30.5744, lng:-97.8530, tier:"featured", desc:"40+ local growers, bakers, and makers. Live acoustic set at 10. Dog friendly."},
-  {title:"Summer Concert Series", category:"Music", day:"Sat", time:"7:30 PM", venue:"Robin Bledsoe Park", lat:30.5090, lng:-97.8230, tier:"premium", desc:"Headliner: The Bluebonnets. Bring a blanket. Food trucks and a beer garden on site from 6."},
-  {title:"Old Town Leander Garage Sale", category:"Garage Sales", day:"Sat", time:"8:00 AM", venue:"200 block W Willis St", lat:30.5810, lng:-97.8590, tier:"standard", desc:"Neighborhood-wide sale. Furniture, tools, kids gear. Early birds welcome."},
-  {title:"Estate Sale - Crystal Falls", category:"Estate Sales", day:"Sat", time:"10:00 AM", venue:"Crystal Falls Pkwy", lat:30.5960, lng:-97.8700, tier:"standard", desc:"Mid-century furniture, china, garden tools. Numbers at 9:30, cash preferred."},
-  {title:"Leander HS Football vs Rouse", category:"Kids & School", day:"Fri", time:"7:00 PM", venue:"Leander HS Stadium", lat:30.5730, lng:-97.8600, tier:"standard", desc:"District rivalry night. Gates at 6, band show at halftime."},
-  {title:"Library Storytime", category:"Kids & School", day:"Fri", time:"10:30 AM", venue:"Cedar Park Library", lat:30.5217, lng:-97.8200, tier:"standard", desc:"Ages 2-5. Songs, a story, and a craft. Free, no sign-up."},
-  {title:"Food Truck Friday", category:"Food & Drink", day:"Fri", time:"5:00 PM", venue:"Lakeline Mall lot", lat:30.4680, lng:-97.7960, tier:"featured", desc:"12 trucks, live music, and a kids zone. Tacos, BBQ, boba, and Detroit pizza."},
-  {title:"Trivia Night", category:"Food & Drink", day:"Fri", time:"8:00 PM", venue:"Growler USA, Cedar Park", lat:30.5150, lng:-97.8180, tier:"standard", desc:"Teams of up to 6. Gift-card prizes for the top three. Arrive early for a table."},
-  {title:"City Council Meeting", category:"City & Gov", day:"Fri", time:"6:30 PM", venue:"Leander City Hall", lat:30.5788, lng:-97.8531, tier:"standard", desc:"Agenda: Old Town parking plan and the FY budget. Public comment opens at 6:45."},
-  {title:"Brushy Creek Trail Cleanup", category:"Outdoors", day:"Sat", time:"8:00 AM", venue:"Brushy Creek Lake Park", lat:30.5100, lng:-97.7900, tier:"standard", desc:"Gloves and bags provided. Coffee and kolaches for volunteers. Meet at the pavilion."},
-  {title:"Vintage Market Days", category:"Markets", day:"Sun", time:"10:00 AM", venue:"Cedar Park Center", lat:30.4700, lng:-97.8020, tier:"featured", desc:"Curated vintage, antiques, and handmade goods. 90 vendors under one roof."},
-  {title:"Yard Sale on Bagdad Rd", category:"Garage Sales", day:"Sat", time:"7:30 AM", venue:"Bagdad Rd", lat:30.5600, lng:-97.8700, tier:"standard", desc:"Baby gear, bikes, and a few power tools. Cash only, rain or shine."},
-  {title:"Sculpture Garden Walk", category:"Outdoors", day:"Sun", time:"2:00 PM", venue:"Liberty Hill", lat:30.6649, lng:-97.9247, tier:"standard", desc:"Guided stroll through the International Sculpture Park. Free, wear good shoes."},
+  {title:"Leander Farmers Market", category:"Markets", date:"2026-07-25", time:"9:00 AM", city:"Leander", venue:"Sarah's Market, Old Town", lat:30.5744, lng:-97.8530, tier:"featured", desc:"Fresh Hill Country produce, local honey, handmade goods and food trucks fill Old Town Leander every Saturday morning. Live acoustic music from 10am and a kids corner with face painting. Rain or shine under the pavilion.", slug:"leander-farmers-market"},
+  {title:"Summer Concert Series", category:"Music", date:"2026-07-25", time:"7:30 PM", city:"Leander", venue:"Robin Bledsoe Park", lat:30.5090, lng:-97.8230, tier:"premium", desc:"The City of Leander closes out July with a full band under the stars at Robin Bledsoe Park. Bring lawn chairs and blankets. Food and drink vendors on site. Free admission, VIP front-row seating available.", slug:"summer-concert-series"},
+  {title:"Old Town Leander Garage Sale", category:"Garage Sales", date:"2026-07-25", time:"8:00 AM", city:"Leander", venue:"200 W Willis St", lat:30.5810, lng:-97.8590, tier:"standard", desc:"Neighborhood-wide garage sale across Old Town. Furniture, tools, kids gear, vintage finds and more across 20-plus homes. Early birds welcome, cash preferred.", slug:"old-town-garage-sale"},
+  {title:"Estate Sale on Crystal Falls", category:"Estate Sales", date:"2026-07-25", time:"10:00 AM", city:"Leander", venue:"Crystal Falls Pkwy", lat:30.5960, lng:-97.8700, tier:"standard", desc:"Full-house estate sale featuring mid-century furniture, fine china, tools, patio sets and collectibles. Professionally managed, numbers handed out at 9:30am.", slug:"estate-sale-crystal-falls"},
+  {title:"Leander HS Football vs Rouse", category:"Kids & School", date:"2026-07-24", time:"7:00 PM", city:"Leander", venue:"Leander HS Stadium", lat:30.5730, lng:-97.8600, tier:"standard", desc:"The Lions host the Rouse Raiders in a preseason scrimmage. Concessions and spirit gear on site. Gates open at 6pm, students free with ID.", slug:"leander-hs-football"},
+  {title:"Toddler Storytime", category:"Kids & School", date:"2026-07-24", time:"10:30 AM", city:"Cedar Park", venue:"Cedar Park Library", lat:30.5217, lng:-97.8200, tier:"standard", desc:"Songs, rhymes and picture books for ages 1 to 3 with a caregiver. Free, no registration needed. Stay after for open playtime in the childrens area.", slug:"toddler-storytime"},
+  {title:"Food Truck Friday", category:"Food & Drink", date:"2026-07-24", time:"5:00 PM", city:"Cedar Park", venue:"Lakeline lot", lat:30.4680, lng:-97.7960, tier:"featured", desc:"A dozen of Central Texas best food trucks gather at the Lakeline lot every Friday evening. Live music, cold local beer, and picnic seating. Family and dog friendly.", slug:"food-truck-friday"},
+  {title:"Trivia Night", category:"Food & Drink", date:"2026-07-24", time:"8:00 PM", city:"Cedar Park", venue:"Growler USA", lat:30.5150, lng:-97.8180, tier:"standard", desc:"Team trivia every Friday at Growler USA. Six rounds, prizes for the top three teams. Arrive early to grab a booth, teams up to six.", slug:"trivia-night"},
+  {title:"City Council Meeting", category:"City & Gov", date:"2026-07-24", time:"6:30 PM", city:"Leander", venue:"Leander City Hall", lat:30.5788, lng:-97.8531, tier:"standard", desc:"Regular session of the Leander City Council. Public comment opens the agenda. Livestreamed and open to all residents. Agenda posted 72 hours in advance.", slug:"city-council-meeting"},
+  {title:"Brushy Creek Trail Cleanup", category:"Outdoors", date:"2026-07-25", time:"8:00 AM", city:"Cedar Park", venue:"Brushy Creek Lake Park", lat:30.5100, lng:-97.7900, tier:"standard", desc:"Volunteer morning to keep the Brushy Creek trail system clean. Gloves, bags and water provided. Meet at the main pavilion, great for scout and service hours.", slug:"brushy-creek-cleanup"},
+  {title:"Vintage Market Days", category:"Markets", date:"2026-07-26", time:"10:00 AM", city:"Cedar Park", venue:"Cedar Park Center", lat:30.4700, lng:-97.8020, tier:"featured", desc:"A curated indoor market of antiques, repurposed decor, artisan goods and vintage clothing from 80-plus vendors. Air conditioned, food court on site.", slug:"vintage-market-days"},
+  {title:"Yard Sale on Bagdad Rd", category:"Garage Sales", date:"2026-07-25", time:"7:30 AM", city:"Leander", venue:"Bagdad Rd", lat:30.5600, lng:-97.8700, tier:"standard", desc:"Multi-family yard sale on Bagdad Road. Baby gear, sporting goods, home decor and a few pieces of furniture. Everything priced to move by noon.", slug:"yard-sale-bagdad"},
+  {title:"Sculpture Garden Walk", category:"Outdoors", date:"2026-07-26", time:"2:00 PM", city:"Liberty Hill", venue:"Liberty Hill", lat:30.6649, lng:-97.9247, tier:"standard", desc:"A guided afternoon walk through Liberty Hills outdoor sculpture collection. Free docent-led tour departs from the visitor center. Wear comfortable shoes.", slug:"sculpture-garden-walk"},
+  {title:"Family Movie in the Park", category:"Family", date:"2026-07-26", time:"8:30 PM", city:"Leander", venue:"Devine Lake Park", lat:30.5800, lng:-97.8400, tier:"featured", desc:"An outdoor family film on the big inflatable screen at Devine Lake Park. Bring blankets and low chairs. Popcorn and snow cones from local vendors. Free admission.", slug:"family-movie-park"},
+  {title:"Farmers Market Yoga", category:"Family", date:"2026-07-26", time:"9:00 AM", city:"Cedar Park", venue:"Elizabeth Milburn Park", lat:30.5050, lng:-97.8250, tier:"standard", desc:"All-levels outdoor yoga on the green at Elizabeth Milburn Park. Bring your own mat and water. Instructor-led, donation based, kids welcome to join.", slug:"farmers-market-yoga"},
+  {title:"Live Jazz Brunch", category:"Music", date:"2026-07-26", time:"11:00 AM", city:"Leander", venue:"The Rail House", lat:30.5720, lng:-97.8560, tier:"standard", desc:"Sunday jazz brunch at The Rail House in Old Town Leander. A rotating trio, bottomless mimosas and a Southern brunch menu. Reservations recommended.", slug:"live-jazz-brunch"}
 ];
 
 const CLOSURES = [
-  {title:"US-183A ramp closure", lat:30.5850, lng:-97.8650, note:"Southbound on-ramp closed Fri 9 PM - Sun 6 AM for paving."},
-  {title:"Bagdad Rd lane closure", lat:30.5600, lng:-97.8650, note:"One lane each way near CR 279. Expect delays, use New Hope Dr."},
+  {label:"US-183A ramp closure", lat:30.5850, lng:-97.8650},
+  {label:"Bagdad Rd lane closure", lat:30.5600, lng:-97.8650}
 ];
 
-const DAYS = ["Fri","Sat","Sun"];
-const DAYFULL = {Fri:"Friday",Sat:"Saturday",Sun:"Sunday"};
-const DAYDATE = {Fri:"Jul 24",Sat:"Jul 25",Sun:"Jul 26"};
-
-/* ============ STATE ============ */
-let state = { view:"list", day:"All", cats:new Set(Object.keys(CAT)), mapMode:"events" };
-let map=null, markers=[];
-
-/* ============ HELPERS ============ */
-const isMobile = () => window.matchMedia("(max-width:860px)").matches;
-function filtered(){
-  return EVENTS.filter(e =>
-    (state.day==="All" || e.day===state.day) &&
-    state.cats.has(e.category)
-  );
+/* rough distance from Leander City Hall center for a "distance" value */
+const CENTER = {lat:30.5788, lng:-97.8531};
+function miles(a){
+  const dx=(a.lng-CENTER.lng)*54.6, dy=(a.lat-CENTER.lat)*69;
+  return Math.sqrt(dx*dx+dy*dy);
 }
-function tierRank(t){ return t==="premium"?0 : t==="featured"?1 : 2; }
-const svgPin = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.4" fill="currentColor"/></svg>`;
+EVENTS.forEach(e=>{ e.dist = miles(e); e.saved=false; });
 
-/* ============ FILTER CHIPS ============ */
-function renderDayChips(){
-  const zone = document.getElementById("dayChips");
-  const opts = ["All",...DAYS];
-  zone.innerHTML = opts.map(d =>
-    `<button class="chip ${state.day===d?'active':''}" data-day="${d}">${d==="All"?"All days":DAYFULL[d]}</button>`
-  ).join("");
-  zone.querySelectorAll(".chip").forEach(c => c.onclick = () => { state.day=c.dataset.day; renderAll(); });
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = { view:'card', search:'', type:'All Events', sort:'Soonest', date:'Any Date', radius:25 };
+
+const DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTH = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function fmtDate(iso){ const d=new Date(iso+'T12:00:00'); return DOW[d.getDay()].toUpperCase()+', '+MONTH[d.getMonth()].toUpperCase()+' '+d.getDate(); }
+function fmtDateLong(iso){ const full=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']; const mf=['January','February','March','April','May','June','July','August','September','October','November','December']; const d=new Date(iso+'T12:00:00'); return full[d.getDay()]+', '+mf[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear(); }
+
+/* ============================================================
+   FILTER + SORT
+   ============================================================ */
+function getFiltered(){
+  let out = EVENTS.slice();
+  const q = state.search.trim().toLowerCase();
+  if(q){ out = out.filter(e => (e.title+' '+e.venue+' '+e.city+' '+e.category).toLowerCase().includes(q)); }
+  if(state.type!=='All Events'){ out = out.filter(e => e.category===state.type); }
+  if(state.date==='This Weekend'){ out = out.filter(e => ['2026-07-24','2026-07-25','2026-07-26'].includes(e.date)); }
+  if(state.date==='This Month'){ out = out.filter(e => e.date.startsWith('2026-07')); }
+  out = out.filter(e => e.dist <= state.radius);
+  if(state.sort==='Distance'){ out.sort((a,b)=>a.dist-b.dist); }
+  else { out.sort((a,b)=> a.date===b.date ? to24(a.time)-to24(b.time) : a.date.localeCompare(b.date)); }
+  return out;
 }
-function renderCatChips(){
-  const zone = document.getElementById("catChips");
-  zone.innerHTML = Object.keys(CAT).map(name => {
-    const on = state.cats.has(name);
-    return `<button class="chip ${on?'active':''}" data-cat="${name}"><span class="dot" style="background:${CAT[name].hex}"></span>${name}</button>`;
-  }).join("");
-  zone.querySelectorAll(".chip").forEach(c => c.onclick = () => {
-    const n=c.dataset.cat;
-    if(state.cats.has(n)) state.cats.delete(n); else state.cats.add(n);
-    if(state.cats.size===0) Object.keys(CAT).forEach(k=>state.cats.add(k)); // never empty
-    renderAll();
+function to24(t){ const m=t.match(/(\d+):(\d+)\s*(AM|PM)/i); let h=+m[1]%12; if(/pm/i.test(m[3]))h+=12; return h*60+ +m[2]; }
+
+/* ============================================================
+   RENDER: CARD VIEW
+   ============================================================ */
+function tierBadge(e){
+  if(e.tier==='featured') return '<div class="featbadge">&#9733; Featured</div>';
+  if(e.tier==='premium')  return '<div class="premtag">Premium</div>';
+  return '';
+}
+function renderCards(list){
+  const el = document.getElementById('cardview');
+  let html = '';
+  list.forEach((e,i)=>{
+    html += `<button class="evcard ${e.tier==='premium'?'premium':''}" onclick="openDrawer('${e.slug}')">
+      <div class="cardtop">
+        <div class="card-img-wrap">${tierBadge(e)}<img src="https://picsum.photos/seed/${e.slug}/480/360" alt="${e.title}" loading="lazy"/></div>
+      </div>
+      <div class="cardbody">
+        <span class="cat-kicker" style="color:${CAT[e.category].color}">${e.category}</span>
+        <h3 class="card-title">${e.title}</h3>
+        <span class="card-meta">${fmtDate(e.date)} &middot; ${e.time}</span>
+        <span class="card-place">${e.city} &middot; ${e.venue}</span>
+      </div>
+    </button>`;
+    if(i===2) html += interstitialSponsor();
+    if(i===7) html += interstitialGreet();
   });
+  el.innerHTML = html;
+}
+function interstitialSponsor(){
+  return `<div class="interstitial railcard">
+    <div class="sponsor-tag">Sponsor</div>
+    <img src="https://picsum.photos/seed/hill-country-bank/480/270" alt="Hill Country Bank"/>
+    <div class="rc-body"><p class="rc-name">Hill Country Bank</p>
+    <p class="rc-copy">No-fee checking for Williamson County families since 1974.</p>
+    <a href="#" class="rc-link">Open an account &rarr;</a></div></div>`;
+}
+function interstitialGreet(){
+  return `<div class="interstitial greetcard"><div class="goldbar"></div>
+    <div class="gc-body"><div class="gc-kick">&#9733; Local Giveaway</div>
+    <h3>Win Leander Summer Concert tickets</h3>
+    <p>Two front-row seats plus parking. Free to enter.</p>
+    <form class="greetform" onsubmit="return greetSubmit(event)"><input type="email" placeholder="you@email.com" required/><button type="submit">Enter</button></form>
+    <p class="greetpow">Powered by greetform</p></div></div>`;
 }
 
-/* ============ LIST VIEW ============ */
-function eventCardHTML(e){
-  const c = CAT[e.category];
-  const cls = e.tier==="premium" ? "card premium" : e.tier==="featured" ? "card featured" : "card";
-  let badge = "";
-  if(e.tier==="featured") badge = `<span class="badge featured">&#9733; Featured</span>`;
-  if(e.tier==="premium") badge = `<span class="badge premium">&#9733; Premium</span>`;
-  return `<div class="${cls}">
-    <div class="toprow">
-      <span class="cat" style="color:${c.hex}">${e.category}</span>
-      <span class="time">${e.time}</span>
-      ${badge}
-    </div>
-    <h3>${e.title}</h3>
-    <div class="venue">${svgPin}${e.venue}</div>
-    <div class="desc">${e.desc}</div>
-    <span class="details" onclick="openDetails('${encodeURIComponent(e.title)}')">Details &rsaquo;</span>
-  </div>`;
+/* ============================================================
+   RENDER: LIST VIEW
+   ============================================================ */
+function renderList(list){
+  const el = document.getElementById('listview');
+  el.innerHTML = list.map(e=>`
+    <div class="listrow">
+      <button class="listthumb" onclick="openDrawer('${e.slug}')" style="border:none;padding:0;background:var(--border)">
+        <img src="https://picsum.photos/seed/${e.slug}/240/180" alt="${e.title}" loading="lazy"/>
+      </button>
+      <button class="listmid" onclick="openDrawer('${e.slug}')" style="border:none;background:transparent;">
+        <span class="cat-kicker" style="color:${CAT[e.category].color}">${e.category}</span>
+        <span class="card-title" style="font-size:17px">${e.title}</span>
+        <span class="listmeta">${fmtDate(e.date)} &middot; ${e.time} &middot; ${e.city} &middot; ${e.venue}</span>
+      </button>
+      <div class="listright">
+        <span class="dist">${e.dist.toFixed(1)} mi</span>
+        <button class="savebtn ${e.saved?'saved':''}" onclick="toggleSave(event,'${e.slug}',this)" aria-label="Save">
+          <svg viewBox="0 0 24 24" fill="${e.saved?'currentColor':'none'}" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        </button>
+      </div>
+    </div>`).join('');
+}
+function toggleSave(ev, slug, btn){
+  ev.stopPropagation();
+  const e = EVENTS.find(x=>x.slug===slug); e.saved=!e.saved;
+  btn.classList.toggle('saved', e.saved);
+  btn.querySelector('svg').setAttribute('fill', e.saved?'currentColor':'none');
 }
 
-const INTERSTITIAL_SPONSOR = `<div class="interstitial rcard">
-  <span class="mono kick" style="color:var(--ink-3);margin-bottom:8px;display:block">Sponsor</span>
-  <div class="sponsor-head"><div class="logo-block rust">RB</div><div><div class="name">Reyna &amp; Bell Realty</div><div class="tag">Cedar Park homes</div></div></div>
-  <h4>Thinking of selling this summer?</h4>
-  <p>Free home valuation for Leander and Crystal Falls owners.</p>
-  <button class="btn navy block">Get my estimate</button>
-</div>`;
-const INTERSTITIAL_GIVEAWAY = `<div class="interstitial rcard giveaway">
-  <span class="mono kick">Enter to win</span>
-  <h4>Win 2 tickets to the Leander Summer Concert</h4>
-  <p>Drop your email for front-row seats to Saturday's show.</p>
-  <form class="form-row" onsubmit="fakeSubmit(event,'You are entered. Good luck!')"><input type="email" placeholder="you@email.com" required /><button class="btn" type="submit">Enter</button></form>
-  <div class="powered">Powered by greetform</div>
-</div>`;
-
-function renderList(){
-  const evs = filtered();
-  const zone = document.getElementById("listView");
-  const daysPresent = DAYS.filter(d => evs.some(e=>e.day===d));
-  if(daysPresent.length===0){ zone.innerHTML = `<div class="card"><div class="desc">No events match those filters. Try adding a category.</div></div>`; return; }
-  let html = "";
-  let dayIndex = 0;
-  daysPresent.forEach(day => {
-    const dayEvs = evs.filter(e=>e.day===day).sort((a,b)=>tierRank(a.tier)-tierRank(b.tier));
-    html += `<div class="day-group"><div class="day-head"><h2>${DAYFULL[day]}</h2><span class="mono">${DAYDATE[day]} &middot; ${dayEvs.length} event${dayEvs.length>1?'s':''}</span></div>`;
-    dayEvs.forEach((e,i) => {
-      html += eventCardHTML(e);
-      // interpose interstitials on mobile after first day's 2nd card, and again later
-      if(dayIndex===0 && i===1) html += INTERSTITIAL_GIVEAWAY;
-      if(dayIndex===1 && i===1) html += INTERSTITIAL_SPONSOR;
-    });
-    html += `</div>`;
-    dayIndex++;
-  });
-  zone.innerHTML = html;
+/* ============================================================
+   RENDER: CALENDAR VIEW (July 2026)
+   ============================================================ */
+function renderCalendar(list){
+  const grid = document.getElementById('calgrid');
+  let html = DOW.map(d=>`<div class="caldow">${d}</div>`).join('');
+  const first = new Date(2026,6,1).getDay(); // July=6
+  const daysIn = 31;
+  const byDay = {};
+  list.forEach(e=>{ const d=+e.date.slice(-2); (byDay[d]=byDay[d]||[]).push(e); });
+  for(let i=0;i<first;i++){ html += `<div class="calcell empty"></div>`; }
+  for(let d=1; d<=daysIn; d++){
+    const evs = byDay[d]||[];
+    const chips = evs.map(e=>`<button class="calchip" style="background:${CAT[e.category].color}" onclick="openDrawer('${e.slug}')" title="${e.title}">${e.title.length>16?e.title.slice(0,15)+'…':e.title} <span class="t">${e.time.replace(':00','')}</span></button>`).join('');
+    html += `<div class="calcell ${d===21?'today':''}"><span class="caldate">${d}</span>${chips}</div>`;
+  }
+  const total = first + daysIn;
+  const trail = (7 - (total%7))%7;
+  for(let i=0;i<trail;i++){ html += `<div class="calcell empty"></div>`; }
+  grid.innerHTML = html;
 }
 
-/* ============ CALENDAR VIEW ============ */
-function renderCalendar(){
-  const evs = filtered();
-  const zone = document.getElementById("calendarView");
-  const cols = DAYS.map(day => {
-    const dayEvs = evs.filter(e=>e.day===day).sort((a,b)=>tierRank(a.tier)-tierRank(b.tier));
-    const items = dayEvs.length ? dayEvs.map(e=>{
-      const c=CAT[e.category];
-      const star = (e.tier!=="standard") ? ` <span class="star">&#9733;</span>` : "";
-      return `<div class="calev" style="border-left-color:${c.hex}" onclick="openDetails('${encodeURIComponent(e.title)}')">
-        <div class="t">${e.time} &middot; ${e.category}</div>
-        <div class="ti">${e.title}${star}</div>
-      </div>`;
-    }).join("") : `<div style="color:var(--ink-3);font-size:12px;font-family:Inter,sans-serif;padding:6px 2px">No events</div>`;
-    return `<div class="calcol"><div class="colhead"><span class="d">${DAYFULL[day]}</span><span class="n">${DAYDATE[day]}</span></div><div class="colbody">${items}</div></div>`;
-  }).join("");
-  zone.innerHTML = `<div class="calgrid">${cols}</div>`;
-}
-
-/* ============ MAP ============ */
+/* ============================================================
+   MAP VIEW (lazy init + resize on show)
+   ============================================================ */
+let map=null, markers=[], closureMarkers=[], mapLayer='events';
 function initMap(){
   if(map) return;
   map = new maplibregl.Map({
-    container:"map",
+    container:'map',
     style:{
       version:8,
-      sources:{
-        carto:{
-          type:"raster",
-          tiles:["https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png",
-                 "https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png",
-                 "https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png"],
-          tileSize:256,
-          attribution:'&copy; OpenStreetMap &copy; CARTO'
-        }
-      },
-      layers:[{id:"carto",type:"raster",source:"carto"}]
+      sources:{ carto:{ type:'raster',
+        tiles:['https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png','https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png','https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'],
+        tileSize:256, attribution:'&copy; OpenStreetMap &copy; CARTO'} },
+      layers:[{id:'carto',type:'raster',source:'carto'}]
     },
-    center:[-97.8531,30.5788],
-    zoom:11.4,
-    attributionControl:{compact:true}
+    center:[-97.8531,30.5788], zoom:12, attributionControl:false
   });
-  map.addControl(new maplibregl.NavigationControl({showCompass:false}),"top-right");
-  map.on("load", drawMarkers);
+  map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-left');
+  map.on('load', ()=>{ buildEventMarkers(); map.resize(); });
 }
-function clearMarkers(){ markers.forEach(m=>m.remove()); markers=[]; }
+function markerEl(e){
+  const wrap=document.createElement('div');
+  const big = e.tier!=='standard';
+  wrap.className='pin'+(big?' big':'');
+  const dia=document.createElement('div');
+  dia.className='diamond';
+  dia.style.background=CAT[e.category].hex;
+  wrap.appendChild(dia);
+  wrap.addEventListener('click',()=>{
+    if(window.innerWidth<=640){ openDrawer(e.slug); return; }
+    new maplibregl.Popup({offset:16,closeButton:true})
+      .setLngLat([e.lng,e.lat])
+      .setHTML(popCard(e))
+      .addTo(map);
+  });
+  return wrap;
+}
+function popCard(e){
+  return `<div class="popcard">
+    <img src="https://picsum.photos/seed/${e.slug}/320/180" alt="${e.title}"/>
+    <div class="pcbody">
+      <span class="cat-kicker" style="color:${CAT[e.category].color}">${e.category}</span>
+      <h3>${e.title}</h3>
+      <div class="pcmeta">${fmtDate(e.date)} &middot; ${e.time} &middot; ${e.city}</div>
+      <button class="pcbtn" onclick="openDrawer('${e.slug}')">View event page</button>
+    </div></div>`;
+}
+function buildEventMarkers(){
+  markers.forEach(m=>m.remove()); markers=[];
+  getFiltered().forEach(e=>{
+    const m=new maplibregl.Marker({element:markerEl(e)}).setLngLat([e.lng,e.lat]).addTo(map);
+    markers.push(m);
+  });
+}
+function buildClosureMarkers(){
+  closureMarkers.forEach(m=>m.remove()); closureMarkers=[];
+  CLOSURES.forEach(c=>{
+    const wrap=document.createElement('div'); wrap.className='pin closure';
+    const d=document.createElement('div'); d.className='diamond';
+    const b=document.createElement('span'); b.className='bang'; b.textContent='!';
+    d.appendChild(b); wrap.appendChild(d);
+    wrap.addEventListener('click',()=>{
+      new maplibregl.Popup({offset:14}).setLngLat([c.lng,c.lat])
+        .setHTML(`<div class="popcard"><div class="pcbody"><span class="cat-kicker" style="color:var(--rust)">Road Closure</span><h3>${c.label}</h3><div class="pcmeta">Active this weekend</div></div></div>`).addTo(map);
+    });
+    closureMarkers.push(new maplibregl.Marker({element:wrap}).setLngLat([c.lng,c.lat]).addTo(map));
+  });
+}
+function setMapLayer(layer){
+  mapLayer=layer;
+  if(layer==='events'){ markers.forEach(m=>m.getElement().style.display=''); closureMarkers.forEach(m=>m.remove()); closureMarkers=[]; }
+  else { buildClosureMarkers(); }
+}
 
-function makeEventMarker(e){
-  const c = CAT[e.category];
-  const wrap = document.createElement("div");
-  wrap.className="pin-wrap";
-  const big = e.tier!=="standard";
-  const pin = document.createElement("div");
-  pin.className = "pin"+(big?" big":"");
-  pin.style.background = c.hex;
-  wrap.appendChild(pin);
-  if(big){ const s=document.createElement("div"); s.className="pin-star"; s.textContent="★"; wrap.appendChild(s); }
-  wrap.style.width = big?"28px":"20px";
-  wrap.style.height = big?"28px":"20px";
-  wrap.addEventListener("click",(ev)=>{ ev.stopPropagation(); openEventPopup(e); });
-  return wrap;
+/* ============================================================
+   DRAWER
+   ============================================================ */
+function openDrawer(slug){
+  const e = EVENTS.find(x=>x.slug===slug); if(!e) return;
+  document.getElementById('d-img').src = `https://picsum.photos/seed/${e.slug}/640/480`;
+  document.getElementById('d-img').alt = e.title;
+  const c=document.getElementById('d-cat'); c.textContent=e.category; c.style.color=CAT[e.category].color;
+  document.getElementById('d-title').textContent=e.title;
+  document.getElementById('d-date').textContent=fmtDateLong(e.date);
+  document.getElementById('d-time').textContent=e.time;
+  document.getElementById('d-place').textContent=`${e.venue}, ${e.city}`;
+  document.getElementById('d-desc').textContent=e.desc;
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('scrim').classList.add('open');
+  document.body.style.overflow='hidden';
 }
-function makeClosureMarker(cl){
-  const wrap=document.createElement("div"); wrap.className="pin-wrap"; wrap.style.width="22px"; wrap.style.height="22px";
-  const pin=document.createElement("div"); pin.className="pin closure";
-  pin.innerHTML=`<svg width="12" height="12" viewBox="0 0 24 24" style="position:absolute;top:5px;left:5px" fill="#fff"><path d="M12 3 2 21h20L12 3zm0 5 5.5 10h-11L12 8z"/></svg>`;
-  wrap.appendChild(pin);
-  wrap.addEventListener("click",(ev)=>{ ev.stopPropagation(); new maplibregl.Popup({offset:16,closeButton:true})
-    .setLngLat([cl.lng,cl.lat])
-    .setHTML(`<div class="pop"><span class="cat" style="color:var(--rust)">Road Closure</span><h4>${cl.title}</h4><div class="v" style="color:var(--ink-3);font-family:'Source Serif 4',serif;font-weight:400;font-size:13px">${cl.note}</div></div>`)
-    .addTo(map); });
-  return wrap;
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('scrim').classList.remove('open');
+  document.body.style.overflow='';
 }
-function openEventPopup(e){
-  const c=CAT[e.category];
-  if(isMobile()){ openSheet(e); return; }
-  new maplibregl.Popup({offset:16,closeButton:true,maxWidth:"260px"})
-    .setLngLat([e.lng,e.lat])
-    .setHTML(`<div class="pop">
-      <span class="cat" style="color:${c.hex}">${e.category}${e.tier!=="standard"?" &middot; "+e.tier:""}</span>
-      <h4>${e.title}</h4>
-      <div class="m">${DAYFULL[e.day]} &middot; ${e.time}</div>
-      <div class="v">${e.venue}</div>
-      <span class="details" onclick="openDetails('${encodeURIComponent(e.title)}')">Details &rsaquo;</span>
-    </div>`)
-    .addTo(map);
-}
-function drawMarkers(){
-  clearMarkers();
-  if(state.mapMode==="closures"){
-    CLOSURES.forEach(cl=>{
-      const m=new maplibregl.Marker({element:makeClosureMarker(cl),anchor:"center"}).setLngLat([cl.lng,cl.lat]).addTo(map);
-      markers.push(m);
-    });
-  }else{
-    filtered().forEach(e=>{
-      const m=new maplibregl.Marker({element:makeEventMarker(e),anchor:"center"}).setLngLat([e.lng,e.lat]).addTo(map);
-      markers.push(m);
-    });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDrawer(); });
+
+/* ============================================================
+   VIEW SWITCH + RENDER ORCHESTRATION
+   ============================================================ */
+function render(){
+  const list = getFiltered();
+  document.getElementById('resultline').textContent = list.length+ ' event'+(list.length===1?'':'s');
+
+  const cardEl=document.getElementById('cardview');
+  const listEl=document.getElementById('listview');
+  const calEl=document.getElementById('calview');
+  const mapEl=document.getElementById('mapview');
+  const layout=document.getElementById('layout');
+
+  cardEl.style.display = state.view==='card'?'grid':'none';
+  listEl.style.display = state.view==='list'?'flex':'none';
+  calEl.style.display  = state.view==='calendar'?'block':'none';
+  mapEl.style.display  = state.view==='map'?'block':'none';
+  document.getElementById('resultline').style.display = state.view==='map'?'none':'block';
+
+  layout.classList.toggle('no-rail', state.view==='map');
+  document.getElementById('rail').style.display = state.view==='map'?'none':'';
+
+  const ms=document.getElementById('mobileSponsor');
+  if(state.view==='map'){ ms.classList.add('hidden'); } else if(!ms.dataset.dismissed){ ms.classList.remove('hidden'); }
+
+  if(state.view==='card') renderCards(list);
+  else if(state.view==='list') renderList(list);
+  else if(state.view==='calendar') renderCalendar(list);
+  else if(state.view==='map'){
+    initMap();
+    setTimeout(()=>{ if(map){ map.resize(); if(map.loaded()){ buildEventMarkers(); if(mapLayer==='closures') buildClosureMarkers(); } } }, 60);
   }
 }
 
-/* map legend chips */
-function renderMapChips(){
-  const zone=document.getElementById("mapChips");
-  const head=document.getElementById("legendHead");
-  if(state.mapMode==="closures"){
-    head.textContent="Legend";
-    zone.innerHTML=`<span class="chip" style="pointer-events:none"><span class="dot" style="background:var(--rust)"></span>Active closure</span>`;
-    return;
-  }
-  head.textContent="Filter map";
-  zone.innerHTML=Object.keys(CAT).map(name=>{
-    const on=state.cats.has(name);
-    return `<button class="chip ${on?'active':''}" data-cat="${name}"><span class="dot" style="background:${CAT[name].hex}"></span>${name}</button>`;
-  }).join("");
-  zone.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{
-    const n=c.dataset.cat;
-    if(state.cats.has(n)) state.cats.delete(n); else state.cats.add(n);
-    if(state.cats.size===0) Object.keys(CAT).forEach(k=>state.cats.add(k));
-    renderAll();
+document.getElementById('viewswitch').addEventListener('click',e=>{
+  const btn=e.target.closest('.viewbtn'); if(!btn) return;
+  document.querySelectorAll('.viewbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  state.view=btn.dataset.view;
+  render();
+});
+
+document.getElementById('mapToggle').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  document.querySelectorAll('#mapToggle button').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  setMapLayer(b.dataset.layer);
+});
+
+/* ============================================================
+   SEARCH
+   ============================================================ */
+document.getElementById('search').addEventListener('input',e=>{ state.search=e.target.value; render(); });
+
+/* ============================================================
+   CUSTOM DROPDOWNS
+   ============================================================ */
+const DD_OPTS = {
+  type:{label:'type-label', field:'type', items:['All Events','Family','Music','Markets','Food & Drink','Garage Sales','Estate Sales','Kids & School','City & Gov','Outdoors'], swatch:true},
+  sort:{label:'sort-label', field:'sort', items:['Soonest','Distance']},
+  date:{label:'date-label', field:'date', items:['Any Date','This Weekend','This Month']},
+  radius:{label:'radius-label', field:'radius', items:['Within 10 miles','Within 25 miles','Within 50 miles']}
+};
+function buildDropdowns(){
+  Object.keys(DD_OPTS).forEach(key=>{
+    const cfg=DD_OPTS[key];
+    const menu=document.querySelector('#dd-'+key+' .dd-menu');
+    menu.innerHTML = cfg.items.map(it=>{
+      const sw = (cfg.swatch && CAT[it]) ? `<span class="swatch" style="background:${CAT[it].color}"></span>` : (cfg.swatch?'<span class="swatch" style="background:var(--muted)"></span>':'');
+      return `<div class="dd-item" data-val="${it}">${sw}${it}</div>`;
+    }).join('');
+    menu.addEventListener('click',ev=>{
+      const item=ev.target.closest('.dd-item'); if(!item) return;
+      const val=item.dataset.val;
+      menu.querySelectorAll('.dd-item').forEach(x=>x.classList.remove('sel'));
+      item.classList.add('sel');
+      if(key==='radius'){ state.radius=parseInt(val.match(/\d+/)[0],10); document.getElementById(cfg.label).textContent=val; }
+      else { state[cfg.field]=val; document.getElementById(cfg.label).textContent = val; }
+      menu.classList.remove('open');
+      render();
+    });
   });
 }
-
-/* ============ MOBILE SHEET ============ */
-function openSheet(e){
-  const c=CAT[e.category];
-  document.getElementById("sheetBody").innerHTML=`
-    <span class="cat" style="color:${c.hex}">${e.category}${e.tier!=="standard"?" &middot; "+e.tier:""}</span>
-    <h4>${e.title}</h4>
-    <div class="m">${DAYFULL[e.day]} &middot; ${e.time}</div>
-    <div class="v">${e.venue}</div>
-    <div class="desc" style="color:var(--ink-3);font-size:14px;margin-bottom:14px">${e.desc}</div>
-    <button class="btn block" onclick="openDetails('${encodeURIComponent(e.title)}')">View details</button>`;
-  document.getElementById("mobileSheet").classList.add("open");
-  document.getElementById("sheetScrim").classList.add("open");
-}
-function closeSheet(){
-  document.getElementById("mobileSheet").classList.remove("open");
-  document.getElementById("sheetScrim").classList.remove("open");
-}
-
-/* ============ VIEW SWITCH ============ */
-function setView(v){
-  state.view=v;
-  document.getElementById("listView").classList.toggle("on",v==="list");
-  document.getElementById("calendarView").classList.toggle("on",v==="calendar");
-  document.getElementById("mapView").classList.toggle("on",v==="map");
-  // filter zone: shown for list/calendar (map has its own legend)
-  document.getElementById("filterZone").style.display = v==="map" ? "none" : "block";
-  // sync top tabs (Events = list/calendar, Map = map)
-  document.querySelectorAll("#topTabs button").forEach(b=>{
-    const isMapTab=b.dataset.view==="map";
-    b.classList.toggle("active", isMapTab ? v==="map" : v!=="map");
+document.querySelectorAll('.dd-btn').forEach(btn=>{
+  btn.addEventListener('click',e=>{
+    e.stopPropagation();
+    const key=btn.dataset.dd;
+    const menu=document.querySelector('#dd-'+key+' .dd-menu');
+    const wasOpen=menu.classList.contains('open');
+    document.querySelectorAll('.dd-menu').forEach(m=>m.classList.remove('open'));
+    if(!wasOpen) menu.classList.add('open');
   });
-  // sync segmented
-  document.querySelectorAll("#segmented button").forEach(b=>b.classList.toggle("active",b.dataset.view===v));
-  document.body.classList.toggle("map-active", v==="map");
-  if(v==="map"){ initMap(); setTimeout(()=>{ if(map){ map.resize(); drawMarkers(); } },60); }
-  closeSheet();
+});
+document.addEventListener('click',()=>document.querySelectorAll('.dd-menu').forEach(m=>m.classList.remove('open')));
+
+/* mobile filter toggle - reveal desktop-filters inline */
+document.getElementById('filterToggle').addEventListener('click',()=>{
+  const df=document.querySelector('.desktop-filters');
+  if(df.dataset.mobileShown==='1'){ df.style.display=''; df.dataset.mobileShown='0'; }
+  else { df.style.display='flex'; df.style.flexBasis='100%'; df.style.flexWrap='wrap'; df.dataset.mobileShown='1'; }
+});
+
+/* ============================================================
+   MOBILE MAP CHIPS + LEGEND
+   ============================================================ */
+function buildMapChips(){
+  const wrap=document.getElementById('mapchips');
+  wrap.innerHTML = '<button class="mapchip" style="background:var(--ink);color:var(--wg-cream)">All events</button>' +
+    Object.keys(CAT).map(c=>`<button class="mapchip"><span class="swatch" style="background:${CAT[c].color}"></span>${c}</button>`).join('');
+}
+function buildLegend(){
+  document.getElementById('legendRows').innerHTML =
+    Object.keys(CAT).map(c=>`<div class="legrow"><span class="legdiamond" style="background:${CAT[c].hex}"></span>${c}</div>`).join('') +
+    `<div class="legrow" style="margin-top:6px"><span class="legdiamond" style="background:var(--rust);transform:none;border-radius:3px"></span>Road closure</div>`;
 }
 
-/* ============ RENDER ALL ============ */
-function renderAll(){
-  renderDayChips();
-  renderCatChips();
-  renderList();
-  renderCalendar();
-  renderMapChips();
-  const n=filtered().length;
-  document.getElementById("resultCount").textContent = n+" event"+(n!==1?"s":"")+" this weekend";
-  if(map && state.view==="map") drawMarkers();
+/* ============================================================
+   MISC
+   ============================================================ */
+function greetSubmit(e){
+  e.preventDefault();
+  const btn=e.target.querySelector('button'); const t=btn.textContent;
+  btn.textContent='Done'; btn.style.background='#2f6b4f';
+  setTimeout(()=>{btn.textContent=t;btn.style.background='';},1600);
+  e.target.querySelector('input').value='';
+  return false;
 }
-
-/* ============ MISC ============ */
-function openDetails(t){ closeSheet(); alert("Event details (prototype)\n\n"+decodeURIComponent(t)+"\n\nIn the live product this opens the full event page with directions, ticket links, and organizer info."); }
-function fakeSubmit(ev,msg){ ev.preventDefault(); ev.target.reset(); alert(msg+"\n\n(Prototype - no data was sent.)"); }
-
-/* top tabs: Events -> last non-map view (default list); Map -> map */
-document.querySelectorAll("#topTabs button").forEach(b=>{
-  b.onclick=()=>{ setView(b.dataset.view==="map" ? "map" : (state.view==="calendar"?"calendar":"list")); };
-});
-document.querySelectorAll("#segmented button").forEach(b=>{
-  b.onclick=()=>setView(b.dataset.view);
-});
-document.querySelectorAll("#mapMode button").forEach(b=>{
-  b.onclick=()=>{
-    state.mapMode=b.dataset.mode;
-    document.querySelectorAll("#mapMode button").forEach(x=>x.classList.toggle("active",x===b));
-    renderMapChips();
-    if(map) drawMarkers();
-  };
+document.querySelector('#mobileSponsor .ms-close').addEventListener('click',()=>{
+  const ms=document.getElementById('mobileSponsor'); ms.dataset.dismissed='1'; ms.classList.add('hidden');
 });
 
-/* init */
-renderAll();
-setView("list");
-window.addEventListener("resize", ()=>{ if(map) map.resize(); });
+/* ============================================================
+   INIT
+   ============================================================ */
+buildDropdowns();
+buildLegend();
+buildMapChips();
+document.querySelector('#dd-type .dd-item[data-val="All Events"]').classList.add('sel');
+document.querySelector('#dd-sort .dd-item[data-val="Soonest"]').classList.add('sel');
+document.querySelector('#dd-date .dd-item[data-val="Any Date"]').classList.add('sel');
+document.querySelector('#dd-radius .dd-item[data-val="Within 25 miles"]').classList.add('sel');
+render();
 </script>
 </body>
 </html>
