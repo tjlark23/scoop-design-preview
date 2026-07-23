@@ -14,6 +14,9 @@
 <link href="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.css" rel="stylesheet" />
 <script src="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.js"></script>
 
+<!-- Per-event SEO structured data (schema.org/Event) is injected into <head> as JSON-LD when an event page opens; see injectEventJsonLd() -->
+
+
 <style>
 :root{
   --paper:#f5efe3;
@@ -198,6 +201,15 @@ img{display:block;max-width:100%;}
 .btn-add:hover{background:var(--rust-deep);}
 .btn-add:active{transform:translateY(1px);}
 
+/* Map View button (opens the standalone map page) */
+.btn-map{
+  font-family:var(--sans);font-size:13px;font-weight:600;
+  background:var(--navy);color:var(--cream);border-radius:3px;padding:10px 15px;
+  display:flex;align-items:center;gap:7px;transition:background .18s,transform .1s;
+}
+.btn-map:hover{background:var(--navy-dark);}
+.btn-map:active{transform:translateY(1px);}
+
 .btn-filters{display:none;}
 
 /* range segmented control (primary date switcher, all views) */
@@ -212,8 +224,17 @@ img{display:block;max-width:100%;}
   display:grid;grid-template-columns:1fr 320px;gap:36px;
   max-width:1220px;margin:0 auto;padding:22px 28px 60px;align-items:start;
 }
-body.view-map .layout{display:none;}
 .view-area{min-width:0;}
+
+/* ===== PAGE ROUTING (events browser / map page / event page) ===== */
+body.page-map .header,body.page-map .ribbon,body.page-map .masthead,
+body.page-map .controls-rule,body.page-map .controls,body.page-map .layout,
+body.page-map .footer,body.page-map .sticky-sponsor,body.page-map .event-page{display:none!important;}
+body.page-map{overflow:hidden;}
+body.page-event .ribbon,body.page-event .masthead,body.page-event .controls-rule,
+body.page-event .controls,body.page-event .layout,body.page-event .map-shell,
+body.page-event .sticky-sponsor{display:none!important;}
+body.page-events .map-shell,body.page-events .event-page{display:none;}
 
 /* view visibility */
 .view{display:none;animation:fadeIn .3s ease;}
@@ -348,6 +369,14 @@ body.view-map .layout{display:none;}
 .cal-chip span{overflow:hidden;text-overflow:ellipsis;}
 .cal-chip .c-time{font-family:var(--mono);font-size:9.5px;color:var(--muted);flex:none;}
 .cal-more{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--rust);cursor:pointer;padding:2px 6px;}
+/* 14-day grid: 2 rows x 7 cols, bigger cells */
+.cal-grid.twoweek{grid-template-rows:repeat(2,1fr);margin-top:20px;}
+.cal-grid.twoweek .cal-cell{min-height:172px;padding:11px;}
+.cal-grid.twoweek .cal-cell.today{background:var(--cream-dark);}
+.cal-grid.twoweek .c-num{display:flex;align-items:baseline;gap:8px;font-family:var(--serif);font-weight:800;font-size:22px;color:var(--navy);margin-bottom:9px;}
+.cal-grid.twoweek .c-num .c-dow{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.1em;color:var(--rust);}
+.cal-grid.twoweek .cal-cell.today .c-num .c-dow{color:var(--rust);}
+.cal-grid.twoweek .cal-chip{font-size:11.5px;padding:4px 7px;margin-bottom:5px;}
 
 /* ============ RIGHT RAIL ============ */
 .rail{display:flex;flex-direction:column;gap:22px;position:sticky;top:20px;}
@@ -385,7 +414,7 @@ body.view-map .layout{display:none;}
 
 /* ============ MAP VIEW ============ */
 .map-shell{display:none;position:relative;height:calc(100vh - 148px);min-height:520px;background:var(--paper);}
-body.view-map .map-shell{display:block;}
+body.page-map .map-shell{display:block;position:fixed;inset:0;height:auto;min-height:0;z-index:100;}
 #map{position:absolute;top:0;left:0;right:0;bottom:44px;}
 .maplibregl-ctrl-attrib{font-family:var(--sans);font-size:9px;background:rgba(250,246,238,.75)!important;}
 
@@ -394,8 +423,11 @@ body.view-map .map-shell{display:block;}
 .map-title .mt-wm{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--navy);letter-spacing:-.01em;}
 .map-title .mt-wm em{color:var(--rust);font-style:normal;}
 .map-title .mt-name{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin:5px 0 9px;}
+.map-title .mt-actions{display:flex;align-items:center;gap:8px;}
 .map-title .mt-share{font-family:var(--sans);font-size:11.5px;font-weight:600;color:var(--navy);border:1px solid var(--border);background:var(--cream);border-radius:3px;padding:6px 11px;display:inline-flex;align-items:center;gap:5px;transition:background .16s,border-color .16s;}
 .map-title .mt-share:hover{background:var(--cream-dark);border-color:var(--navy);}
+.map-title .mt-back{font-family:var(--sans);font-size:11.5px;font-weight:600;color:var(--rust);cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:color .16s;}
+.map-title .mt-back:hover{color:var(--rust-deep);}
 
 /* top-right rust submit + bottom-right navy newsletter + bottom sponsor banner */
 .map-submit{top:18px;right:58px;font-family:var(--sans);font-size:12.5px;font-weight:600;background:var(--rust);color:var(--cream);border:none;border-radius:3px;padding:10px 15px;display:inline-flex;align-items:center;gap:6px;box-shadow:var(--shadow-lift);transition:background .16s,transform .1s;}
@@ -453,38 +485,48 @@ body.view-map .map-shell{display:block;}
 .maplibregl-popup.ad-popup .maplibregl-popup-tip{border-top-color:var(--cream);}
 .maplibregl-popup.ad-popup .ad-pop-mark{color:var(--rust);letter-spacing:.1em;}
 
-/* ============ DRAWER ============ */
-.overlay{position:fixed;inset:0;background:rgba(11,22,36,.5);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .3s;z-index:80;}
-.overlay.open{opacity:1;pointer-events:auto;}
-.drawer{
-  position:fixed;top:0;right:0;height:100vh;width:min(480px,100vw);
-  background:var(--cream);z-index:90;transform:translateX(100%);
-  transition:transform .38s cubic-bezier(.2,.7,.3,1);overflow-y:auto;
-  box-shadow:-20px 0 50px -20px rgba(11,22,36,.5);
-}
-.drawer.open{transform:translateX(0);}
-.dr-close{position:absolute;top:16px;right:16px;z-index:3;width:38px;height:38px;border-radius:3px;background:rgba(250,246,238,.9);display:flex;align-items:center;justify-content:center;color:var(--navy);backdrop-filter:blur(4px);box-shadow:var(--shadow-sm);transition:background .16s;}
-.dr-close:hover{background:var(--cream);}
-.dr-img{position:relative;aspect-ratio:16/9;background:var(--border);overflow:hidden;}
-.dr-img img{width:100%;height:100%;object-fit:cover;}
-.dr-img .tag-featured{position:absolute;top:16px;left:16px;}
-.dr-body{padding:24px 26px 40px;}
-.dr-kicker{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;color:var(--rust);display:flex;align-items:center;gap:8px;}
-.dr-kicker .dot{width:8px;height:8px;border-radius:2px;}
-.dr-title{font-family:var(--serif);font-weight:800;font-size:34px;line-height:1.05;color:var(--navy);margin:12px 0 16px;letter-spacing:-.02em;}
-.dr-facts{display:flex;flex-direction:column;gap:10px;padding:16px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:18px;}
-.dr-fact{display:flex;align-items:center;gap:12px;font-family:var(--sans);font-size:14px;color:var(--ink);}
-.dr-fact svg{color:var(--muted);flex:none;}
-.dr-fact b{font-weight:600;}
-.dr-desc{font-family:var(--body);font-size:15.5px;line-height:1.6;color:var(--ink);margin:0 0 24px;}
-.dr-actions{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
-.dr-primary{font-family:var(--sans);font-size:15px;font-weight:600;background:var(--rust);color:var(--cream);border-radius:3px;padding:14px;text-align:center;transition:background .18s;}
-.dr-primary:hover{background:var(--rust-deep);}
-.dr-secondary{display:flex;gap:10px;}
-.dr-secondary button{flex:1;font-family:var(--sans);font-size:14px;font-weight:600;border:1px solid var(--border);background:var(--cream);color:var(--navy);border-radius:3px;padding:12px;display:flex;align-items:center;justify-content:center;gap:7px;transition:background .16s,border-color .16s;}
-.dr-secondary button:hover{background:var(--cream-dark);border-color:var(--navy);}
-.dr-secondary button.saved{background:var(--rust);color:var(--cream);border-color:var(--rust);}
-.dr-note{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.04em;color:var(--muted);text-transform:uppercase;text-align:center;line-height:1.6;padding-top:6px;}
+/* ============ EVENT PAGE (SEO route: #event/<slug>) ============ */
+.event-page{padding:22px 0 60px;}
+.ep-back{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--rust);display:inline-flex;align-items:center;gap:6px;cursor:pointer;transition:gap .18s;}
+.ep-back:hover{gap:9px;}
+.ep-crumb{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;margin:12px 0 18px;line-height:1.5;}
+.ep-crumb b{color:var(--navy);}
+.ep-hero{position:relative;aspect-ratio:16/9;border-radius:4px;overflow:hidden;background:var(--border);box-shadow:var(--shadow-lift);}
+.ep-hero img{width:100%;height:100%;object-fit:cover;}
+.ep-tags{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0 20px;}
+.ep-head{margin-bottom:16px;}
+.ep-head h1{font-family:var(--serif);font-weight:900;font-size:46px;line-height:1.02;color:var(--navy);margin:0 0 12px;letter-spacing:-.025em;}
+.ep-meta{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;}
+.ep-cta{display:flex;flex-wrap:wrap;gap:10px;padding:18px 0 24px;border-bottom:1px solid var(--border);margin-bottom:26px;}
+.ep-primary{font-family:var(--sans);font-size:14px;font-weight:600;background:var(--rust);color:var(--cream);border-radius:3px;padding:13px 22px;display:inline-flex;align-items:center;gap:7px;transition:background .18s,transform .1s;}
+.ep-primary:hover{background:var(--rust-deep);}
+.ep-primary:active{transform:translateY(1px);}
+.ep-secondary{font-family:var(--sans);font-size:14px;font-weight:600;border:1px solid var(--border);background:var(--cream);color:var(--navy);border-radius:3px;padding:13px 20px;display:inline-flex;align-items:center;gap:7px;transition:background .16s,border-color .16s;}
+.ep-secondary:hover{background:var(--cream-dark);border-color:var(--navy);}
+.ep-body{display:grid;grid-template-columns:1fr 320px;gap:36px;align-items:start;}
+.ep-main{min-width:0;}
+.ep-venue{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--navy);display:flex;align-items:flex-start;gap:10px;margin-bottom:6px;}
+.ep-venue svg{color:var(--muted);flex:none;margin-top:2px;}
+.ep-address{font-family:var(--mono);font-size:11.5px;color:var(--muted);letter-spacing:.02em;margin:0 0 22px 27px;}
+.ep-desc{font-family:var(--body);font-size:16.5px;line-height:1.65;color:var(--ink);margin:0 0 22px;}
+.ep-organizer{font-family:var(--sans);font-size:13.5px;color:var(--ink);padding:14px 0;border-top:1px solid var(--border-soft);border-bottom:1px solid var(--border-soft);margin-bottom:24px;}
+.ep-organizer b{font-weight:600;color:var(--navy);}
+.ep-organizer .ep-org-lead{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:5px;}
+.ep-map{position:relative;border:1px solid var(--border);border-radius:4px;overflow:hidden;background:var(--cream-dark);}
+.ep-map .epm-canvas{height:210px;position:relative;background:
+  linear-gradient(0deg,transparent 49%,var(--border) 49%,var(--border) 51%,transparent 51%) 0 0/100% 42px,
+  linear-gradient(90deg,transparent 49%,var(--border) 49%,var(--border) 51%,transparent 51%) 0 0/54px 100%,
+  var(--paper);}
+.ep-map .epm-pin{position:absolute;top:50%;left:50%;transform:translate(-50%,-100%);}
+.ep-map .epm-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 15px;border-top:1px solid var(--border);background:var(--cream);}
+.ep-map .epm-venue{font-family:var(--serif);font-weight:700;font-size:15px;color:var(--navy);line-height:1.15;}
+.ep-map .epm-sub{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.04em;margin-top:3px;}
+.ep-map .epm-link{font-family:var(--sans);font-size:12px;font-weight:600;color:var(--rust);flex:none;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:gap .18s;}
+.ep-map .epm-link:hover{gap:8px;}
+.ep-rail{display:flex;flex-direction:column;gap:22px;}
+.ep-more{margin-top:44px;}
+.ep-more .section-head{margin-bottom:22px;}
+.ep-more .card-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));}
 
 /* ============ MOBILE STICKY SPONSOR BAR ============ */
 .sticky-sponsor{display:none;position:fixed;bottom:0;left:0;right:0;z-index:70;background:var(--navy);color:var(--cream);align-items:center;gap:12px;padding:10px 16px;box-shadow:0 -6px 20px rgba(11,22,36,.3);}
@@ -573,10 +615,16 @@ body.view-map .map-shell{display:block;}
   .range-seg{overflow-x:auto;max-width:100%;scrollbar-width:none;}
   .range-seg::-webkit-scrollbar{display:none;}
   .sticky-sponsor{display:flex;}
-  body.view-map .sticky-sponsor{display:none;}
-  .drawer{width:100vw;}
-  .dr-title{font-size:28px;}
+  body.page-map .sticky-sponsor{display:none!important;}
+  body.page-event .sticky-sponsor{display:none!important;}
   .footer-inner{grid-template-columns:1fr;gap:22px;}
+  /* event page single column on mobile */
+  .ep-head h1{font-size:32px;}
+  .ep-body{grid-template-columns:1fr;gap:28px;}
+  .ep-rail{flex-direction:column;}
+  .ep-cta{gap:8px;}
+  .ep-primary,.ep-secondary{flex:1;justify-content:center;padding:12px 14px;}
+  .ep-more .card-grid{grid-template-columns:1fr;}
 }
 
 /* mobile map bottom category bar */
@@ -662,7 +710,7 @@ body.view-calendar .layout{grid-template-columns:1fr;}
 }
 </style>
 </head>
-<body class="view-card">
+<body class="page-events view-card">
 
 <!-- HEADER -->
 <header class="header">
@@ -689,7 +737,7 @@ body.view-calendar .layout{grid-template-columns:1fr;}
   <span class="r-label">THIS WEEKEND IN WILCO</span>
   <span class="chip">FRI JUL 24 - SUN JUL 26</span>
   <span class="weather"><span class="dot"></span>94&deg; · Sunny</span>
-  <a href="#" class="r-cta">Submit an event &rarr;</a>
+  <a href="#map" class="r-cta" id="ribbonMap">Open the event map &rarr;</a>
 </div>
 
 <!-- MASTHEAD -->
@@ -714,17 +762,12 @@ body.view-calendar .layout{grid-template-columns:1fr;}
       <button data-view="calendar" title="Calendar" aria-label="Calendar">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
       </button>
-      <button data-view="map" title="Map" aria-label="Map">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3L3 5v16l6-2 6 2 6-2V3l-6 2-6-2z"/><line x1="9" y1="3" x2="9" y2="19"/><line x1="15" y1="5" x2="15" y2="21"/></svg>
-      </button>
     </div>
 
-    <div class="range-seg" id="rangeSeg" role="group" aria-label="Date range">
-      <button data-range="This Weekend" class="active">This Weekend</button>
-      <button data-range="7 Days">7 Days</button>
-      <button data-range="14 Days">14 Days</button>
-      <button data-range="Month">Month</button>
-    </div>
+    <button class="btn-map" id="btnMap">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3L3 5v16l6-2 6 2 6-2V3l-6 2-6-2z"/><line x1="9" y1="3" x2="9" y2="19"/><line x1="15" y1="5" x2="15" y2="21"/></svg>
+      <span class="lbl">Map View</span>
+    </button>
 
     <button class="btn-filters" id="btnFilters">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
@@ -758,6 +801,9 @@ body.view-calendar .layout{grid-template-columns:1fr;}
   <aside class="rail" id="rail"></aside>
 </div>
 
+<!-- EVENT PAGE (route: #event/<slug>) -->
+<main class="event-page" id="eventPage"></main>
+
 <!-- MAP SHELL -->
 <div class="map-shell">
   <div id="map"></div>
@@ -765,7 +811,10 @@ body.view-calendar .layout{grid-template-columns:1fr;}
   <div class="map-float map-title">
     <div class="mt-wm">WilCo <em>Guide</em></div>
     <div class="mt-name">Event Map</div>
-    <button class="mt-share" id="mapShare">Share <span aria-hidden="true">&#8599;</span></button>
+    <div class="mt-actions">
+      <button class="mt-share" id="mapShare">Share <span aria-hidden="true">&#8599;</span></button>
+      <a class="mt-back" id="mapBack" href="#"><span aria-hidden="true">&larr;</span> Back to events</a>
+    </div>
   </div>
 
   <div class="map-float map-days" id="mapDays">
@@ -832,10 +881,6 @@ body.view-calendar .layout{grid-template-columns:1fr;}
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
   </button>
 </div>
-
-<!-- DRAWER -->
-<div class="overlay" id="overlay"></div>
-<div class="drawer" id="drawer"></div>
 
 <!-- CALENDAR DAY MODAL -->
 <div class="cal-scrim" id="calScrim"></div>
@@ -916,20 +961,12 @@ EVENTS.forEach(e=>{
 /* ================= STATE ================= */
 const state={
   view:"card", search:"", type:"All Events", sort:"Soonest",
-  range:"This Weekend",
+  calMode:"14 Days",
   saved:new Set(), mapDay:"all", catOn:new Set(Object.keys(CATS)), closures:false
 };
 
-/* global date-range window (all views respect this) */
-function inRange(e){
-  const d=e.dateObj;
-  if(state.range==="This Weekend"){return d>=WEEKEND_START && d<=WEEKEND_END;}
-  const n=state.range==="7 Days"?7:state.range==="14 Days"?14:31;
-  const end=new Date(PROTO_TODAY);end.setDate(end.getDate()+n-1);end.setHours(23,59);
-  return d>=PROTO_TODAY && d<=end;
-}
-function headingForRange(){return {"This Weekend":"This Weekend","7 Days":"Next 7 Days","14 Days":"Next 14 Days","Month":"This Month"}[state.range]||"Events";}
-function rangeKicker(){return state.range==="This Weekend"?"FRI JUL 24 - SUN JUL 26":"FROM TODAY";}
+/* views render every upcoming event in chronological order (no global range filter) */
+const WEEKEND_KICKER="FRI JUL 24 - SUN JUL 26";
 
 function timeMin(t){
   const m=t.match(/(\d+):(\d+)\s*(AM|PM)/i);
@@ -947,7 +984,6 @@ function getFiltered(){
     const q=state.search.toLowerCase();
     list=list.filter(e=>(e.title+" "+e.cat+" "+e.city+" "+e.venue).toLowerCase().includes(q));
   }
-  list=list.filter(inRange);
   if(state.sort==="Alphabetical") list.sort((a,b)=>a.title.localeCompare(b.title));
   else list.sort((a,b)=>eventSortKey(a)-eventSortKey(b));
   return list;
@@ -1051,8 +1087,8 @@ function renderCard(){
   const gridHTML = `
     <div class="section-head">
       <div>
-        <span class="s-kicker">${rangeKicker()}</span>
-        <h2>${headingForRange()}</h2>
+        <span class="s-kicker">${WEEKEND_KICKER}</span>
+        <h2>This Weekend</h2>
       </div>
       <span class="s-count">${list.length} EVENTS · ${new Set(list.map(e=>e.cat)).size} CATEGORIES</span>
     </div>
@@ -1107,13 +1143,16 @@ function renderList(){
 let calByDate={};
 function pad2(n){return String(n).padStart(2,"0");}
 function isoOf(dt){return `${dt.getFullYear()}-${pad2(dt.getMonth()+1)}-${pad2(dt.getDate())}`;}
-function calRangeControlHTML(){
-  return `<div class="range-seg cal-range" role="group" aria-label="Calendar range">
-    ${["This Weekend","7 Days","14 Days","Month"].map(r=>`<button data-range="${r}"${r===state.range?' class="active"':''}>${r}</button>`).join("")}
+
+/* local calendar toggle: only "14 Days" and "Month" */
+function calToggleHTML(){
+  return `<div class="range-seg cal-toggle" role="group" aria-label="Calendar range">
+    ${["14 Days","Month"].map(r=>`<button data-cal="${r}"${r===state.calMode?' class="active"':''}>${r}</button>`).join("")}
   </div>`;
 }
-function wireCalRange(el){
-  el.querySelectorAll(".cal-range button").forEach(b=>{b.onclick=()=>setRange(b.dataset.range);});
+function setCalMode(v){state.calMode=v;renderCalendar();}
+function wireCalToggle(el){
+  el.querySelectorAll(".cal-toggle button").forEach(b=>{b.onclick=()=>setCalMode(b.dataset.cal);});
 }
 
 function renderCalendar(){
@@ -1122,45 +1161,36 @@ function renderCalendar(){
   const byIso={};
   list.forEach(e=>{(byIso[e.date]=byIso[e.date]||[]).push(e);});
   calByDate=byIso;
-  if(state.range==="Month") renderCalMonth(el,list,byIso);
-  else renderCalAgenda(el,list,byIso);
-  wireCalRange(el);
+  if(state.calMode==="Month") renderCalMonth(el,list,byIso);
+  else renderCal14(el,list,byIso);
+  wireCalToggle(el);
 }
 
-/* agenda: big day blocks (7 or 14 days), every event shown, no truncation */
-function renderCalAgenda(el,list,byIso){
-  const days=state.range==="14 Days"?14:7;
-  let blocks="";
-  for(let i=0;i<days;i++){
+/* 14 days: a 2-row x 7-column grid of bigger cells + click-a-day modal */
+function renderCal14(el,list,byIso){
+  let cells="";
+  for(let i=0;i<14;i++){
     const dt=new Date(PROTO_TODAY);dt.setDate(dt.getDate()+i);
     const iso=isoOf(dt);
     const evs=(byIso[iso]||[]).slice().sort((a,b)=>timeMin(a.time)-timeMin(b.time));
+    const shown=evs.slice(0,4);
+    const more=evs.length-shown.length;
+    const hasEv=evs.length>0;
     const isToday=i===0;
     const dow=["SUN","MON","TUE","WED","THU","FRI","SAT"][dt.getDay()];
-    const mon=dt.toLocaleDateString("en-US",{month:"short"}).toUpperCase();
-    blocks+=`<div class="ag-day${isToday?" today":""}${evs.length?" has-ev":""} reveal" style="animation-delay:${i*35}ms">
-      <div class="ag-date"${evs.length?` data-day="${iso}"`:""}>
-        <span class="ag-dow">${dow}</span>
-        <span class="ag-dnum">${dt.getDate()}</span>
-        <span class="ag-mon">${mon}</span>
-      </div>
-      <div class="ag-evs">
-        ${evs.length?evs.map(e=>`
-          <div class="ag-ev" data-id="${e.id}">
-            <span class="ag-time">${e.time}</span>
-            <div class="ag-main"><div class="ag-t">${e.title}</div><div class="ag-v">${e.venue}, ${e.city}</div></div>
-            <span class="ag-type" style="border-color:${CATS[e.cat].hex};color:${CATS[e.cat].hex}"><span class="tdot" style="background:${CATS[e.cat].hex}"></span>${e.cat}</span>
-          </div>`).join(""):`<div class="ag-empty">No events</div>`}
-      </div>
+    cells+=`<div class="cal-cell big${isToday?" today":""}${hasEv?" has-ev":""} reveal" style="animation-delay:${i*30}ms"${hasEv?` data-day="${iso}"`:""}>
+      <div class="c-num"><span class="c-dow">${dow}</span>${dt.getDate()}</div>
+      ${shown.map(e=>`<div class="cal-chip"><span class="c-dot" style="background:${CATS[e.cat].hex}"></span><span>${e.title}</span><span class="c-time">${e.time.replace(/:00/,"").replace(" ","")}</span></div>`).join("")}
+      ${more>0?`<div class="cal-more">+${more} more</div>`:""}
     </div>`;
   }
   el.innerHTML=`
     <div class="cal-head">
-      <h2>${headingForRange()}</h2>
-      ${calRangeControlHTML()}
+      <h2>Next 14 Days</h2>
+      ${calToggleHTML()}
     </div>
-    <div class="agenda">${blocks}</div>`;
-  el.querySelectorAll(".ag-date[data-day]").forEach(c=>{c.onclick=()=>openDayModal(c.dataset.day);});
+    <div class="cal-grid twoweek">${cells}</div>`;
+  el.querySelectorAll(".cal-cell[data-day]").forEach(c=>{c.onclick=()=>openDayModal(c.dataset.day);});
 }
 
 /* month: uniform grid + click-a-day modal */
@@ -1193,7 +1223,7 @@ function renderCalMonth(el,list,byIso){
   el.innerHTML=`
     <div class="cal-head">
       <h2>July 2026</h2>
-      ${calRangeControlHTML()}
+      ${calToggleHTML()}
     </div>
     <div class="cal-weekdays">${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d=>`<div>${d}</div>`).join("")}</div>
     <div class="cal-grid">${cells}</div>`;
@@ -1232,7 +1262,7 @@ function openDayModal(iso){
     </div>`;
   document.getElementById("cmClose").onclick=closeDayModal;
   modal.querySelectorAll(".cm-row").forEach(r=>{
-    r.onclick=ev=>{ev.stopPropagation();closeDayModal();openDrawer(+r.dataset.id);};
+    r.onclick=ev=>{ev.stopPropagation();closeDayModal();goEvent(+r.dataset.id);};
   });
   document.getElementById("calScrim").classList.add("open");
   modal.classList.add("open");
@@ -1296,43 +1326,141 @@ function railCards(){
 }
 function renderRail(){document.getElementById("rail").innerHTML=railCards();}
 
-/* ================= DRAWER ================= */
-function openDrawer(id){
-  const e=EVENTS.find(x=>x.id===id);
-  if(!e)return;
-  const saved=state.saved.has(e.id);
-  document.getElementById("drawer").innerHTML=`
-    <button class="dr-close" id="drClose" aria-label="Close">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
-    </button>
-    <div class="dr-img"><img src="${e.imgWide}" alt="${e.title}"/></div>
-    <div class="dr-body">
-      <div class="dr-kicker">${catDot(e.cat)} ${e.cat} · ${e.city}</div>
-      <h1 class="dr-title">${e.title}</h1>
-      <div class="dr-facts">
-        <div class="dr-fact"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg><span><b>${e.dateLong}</b></span></div>
-        <div class="dr-fact"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg><span>${e.time}</span></div>
-        <div class="dr-fact"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>${e.venue}, ${e.city}</span></div>
-      </div>
-      <p class="dr-desc">${e.desc}</p>
-      <div class="dr-actions">
-        <a href="#" class="dr-primary">Get tickets / View original</a>
-        <div class="dr-secondary">
-          <button><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="12" y1="13" x2="12" y2="17"/><line x1="10" y1="15" x2="14" y2="15"/></svg>Add to calendar</button>
+/* ================= EVENT PAGE (SEO route) ================= */
+function metaLine(e){return e.dateLong.replace(/, \d{4}$/,"").toUpperCase()+" · "+e.time;}
+
+function eventPageHTML(e){
+  const hex=CATS[e.cat].hex;
+  const more=EVENTS.filter(x=>x.id!==e.id).sort((a,b)=>eventSortKey(a)-eventSortKey(b)).slice(0,4);
+  const tags=`
+    <span class="ev-tag city">${e.city}</span>
+    <span class="ev-tag type" style="border-color:${hex};color:${hex}"><span class="tdot" style="background:${hex}"></span>${e.cat}</span>`;
+  return `
+  <div class="wrap">
+    <a class="ep-back" id="epBack"><span aria-hidden="true">&larr;</span> All events</a>
+    <div class="ep-crumb"><span id="epCrumbHome" style="cursor:pointer;color:var(--rust)">Events</span> · ${e.city} · <b>${e.title}</b></div>
+
+    <div class="ep-hero">
+      <img src="${e.imgWide}" alt="${e.title}" />
+    </div>
+    <div class="ep-tags">${tags}</div>
+
+    <div class="ep-head">
+      <h1>${e.title}</h1>
+      <div class="ep-meta">${metaLine(e)}</div>
+    </div>
+
+    <div class="ep-cta">
+      <button class="ep-primary" id="epTickets">Get tickets / View source <span aria-hidden="true">&#8599;</span></button>
+      <button class="ep-secondary" id="epCal"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="12" y1="13" x2="12" y2="17"/><line x1="10" y1="15" x2="14" y2="15"/></svg>Add to calendar</button>
+      <button class="ep-secondary" id="epShare"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>Share</button>
+    </div>
+
+    <div class="ep-body">
+      <div class="ep-main">
+        <div class="ep-venue"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>${e.venue}</span></div>
+        <div class="ep-address">${e.venue}, ${e.city}, TX</div>
+        <p class="ep-desc">${e.desc}</p>
+        <div class="ep-organizer"><span class="ep-org-lead">Organizer</span>Presented by <b>${e.city} Parks &amp; Community</b>, listed and vetted by WilCo Guide.</div>
+        <div class="ep-map">
+          <div class="epm-canvas"><div class="epm-pin"><span class="mk-dot big" style="background:${hex};display:block"></span></div></div>
+          <div class="epm-bar">
+            <div>
+              <div class="epm-venue">${e.venue}</div>
+              <div class="epm-sub">${e.city}, TX</div>
+            </div>
+            <span class="epm-link" id="epMapLink">View on the WilCo map <span aria-hidden="true">&rarr;</span></span>
+          </div>
         </div>
       </div>
-      <div class="dr-note">This is your WilCo Guide event page<br/>built for local SEO</div>
-    </div>`;
-  document.getElementById("drClose").onclick=closeDrawer;
-  document.getElementById("overlay").classList.add("open");
-  document.getElementById("drawer").classList.add("open");
+      <aside class="ep-rail">${railCards()}</aside>
+    </div>
+
+    <div class="ep-more">
+      <div class="section-head">
+        <div>
+          <span class="s-kicker">Keep exploring</span>
+          <h2>More events this weekend</h2>
+        </div>
+      </div>
+      <div class="card-grid">${more.map((m,i)=>cardHTML(m,i)).join("")}</div>
+    </div>
+  </div>`;
 }
-function closeDrawer(){
-  document.getElementById("overlay").classList.remove("open");
-  document.getElementById("drawer").classList.remove("open");
+
+/* per-event schema.org/Event JSON-LD (crawlable-page SEO intent) */
+function injectEventJsonLd(e){
+  const old=document.getElementById("eventJsonLd");if(old)old.remove();
+  const mins=timeMin(e.time), hh=pad2(Math.floor(mins/60)), mm=pad2(mins%60);
+  const data={
+    "@context":"https://schema.org",
+    "@type":"Event",
+    "name":e.title,
+    "startDate":`${e.date}T${hh}:${mm}:00-05:00`,
+    "eventStatus":"https://schema.org/EventScheduled",
+    "eventAttendanceMode":"https://schema.org/OfflineEventAttendanceMode",
+    "image":[e.imgWide],
+    "description":e.desc,
+    "location":{"@type":"Place","name":e.venue,"address":{"@type":"PostalAddress","addressLocality":e.city,"addressRegion":"TX","addressCountry":"US"}},
+    "organizer":{"@type":"Organization","name":"WilCo Guide","url":"https://wilcoguide.com"}
+  };
+  const s=document.createElement("script");
+  s.type="application/ld+json";s.id="eventJsonLd";
+  s.textContent=JSON.stringify(data,null,2);
+  document.head.appendChild(s);
 }
-document.getElementById("overlay").onclick=closeDrawer;
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeDrawer();closeDayModal();}});
+
+function showEventPage(e){
+  document.body.className="page-event";
+  const host=document.getElementById("eventPage");
+  host.innerHTML=eventPageHTML(e);
+  injectEventJsonLd(e);
+  host.querySelector("#epBack").onclick=goEvents;
+  host.querySelector("#epCrumbHome").onclick=goEvents;
+  host.querySelector("#epMapLink").onclick=goMap;
+  host.querySelector("#epTickets").onclick=()=>alert("Get tickets / view the original source (prototype)");
+  host.querySelector("#epCal").onclick=()=>alert("Add to calendar (prototype)");
+  host.querySelector("#epShare").onclick=()=>alert("Share this event page: "+location.href);
+  document.title="WilCo Guide · "+e.title;
+  window.scrollTo(0,0);
+}
+
+/* ================= ROUTER (hash-based) ================= */
+function slugToEvent(slug){return EVENTS.find(x=>x.seed===slug);}
+function goEvent(id){const e=EVENTS.find(x=>x.id===id);if(e)location.hash="#event/"+e.seed;}
+function goMap(){location.hash="#map";}
+function goEvents(){location.hash="#";}
+
+function showEventsBrowser(){
+  document.body.className="page-events view-"+state.view;
+  document.querySelectorAll("#viewSwitch button").forEach(b=>b.classList.toggle("active",b.dataset.view===state.view));
+  document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));
+  document.getElementById("view-"+state.view).classList.add("active");
+  document.title="WilCo Guide · Events";
+  renderActive();
+  window.scrollTo(0,0);
+}
+function showMapPage(){
+  document.body.className="page-map";
+  document.title="WilCo Guide · Event Map";
+  initMap();
+  setTimeout(()=>{if(map)map.resize();},60);
+}
+function applyRoute(){
+  const h=location.hash;
+  if(h.indexOf("#event/")===0){
+    const e=slugToEvent(decodeURIComponent(h.slice(7)));
+    if(e){showEventPage(e);return;}
+  }
+  if(h==="#map"){showMapPage();return;}
+  showEventsBrowser();
+}
+window.addEventListener("hashchange",applyRoute);
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Escape")return;
+  closeDayModal();
+  if(document.body.classList.contains("page-event")||document.body.classList.contains("page-map"))goEvents();
+});
 
 /* ================= SAVE ================= */
 function toggleSave(id){
@@ -1345,24 +1473,25 @@ function renderActive(){
   if(state.view==="card")renderCard();
   else if(state.view==="list")renderList();
   else if(state.view==="calendar")renderCalendar();
-  else if(state.view==="map")refreshMarkers();
 }
 function setView(v){
   state.view=v;
-  document.body.className="view-"+v;
+  document.body.className="page-events view-"+v;
   document.querySelectorAll("#viewSwitch button").forEach(b=>b.classList.toggle("active",b.dataset.view===v));
   document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));
-  if(v!=="map"){document.getElementById("view-"+v).classList.add("active");renderActive();}
-  else{initMap();}
+  document.getElementById("view-"+v).classList.add("active");
+  renderActive();
 }
 document.querySelectorAll("#viewSwitch button").forEach(b=>{b.onclick=()=>setView(b.dataset.view);});
+document.getElementById("btnMap").onclick=goMap;
+document.getElementById("ribbonMap").onclick=e=>{e.preventDefault();goMap();};
 
 /* ================= EVENT DELEGATION ================= */
 document.body.addEventListener("click",ev=>{
   const save=ev.target.closest("[data-save]");
   if(save){ev.stopPropagation();toggleSave(+save.dataset.save);return;}
   const card=ev.target.closest("[data-id]");
-  if(card){openDrawer(+card.dataset.id);}
+  if(card){goEvent(+card.dataset.id);}
 });
 
 /* ================= FILTER WIRING ================= */
@@ -1378,17 +1507,11 @@ buildDropdown(document.getElementById("ddType"),"TYPE",
   "type",onFilterChange,true);
 buildDropdown(document.getElementById("ddSort"),"SORT",["Soonest","Alphabetical"],"sort",onFilterChange,false);
 
-/* global range segmented control (all views respect it) */
-function setRange(v){
-  state.range=v;
-  document.querySelectorAll("#rangeSeg button").forEach(b=>b.classList.toggle("active",b.dataset.range===v));
-  onFilterChange();
-}
-document.querySelectorAll("#rangeSeg button").forEach(b=>{b.onclick=()=>setRange(b.dataset.range);});
 document.getElementById("btnFilters").onclick=()=>document.getElementById("controls").classList.toggle("filters-open");
 document.getElementById("ssClose").onclick=()=>document.getElementById("stickySponsor").style.display="none";
 
 /* map furniture buttons (prototype actions) */
+document.getElementById("mapBack").onclick=e=>{e.preventDefault();goEvents();};
 document.getElementById("mapShare").onclick=()=>alert("Share this event map (prototype)");
 document.getElementById("mapSubmit").onclick=()=>alert("Opens the greetform event submission (prototype)");
 document.getElementById("mapNews").onclick=()=>alert("Join the free WilCo Guide newsletter (prototype)");
@@ -1465,7 +1588,7 @@ function buildMarkers(){
     el.className="mk-dot"+(big?" big":"");
     el.style.background=CATS[e.cat].hex;
     el.title=e.title;
-    el.onclick=()=>openDrawer(e.id);
+    el.onclick=()=>goEvent(e.id);
     const marker=new maplibregl.Marker({element:el,anchor:"center"}).setLngLat([e.lng,e.lat]).addTo(map);
     markers.push({e,marker,el});
   });
@@ -1510,9 +1633,8 @@ function refreshMarkers(){
     const dayOK=state.mapDay==="all"||e.dayName===state.mapDay;
     const catOK=state.catOn.has(e.cat);
     const typeOK=state.type==="All Events"||e.cat===state.type;
-    const rangeOK=inRange(e);
     const searchOK=!state.search.trim()||(e.title+e.cat+e.city+e.venue).toLowerCase().includes(state.search.toLowerCase());
-    el.style.display=(dayOK&&catOK&&typeOK&&rangeOK&&searchOK)?"block":"none";
+    el.style.display=(dayOK&&catOK&&typeOK&&searchOK)?"block":"none";
   });
   buildClosures();
 }
@@ -1611,14 +1733,14 @@ function fallbackMap(){
     const d=document.createElement("div");d.className="mk-dot"+(big?" big":"");d.style.position="absolute";
     d.style.left=p.x+"px";d.style.top=p.y+"px";d.style.transform="translate(-50%,-50%)";
     d.style.background=CATS[e.cat].hex;
-    d.onclick=()=>openDrawer(e.id);
+    d.onclick=()=>goEvent(e.id);
     el.appendChild(d);
   });
 }
 
 /* ================= INIT ================= */
 renderRail();
-renderCard();
+applyRoute();
 </script>
 </body>
 </html>
