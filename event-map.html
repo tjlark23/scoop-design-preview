@@ -738,7 +738,6 @@ body.view-calendar .layout{grid-template-columns:1fr;}
 
     <div class="dd" id="ddType"></div>
     <div class="dd" id="ddSort"></div>
-    <div class="dd" id="ddRadius"></div>
 
     <div class="spacer"></div>
     <button class="btn-add">
@@ -917,7 +916,7 @@ EVENTS.forEach(e=>{
 /* ================= STATE ================= */
 const state={
   view:"card", search:"", type:"All Events", sort:"Soonest",
-  range:"This Weekend", radius:"Within 25 miles",
+  range:"This Weekend",
   saved:new Set(), mapDay:"all", catOn:new Set(Object.keys(CATS)), closures:false
 };
 
@@ -949,9 +948,7 @@ function getFiltered(){
     list=list.filter(e=>(e.title+" "+e.cat+" "+e.city+" "+e.venue).toLowerCase().includes(q));
   }
   list=list.filter(inRange);
-  const rad={"Within 10 miles":10,"Within 25 miles":25,"Within 50 miles":50}[state.radius];
-  if(rad) list=list.filter(e=>e.dist<=rad);
-  if(state.sort==="Distance") list.sort((a,b)=>a.dist-b.dist);
+  if(state.sort==="Alphabetical") list.sort((a,b)=>a.title.localeCompare(b.title));
   else list.sort((a,b)=>eventSortKey(a)-eventSortKey(b));
   return list;
 }
@@ -1379,8 +1376,7 @@ document.querySelector(".header-search input").addEventListener("input",e=>{
 buildDropdown(document.getElementById("ddType"),"TYPE",
   ["All Events","Family","Music","Markets","Food & Drink","Garage Sales","Estate Sales","Kids & School","City & Gov","Outdoors"],
   "type",onFilterChange,true);
-buildDropdown(document.getElementById("ddSort"),"SORT",["Soonest","Distance"],"sort",onFilterChange,false);
-buildDropdown(document.getElementById("ddRadius"),"NEAR",["Within 10 miles","Within 25 miles","Within 50 miles"],"radius",onFilterChange,false);
+buildDropdown(document.getElementById("ddSort"),"SORT",["Soonest","Alphabetical"],"sort",onFilterChange,false);
 
 /* global range segmented control (all views respect it) */
 function setRange(v){
