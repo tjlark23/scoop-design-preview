@@ -443,6 +443,10 @@ body.view-map .map-shell{display:block;}
 .footer .f-meta{grid-column:1/-1;margin-top:28px;padding-top:16px;border-top:1px solid #24304a;font-size:11px;font-family:var(--mono);letter-spacing:.04em;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
 
 /* ============ RESPONSIVE ============ */
+@media (min-width:1081px){
+  .controls{flex-wrap:nowrap;}
+  .ctrl-search{flex:0 1 160px;min-width:80px;}
+}
 @media (max-width:1080px){
   .layout{grid-template-columns:1fr;}
   .rail{position:static;flex-direction:row;flex-wrap:wrap;}
