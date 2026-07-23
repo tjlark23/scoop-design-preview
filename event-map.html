@@ -200,6 +200,13 @@ img{display:block;max-width:100%;}
 
 .btn-filters{display:none;}
 
+/* range segmented control (primary date switcher, all views) */
+.range-seg{display:flex;border:1px solid var(--border);border-radius:3px;overflow:hidden;background:var(--cream);flex:none;}
+.range-seg button{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.03em;padding:9px 13px;color:var(--muted);border-right:1px solid var(--border);white-space:nowrap;transition:background .14s,color .14s;}
+.range-seg button:last-child{border-right:none;}
+.range-seg button.active{background:var(--ink);color:var(--cream);}
+.range-seg button:hover:not(.active){background:var(--cream-dark);color:var(--navy);}
+
 /* ============ LAYOUT ============ */
 .layout{
   display:grid;grid-template-columns:1fr 320px;gap:36px;
@@ -293,6 +300,36 @@ body.view-map .layout{display:none;}
 .list-save{width:36px;height:36px;border-radius:3px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--navy);transition:background .16s,border-color .16s;}
 .list-save:hover{background:var(--cream-dark);}
 .list-save.saved{background:var(--rust);color:var(--cream);border-color:var(--rust);}
+/* rebalanced list row: tag row left, date/time block right */
+.list-tags{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.list-when{flex:none;text-align:right;min-width:118px;display:flex;flex-direction:column;align-items:flex-end;gap:5px;padding-left:8px;}
+.lw-date{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--muted);}
+.lw-time{font-family:var(--serif);font-weight:700;font-size:23px;color:var(--navy);line-height:1;letter-spacing:-.01em;}
+
+/* ============ CALENDAR AGENDA (7 / 14 day big blocks) ============ */
+.agenda{display:flex;flex-direction:column;gap:14px;margin-top:20px;}
+.ag-day{border:1px solid var(--border);border-radius:4px;background:var(--cream);overflow:hidden;display:grid;grid-template-columns:132px 1fr;}
+.ag-date{background:var(--cream-dark);padding:16px;border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;gap:3px;}
+.ag-day.has-ev .ag-date{cursor:pointer;transition:background .16s;}
+.ag-day.has-ev .ag-date:hover{background:var(--border);}
+.ag-day.today .ag-date{background:var(--navy);border-right-color:var(--navy);}
+.ag-dow{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--rust);}
+.ag-day.today .ag-dow{color:var(--gold);}
+.ag-dnum{font-family:var(--serif);font-weight:800;font-size:34px;line-height:1;color:var(--navy);letter-spacing:-.02em;}
+.ag-day.today .ag-dnum{color:var(--cream);}
+.ag-mon{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;}
+.ag-day.today .ag-mon{color:#c7d2e0;}
+.ag-evs{padding:9px 8px;display:flex;flex-direction:column;justify-content:center;}
+.ag-ev{display:flex;align-items:center;gap:13px;padding:9px 12px;border-radius:3px;cursor:pointer;transition:background .14s;}
+.ag-ev:hover{background:var(--cream-dark);}
+.ag-time{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink);width:74px;flex:none;letter-spacing:.02em;}
+.ag-main{flex:1;min-width:0;}
+.ag-t{font-family:var(--serif);font-weight:600;font-size:16px;color:var(--navy);line-height:1.12;}
+.ag-v{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.02em;margin-top:2px;}
+.ag-type{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border:1px solid;border-radius:2px;padding:4px 7px;display:inline-flex;align-items:center;gap:5px;flex:none;}
+.ag-type .tdot{width:6px;height:6px;border-radius:2px;flex:none;}
+.ag-empty{padding:15px 12px;font-family:var(--body);font-size:13px;color:var(--muted);font-style:italic;}
+.cal-head{align-items:center;flex-wrap:wrap;gap:12px;}
 
 /* ============ CALENDAR VIEW ============ */
 .cal-head{display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:2px;}
@@ -349,21 +386,37 @@ body.view-map .layout{display:none;}
 /* ============ MAP VIEW ============ */
 .map-shell{display:none;position:relative;height:calc(100vh - 148px);min-height:520px;background:var(--paper);}
 body.view-map .map-shell{display:block;}
-#map{position:absolute;inset:0;}
+#map{position:absolute;top:0;left:0;right:0;bottom:44px;}
 .maplibregl-ctrl-attrib{font-family:var(--sans);font-size:9px;background:rgba(250,246,238,.75)!important;}
 
 .map-float{position:absolute;background:var(--cream);border:1px solid var(--border);box-shadow:var(--shadow-lift);z-index:5;}
-.map-title{top:18px;left:18px;padding:12px 15px;border-radius:3px;}
-.map-title .mt-mark{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.16em;color:var(--rust);text-transform:uppercase;}
-.map-title .mt-name{font-family:var(--serif);font-weight:700;font-size:17px;color:var(--navy);line-height:1.1;margin-top:3px;}
-.map-title .mt-sub{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.04em;margin-top:2px;}
+.map-title{top:18px;left:18px;padding:11px 14px;border-radius:3px;}
+.map-title .mt-wm{font-family:var(--serif);font-weight:900;font-size:15px;color:var(--navy);letter-spacing:-.01em;}
+.map-title .mt-wm em{color:var(--rust);font-style:normal;}
+.map-title .mt-name{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin:5px 0 9px;}
+.map-title .mt-share{font-family:var(--sans);font-size:11.5px;font-weight:600;color:var(--navy);border:1px solid var(--border);background:var(--cream);border-radius:3px;padding:6px 11px;display:inline-flex;align-items:center;gap:5px;transition:background .16s,border-color .16s;}
+.map-title .mt-share:hover{background:var(--cream-dark);border-color:var(--navy);}
+
+/* top-right rust submit + bottom-right navy newsletter + bottom sponsor banner */
+.map-submit{top:18px;right:58px;font-family:var(--sans);font-size:12.5px;font-weight:600;background:var(--rust);color:var(--cream);border:none;border-radius:3px;padding:10px 15px;display:inline-flex;align-items:center;gap:6px;box-shadow:var(--shadow-lift);transition:background .16s,transform .1s;}
+.map-submit:hover{background:var(--rust-deep);}
+.map-submit:active{transform:translateY(1px);}
+.map-newsletter{bottom:60px;right:18px;font-family:var(--sans);font-size:13px;font-weight:600;background:var(--navy);color:var(--cream);border:none;border-radius:3px;padding:12px 18px;display:inline-flex;align-items:center;gap:7px;box-shadow:var(--shadow-lift);transition:background .16s,transform .1s;}
+.map-newsletter:hover{background:var(--navy-dark);}
+.map-newsletter:active{transform:translateY(1px);}
+.map-adbanner{position:absolute;left:0;right:0;bottom:0;height:44px;z-index:6;background:var(--navy);color:var(--cream);display:flex;align-items:center;gap:14px;padding:0 18px;box-shadow:0 -4px 16px rgba(11,22,36,.25);}
+.map-adbanner .ad-logo{width:30px;height:30px;border-radius:3px;background:var(--cream);color:var(--navy);font-family:var(--serif);font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none;}
+.map-adbanner .ad-txt{flex:1;min-width:0;font-family:var(--sans);font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.map-adbanner .ad-mark{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.16em;color:var(--gold);}
+.map-adbanner .ad-cta{font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--gold);flex:none;display:inline-flex;align-items:center;gap:5px;}
 
 .map-days{top:18px;left:50%;transform:translateX(-50%);display:flex;border-radius:3px;overflow:hidden;}
 .map-days button{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.08em;padding:9px 15px;color:var(--muted);border-right:1px solid var(--border);background:var(--cream);transition:background .14s,color .14s;}
 .map-days button:last-child{border-right:none;}
 .map-days button.active{background:var(--ink);color:var(--cream);}
 
-.map-legend{bottom:24px;left:18px;padding:14px 16px;border-radius:3px;width:236px;}
+.map-legend{bottom:60px;left:18px;padding:14px 16px;border-radius:3px;width:236px;}
+.map-legend .ml-cap{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.03em;line-height:1.4;margin-top:10px;padding-top:9px;border-top:1px solid var(--border-soft);}
 .map-legend .ml-head{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.16em;color:var(--muted);text-transform:uppercase;margin-bottom:10px;}
 .ml-row{display:flex;align-items:center;gap:9px;padding:5px 0;cursor:pointer;font-family:var(--sans);font-size:12.5px;color:var(--ink);user-select:none;}
 .ml-row .ml-check{width:15px;height:15px;border:1px solid var(--border);border-radius:2px;display:flex;align-items:center;justify-content:center;flex:none;background:var(--cream);transition:background .14s,border-color .14s;}
@@ -381,10 +434,24 @@ body.view-map .map-shell{display:block;}
 .ml-toggle.on .toggle-sw{background:var(--rust);}
 .ml-toggle.on .toggle-sw::after{transform:translateX(17px);}
 
-/* map markers */
+/* map markers (closures still use the diamond svg) */
 .mk{cursor:pointer;transform-origin:center bottom;transition:transform .18s;}
 .mk:hover{transform:scale(1.18);z-index:10;}
 .mk svg{filter:drop-shadow(0 3px 5px rgba(11,22,36,.4));}
+
+/* friendly circular category dot markers */
+.mk-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--cream);box-shadow:0 2px 5px rgba(11,22,36,.4);cursor:pointer;transition:transform .18s;}
+.mk-dot.big{width:22px;height:22px;box-shadow:0 3px 7px rgba(11,22,36,.45);}
+.mk-dot:hover{transform:scale(1.22);z-index:10;}
+
+/* sponsored logo pins (square-ish monogram badge, distinct from event dots) */
+.ad-pin{width:28px;height:28px;border-radius:4px;border:2px solid var(--cream);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:9px;letter-spacing:.02em;color:var(--cream);box-shadow:0 3px 7px rgba(11,22,36,.45);cursor:pointer;}
+.ad-pin:hover{transform:scale(1.1);z-index:11;}
+
+/* on-brand map popup */
+.maplibregl-popup.ad-popup .maplibregl-popup-content{background:var(--cream);border:1px solid var(--border);border-radius:3px;box-shadow:var(--shadow-lift);font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.06em;color:var(--navy);padding:8px 12px;}
+.maplibregl-popup.ad-popup .maplibregl-popup-tip{border-top-color:var(--cream);}
+.maplibregl-popup.ad-popup .ad-pop-mark{color:var(--rust);letter-spacing:.1em;}
 
 /* ============ DRAWER ============ */
 .overlay{position:fixed;inset:0;background:rgba(11,22,36,.5);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .3s;z-index:80;}
@@ -444,8 +511,7 @@ body.view-map .map-shell{display:block;}
 
 /* ============ RESPONSIVE ============ */
 @media (min-width:1081px){
-  .controls{flex-wrap:nowrap;}
-  .ctrl-search{flex:0 1 160px;min-width:80px;}
+  .ctrl-search{flex:0 1 150px;min-width:80px;}
 }
 @media (max-width:1080px){
   .layout{grid-template-columns:1fr;}
@@ -491,11 +557,21 @@ body.view-map .map-shell{display:block;}
   .cal-weekdays div{padding:8px 5px;font-size:8px;}
   .list-thumb{width:72px;height:56px;}
   .list-title{font-size:18px;}
-  .list-right .list-dist{display:none;}
+  .list-when{min-width:74px;padding-left:6px;}
+  .lw-time{font-size:18px;}
+  .lw-date{font-size:10px;}
   .map-shell{height:calc(100vh - 118px);}
+  #map{bottom:48px;}
   .map-title{display:none;}
+  .map-submit{display:none;}
   .map-legend{display:none;}
-  .map-days{width:calc(100% - 36px);left:18px;transform:none;justify-content:center;}
+  .map-days{width:calc(100% - 28px);left:14px;top:14px;transform:none;justify-content:flex-start;overflow-x:auto;scrollbar-width:none;}
+  .map-days::-webkit-scrollbar{display:none;}
+  .map-newsletter{left:14px;right:14px;bottom:auto;top:60px;justify-content:center;padding:11px;font-size:12.5px;box-shadow:var(--shadow-lift);}
+  .map-adbanner{height:48px;padding:0 14px;gap:10px;}
+  .map-adbanner .ad-cta{display:none;}
+  .range-seg{overflow-x:auto;max-width:100%;scrollbar-width:none;}
+  .range-seg::-webkit-scrollbar{display:none;}
   .sticky-sponsor{display:flex;}
   body.view-map .sticky-sponsor{display:none;}
   .drawer{width:100vw;}
@@ -506,7 +582,7 @@ body.view-map .map-shell{display:block;}
 /* mobile map bottom category bar */
 .map-mobile-bar{display:none;}
 @media (max-width:640px){
-  .map-mobile-bar{display:flex;position:absolute;bottom:16px;left:0;right:0;gap:8px;padding:0 14px;overflow-x:auto;z-index:6;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .map-mobile-bar{display:flex;position:absolute;bottom:58px;left:0;right:0;gap:8px;padding:0 14px;overflow-x:auto;z-index:6;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
   .map-mobile-bar::-webkit-scrollbar{display:none;}
   .mmb-chip{font-family:var(--mono);font-size:11px;font-weight:600;white-space:nowrap;background:var(--cream);border:1px solid var(--border);border-radius:3px;padding:8px 12px;display:flex;align-items:center;gap:7px;color:var(--ink);box-shadow:var(--shadow-sm);}
   .mmb-chip.off{opacity:.45;}
@@ -643,6 +719,13 @@ body.view-calendar .layout{grid-template-columns:1fr;}
       </button>
     </div>
 
+    <div class="range-seg" id="rangeSeg" role="group" aria-label="Date range">
+      <button data-range="This Weekend" class="active">This Weekend</button>
+      <button data-range="7 Days">7 Days</button>
+      <button data-range="14 Days">14 Days</button>
+      <button data-range="Month">Month</button>
+    </div>
+
     <button class="btn-filters" id="btnFilters">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
       Filters
@@ -655,7 +738,6 @@ body.view-calendar .layout{grid-template-columns:1fr;}
 
     <div class="dd" id="ddType"></div>
     <div class="dd" id="ddSort"></div>
-    <div class="dd" id="ddDate"></div>
     <div class="dd" id="ddRadius"></div>
 
     <div class="spacer"></div>
@@ -680,18 +762,36 @@ body.view-calendar .layout{grid-template-columns:1fr;}
 <!-- MAP SHELL -->
 <div class="map-shell">
   <div id="map"></div>
+
   <div class="map-float map-title">
-    <div class="mt-mark">WILCO EVENT MAP</div>
-    <div class="mt-name">This Weekend</div>
-    <div class="mt-sub">Jul 24 to 26 · 16 events</div>
+    <div class="mt-wm">WilCo <em>Guide</em></div>
+    <div class="mt-name">Event Map</div>
+    <button class="mt-share" id="mapShare">Share <span aria-hidden="true">&#8599;</span></button>
   </div>
+
   <div class="map-float map-days" id="mapDays">
     <button data-day="all" class="active">ALL</button>
+    <button data-day="Mon">MON</button>
+    <button data-day="Tue">TUE</button>
+    <button data-day="Wed">WED</button>
+    <button data-day="Thu">THU</button>
     <button data-day="Fri">FRI</button>
     <button data-day="Sat">SAT</button>
     <button data-day="Sun">SUN</button>
   </div>
+
+  <button class="map-float map-submit" id="mapSubmit">Submit an event <span aria-hidden="true">&#8599;</span></button>
+
   <div class="map-float map-legend" id="mapLegend"></div>
+
+  <button class="map-float map-newsletter" id="mapNews">Get the newsletter, free <span aria-hidden="true">&rarr;</span></button>
+
+  <div class="map-adbanner" id="mapAd">
+    <div class="ad-logo">HC</div>
+    <div class="ad-txt"><span class="ad-mark">SPONSOR</span> · Hill Country Bank · Local banking since 1974</div>
+    <a href="#" class="ad-cta">Open an account <span aria-hidden="true">&rarr;</span></a>
+  </div>
+
   <div class="map-mobile-bar" id="mapMobileBar"></div>
 </div>
 
@@ -782,6 +882,19 @@ const ROAD_CLOSURES = [
 
 const CENTER = {lat:30.5788, lng:-97.8531};
 
+/* prototype "today" (matches the weekend framing across the page) */
+const PROTO_TODAY   = new Date(2026,6,22);           // Wed Jul 22 2026
+const WEEKEND_START = new Date(2026,6,24,0,0);       // Fri Jul 24
+const WEEKEND_END   = new Date(2026,6,26,23,59);     // Sun Jul 26
+
+/* sponsored business logo pins (a paid ad + wayfinding product) */
+const ADVERTISERS = [
+  {name:"Java Junction Coffee", mono:"JAVA", lat:30.5735, lng:-97.8555, color:"#6f4a2f"},
+  {name:"Reveille Barbecue Co.", mono:"RB",  lat:30.5630, lng:-97.8615, color:"#a84e30"},
+  {name:"Hill Country Bank",     mono:"HC",  lat:30.5795, lng:-97.8495, color:"#123260"},
+  {name:"Bluebonnet Boutique",   mono:"BM",  lat:30.5150, lng:-97.8175, color:"#8a5a6a"}
+];
+
 function haversine(a,b){
   const R=3958.8, toRad=x=>x*Math.PI/180;
   const dLat=toRad(b.lat-a.lat), dLng=toRad(b.lng-a.lng);
@@ -796,15 +909,28 @@ EVENTS.forEach(e=>{
   e.dayName=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()];
   e.dateShort=d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"}).toUpperCase();
   e.dateLong=d.toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric",year:"numeric"});
+  e.monthDay=d.toLocaleDateString("en-US",{month:"short",day:"numeric"}).toUpperCase();
   e.dayNum=d.getDate();
+  e.dateObj=d;
 });
 
 /* ================= STATE ================= */
 const state={
   view:"card", search:"", type:"All Events", sort:"Soonest",
-  date:"This Weekend", radius:"Within 25 miles",
+  range:"This Weekend", radius:"Within 25 miles",
   saved:new Set(), mapDay:"all", catOn:new Set(Object.keys(CATS)), closures:false
 };
+
+/* global date-range window (all views respect this) */
+function inRange(e){
+  const d=e.dateObj;
+  if(state.range==="This Weekend"){return d>=WEEKEND_START && d<=WEEKEND_END;}
+  const n=state.range==="7 Days"?7:state.range==="14 Days"?14:31;
+  const end=new Date(PROTO_TODAY);end.setDate(end.getDate()+n-1);end.setHours(23,59);
+  return d>=PROTO_TODAY && d<=end;
+}
+function headingForRange(){return {"This Weekend":"This Weekend","7 Days":"Next 7 Days","14 Days":"Next 14 Days","Month":"This Month"}[state.range]||"Events";}
+function rangeKicker(){return state.range==="This Weekend"?"FRI JUL 24 - SUN JUL 26":"FROM TODAY";}
 
 function timeMin(t){
   const m=t.match(/(\d+):(\d+)\s*(AM|PM)/i);
@@ -822,10 +948,7 @@ function getFiltered(){
     const q=state.search.toLowerCase();
     list=list.filter(e=>(e.title+" "+e.cat+" "+e.city+" "+e.venue).toLowerCase().includes(q));
   }
-  if(state.date!=="This Weekend"){
-    const map={"Fri Jul 24":"Fri","Sat Jul 25":"Sat","Sun Jul 26":"Sun"};
-    list=list.filter(e=>e.dayName===map[state.date]);
-  }
+  list=list.filter(inRange);
   const rad={"Within 10 miles":10,"Within 25 miles":25,"Within 50 miles":50}[state.radius];
   if(rad) list=list.filter(e=>e.dist<=rad);
   if(state.sort==="Distance") list.sort((a,b)=>a.dist-b.dist);
@@ -931,8 +1054,8 @@ function renderCard(){
   const gridHTML = `
     <div class="section-head">
       <div>
-        <span class="s-kicker">FRI JUL 24 - SUN JUL 26</span>
-        <h2>This Weekend</h2>
+        <span class="s-kicker">${rangeKicker()}</span>
+        <h2>${headingForRange()}</h2>
       </div>
       <span class="s-count">${list.length} EVENTS · ${new Set(list.map(e=>e.cat)).size} CATEGORIES</span>
     </div>
@@ -946,11 +1069,13 @@ function renderList(){
   const list=getFiltered();
   const el=document.getElementById("view-list");
   if(!list.length){el.innerHTML=`<div style="text-align:center;padding:80px 20px;font-family:var(--sans);color:var(--muted);">No events match those filters.</div>`;return;}
-  const days=["Fri","Sat","Sun"];
+  // group by calendar date, in chronological order
+  const byIso={};
+  list.forEach(e=>{(byIso[e.date]=byIso[e.date]||[]).push(e);});
+  const isos=Object.keys(byIso).sort();
   let idx=0;
-  el.innerHTML=days.map(dn=>{
-    const evs=list.filter(e=>e.dayName===dn).sort((a,b)=>timeMin(a.time)-timeMin(b.time));
-    if(!evs.length)return "";
+  el.innerHTML=isos.map(iso=>{
+    const evs=byIso[iso].sort((a,b)=>timeMin(a.time)-timeMin(b.time));
     const full=evs[0].dateLong.replace(/, \d{4}$/,"");
     return `
       <div class="day-block">
@@ -959,20 +1084,21 @@ function renderList(){
           <span class="d-count">${evs.length} EVENT${evs.length>1?"S":""}</span>
         </div>
         ${evs.map(e=>{
-          const saved=state.saved.has(e.id)?"saved":"";
+          const hex=CATS[e.cat].hex;
           return `
           <div class="list-row reveal" style="animation-delay:${(idx++)*30}ms" data-id="${e.id}">
             <div class="list-thumb"><img src="${e.img}" alt="${e.title}" loading="lazy"/></div>
             <div class="list-main">
-              <div class="list-kicker">${catDot(e.cat)} ${e.cat} · ${e.city}</div>
+              <div class="list-tags">
+                <span class="ev-tag city">${e.city}</span>
+                <span class="ev-tag type" style="border-color:${hex};color:${hex}"><span class="tdot" style="background:${hex}"></span>${e.cat}</span>
+              </div>
               <div class="list-title">${e.title}</div>
-              <div class="list-sub">${e.time} · ${e.city} · ${e.venue}</div>
+              <div class="list-sub">${e.venue}, ${e.city}</div>
             </div>
-            <div class="list-right">
-              <div class="list-dist">${e.dist.toFixed(1)} mi<span>AWAY</span></div>
-              <button class="list-save ${saved}" data-save="${e.id}" aria-label="Save">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="${saved?"currentColor":"none"}" stroke="currentColor" stroke-width="2"><path d="M5 3v18l7-5 7 5V3z"/></svg>
-              </button>
+            <div class="list-when">
+              <div class="lw-date">${e.dayName.toUpperCase()} · ${e.monthDay}</div>
+              <div class="lw-time">${e.time}</div>
             </div>
           </div>`;
         }).join("")}
@@ -982,28 +1108,82 @@ function renderList(){
 
 /* ================= CALENDAR VIEW ================= */
 let calByDate={};
+function pad2(n){return String(n).padStart(2,"0");}
+function isoOf(dt){return `${dt.getFullYear()}-${pad2(dt.getMonth()+1)}-${pad2(dt.getDate())}`;}
+function calRangeControlHTML(){
+  return `<div class="range-seg cal-range" role="group" aria-label="Calendar range">
+    ${["This Weekend","7 Days","14 Days","Month"].map(r=>`<button data-range="${r}"${r===state.range?' class="active"':''}>${r}</button>`).join("")}
+  </div>`;
+}
+function wireCalRange(el){
+  el.querySelectorAll(".cal-range button").forEach(b=>{b.onclick=()=>setRange(b.dataset.range);});
+}
+
 function renderCalendar(){
   const list=getFiltered();
   const el=document.getElementById("view-calendar");
+  const byIso={};
+  list.forEach(e=>{(byIso[e.date]=byIso[e.date]||[]).push(e);});
+  calByDate=byIso;
+  if(state.range==="Month") renderCalMonth(el,list,byIso);
+  else renderCalAgenda(el,list,byIso);
+  wireCalRange(el);
+}
+
+/* agenda: big day blocks (7 or 14 days), every event shown, no truncation */
+function renderCalAgenda(el,list,byIso){
+  const days=state.range==="14 Days"?14:7;
+  let blocks="";
+  for(let i=0;i<days;i++){
+    const dt=new Date(PROTO_TODAY);dt.setDate(dt.getDate()+i);
+    const iso=isoOf(dt);
+    const evs=(byIso[iso]||[]).slice().sort((a,b)=>timeMin(a.time)-timeMin(b.time));
+    const isToday=i===0;
+    const dow=["SUN","MON","TUE","WED","THU","FRI","SAT"][dt.getDay()];
+    const mon=dt.toLocaleDateString("en-US",{month:"short"}).toUpperCase();
+    blocks+=`<div class="ag-day${isToday?" today":""}${evs.length?" has-ev":""} reveal" style="animation-delay:${i*35}ms">
+      <div class="ag-date"${evs.length?` data-day="${iso}"`:""}>
+        <span class="ag-dow">${dow}</span>
+        <span class="ag-dnum">${dt.getDate()}</span>
+        <span class="ag-mon">${mon}</span>
+      </div>
+      <div class="ag-evs">
+        ${evs.length?evs.map(e=>`
+          <div class="ag-ev" data-id="${e.id}">
+            <span class="ag-time">${e.time}</span>
+            <div class="ag-main"><div class="ag-t">${e.title}</div><div class="ag-v">${e.venue}, ${e.city}</div></div>
+            <span class="ag-type" style="border-color:${CATS[e.cat].hex};color:${CATS[e.cat].hex}"><span class="tdot" style="background:${CATS[e.cat].hex}"></span>${e.cat}</span>
+          </div>`).join(""):`<div class="ag-empty">No events</div>`}
+      </div>
+    </div>`;
+  }
+  el.innerHTML=`
+    <div class="cal-head">
+      <h2>${headingForRange()}</h2>
+      ${calRangeControlHTML()}
+    </div>
+    <div class="agenda">${blocks}</div>`;
+  el.querySelectorAll(".ag-date[data-day]").forEach(c=>{c.onclick=()=>openDayModal(c.dataset.day);});
+}
+
+/* month: uniform grid + click-a-day modal */
+function renderCalMonth(el,list,byIso){
   const year=2026, month=6;
   const first=new Date(year,month,1);
   const startDay=first.getDay();
   const daysInMonth=new Date(year,month+1,0).getDate();
-  const today=21;
-
-  const byDate={};
-  list.forEach(e=>{(byDate[e.dayNum]=byDate[e.dayNum]||[]).push(e);});
-  calByDate=byDate;
+  const today=22;
 
   let cells="";
   const prevDays=new Date(year,month,0).getDate();
   for(let i=startDay-1;i>=0;i--){cells+=`<div class="cal-cell out"><div class="c-num">${prevDays-i}</div></div>`;}
   for(let d=1;d<=daysInMonth;d++){
-    const evs=(byDate[d]||[]).sort((a,b)=>timeMin(a.time)-timeMin(b.time));
+    const iso=`${year}-${pad2(month+1)}-${pad2(d)}`;
+    const evs=(byIso[iso]||[]).sort((a,b)=>timeMin(a.time)-timeMin(b.time));
     const shown=evs.slice(0,3);
     const more=evs.length-shown.length;
     const hasEv=evs.length>0;
-    cells+=`<div class="cal-cell${d===today?" today":""}${hasEv?" has-ev":""}"${hasEv?` data-day="${d}"`:""}>
+    cells+=`<div class="cal-cell${d===today?" today":""}${hasEv?" has-ev":""}"${hasEv?` data-day="${iso}"`:""}>
       <div class="c-num">${d}</div>
       ${shown.map(e=>`<div class="cal-chip"><span class="c-dot" style="background:${CATS[e.cat].hex}"></span><span>${e.title}</span><span class="c-time">${e.time.replace(/:00/,"").replace(" ","")}</span></div>`).join("")}
       ${more>0?`<div class="cal-more">+${more} more</div>`:""}
@@ -1016,19 +1196,19 @@ function renderCalendar(){
   el.innerHTML=`
     <div class="cal-head">
       <h2>July 2026</h2>
-      <span class="c-sub">${list.length} EVENTS THIS MONTH</span>
+      ${calRangeControlHTML()}
     </div>
     <div class="cal-weekdays">${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d=>`<div>${d}</div>`).join("")}</div>
     <div class="cal-grid">${cells}</div>`;
 
   el.querySelectorAll(".cal-cell[data-day]").forEach(c=>{
-    c.onclick=()=>openDayModal(+c.dataset.day);
+    c.onclick=()=>openDayModal(c.dataset.day);
   });
 }
 
 /* ================= CALENDAR DAY MODAL ================= */
-function openDayModal(day){
-  const evs=(calByDate[day]||[]).slice().sort((a,b)=>timeMin(a.time)-timeMin(b.time));
+function openDayModal(iso){
+  const evs=(calByDate[iso]||[]).slice().sort((a,b)=>timeMin(a.time)-timeMin(b.time));
   if(!evs.length)return;
   const dl=evs[0].dateLong.replace(/, \d{4}$/,"");
   const modal=document.getElementById("calModal");
@@ -1135,20 +1315,18 @@ function openDrawer(id){
       <div class="dr-facts">
         <div class="dr-fact"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg><span><b>${e.dateLong}</b></span></div>
         <div class="dr-fact"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg><span>${e.time}</span></div>
-        <div class="dr-fact"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>${e.venue}, ${e.city} · ${e.dist.toFixed(1)} mi away</span></div>
+        <div class="dr-fact"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>${e.venue}, ${e.city}</span></div>
       </div>
       <p class="dr-desc">${e.desc}</p>
       <div class="dr-actions">
         <a href="#" class="dr-primary">Get tickets / View original</a>
         <div class="dr-secondary">
           <button><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="12" y1="13" x2="12" y2="17"/><line x1="10" y1="15" x2="14" y2="15"/></svg>Add to calendar</button>
-          <button class="${saved?"saved":""}" id="drSave"><svg width="16" height="16" viewBox="0 0 24 24" fill="${saved?"currentColor":"none"}" stroke="currentColor" stroke-width="2"><path d="M5 3v18l7-5 7 5V3z"/></svg>${saved?"Saved":"Save"}</button>
         </div>
       </div>
       <div class="dr-note">This is your WilCo Guide event page<br/>built for local SEO</div>
     </div>`;
   document.getElementById("drClose").onclick=closeDrawer;
-  document.getElementById("drSave").onclick=()=>{toggleSave(e.id);openDrawer(e.id);};
   document.getElementById("overlay").classList.add("open");
   document.getElementById("drawer").classList.add("open");
 }
@@ -1202,10 +1380,23 @@ buildDropdown(document.getElementById("ddType"),"TYPE",
   ["All Events","Family","Music","Markets","Food & Drink","Garage Sales","Estate Sales","Kids & School","City & Gov","Outdoors"],
   "type",onFilterChange,true);
 buildDropdown(document.getElementById("ddSort"),"SORT",["Soonest","Distance"],"sort",onFilterChange,false);
-buildDropdown(document.getElementById("ddDate"),"WHEN",["This Weekend","Fri Jul 24","Sat Jul 25","Sun Jul 26"],"date",onFilterChange,false);
 buildDropdown(document.getElementById("ddRadius"),"NEAR",["Within 10 miles","Within 25 miles","Within 50 miles"],"radius",onFilterChange,false);
+
+/* global range segmented control (all views respect it) */
+function setRange(v){
+  state.range=v;
+  document.querySelectorAll("#rangeSeg button").forEach(b=>b.classList.toggle("active",b.dataset.range===v));
+  onFilterChange();
+}
+document.querySelectorAll("#rangeSeg button").forEach(b=>{b.onclick=()=>setRange(b.dataset.range);});
 document.getElementById("btnFilters").onclick=()=>document.getElementById("controls").classList.toggle("filters-open");
 document.getElementById("ssClose").onclick=()=>document.getElementById("stickySponsor").style.display="none";
+
+/* map furniture buttons (prototype actions) */
+document.getElementById("mapShare").onclick=()=>alert("Share this event map (prototype)");
+document.getElementById("mapSubmit").onclick=()=>alert("Opens the greetform event submission (prototype)");
+document.getElementById("mapNews").onclick=()=>alert("Join the free WilCo Guide newsletter (prototype)");
+document.getElementById("mapAd").querySelector(".ad-cta").onclick=e=>{e.preventDefault();alert("Sponsored: Hill Country Bank (prototype)");};
 
 /* ================= MAP ================= */
 let map=null, mapReady=false, markers=[], closureMarkers=[];
@@ -1222,25 +1413,48 @@ function closureSVG(){
   return `<svg width="26" height="30" viewBox="0 0 26 30"><path d="M13 28 L4 12 L13 3 L22 12 Z" fill="#a84e30" stroke="#faf6ee" stroke-width="1.5"/><text x="13" y="16" text-anchor="middle" font-size="12" font-family="monospace" font-weight="700" fill="#faf6ee">!</text></svg>`;
 }
 
+/* artistic "map of fun": no water, warm muted land, faint major roads only, sparse low-contrast labels */
 function recolorMap(){
   if(!map)return;
+  const LAND="#f5efe3", SOFT="#ece4d3", BLDG="#e8dfcd", ROAD="#e3d8bf", LABEL="#8b8375", HALO="#f5efe3";
+  const WATER=/water|waterway|ocean|sea|lake|river|reservoir|bathym|dock|swimming/i;
+  const HIDE_LINE=/service|minor|track|path|pedestrian|steps|rail|ferry|aeroway|runway|taxiway|bridge|tunnel|boundary|admin/i;
+  const KEEP_LABEL=/place|city|town|village|state|country|continent/i;
   try{
     const layers=map.getStyle().layers||[];
     layers.forEach(l=>{
+      const id=l.id||"", sl=l["source-layer"]||"";
       try{
-        if(l.type==="background"){map.setPaintProperty(l.id,"background-color","#f5efe3");}
-        else if(l.type==="fill"){
-          if(/water|ocean|sea|lake|river/i.test(l.id)){map.setPaintProperty(l.id,"fill-color","#9aabc2");}
-          else if(/landcover|landuse|park|wood|grass|forest/i.test(l.id)){map.setPaintProperty(l.id,"fill-color","#eee7db");}
-          else {map.setPaintProperty(l.id,"fill-color","#f5efe3");}
+        // 1. hide ALL water everywhere (no blue anywhere)
+        if(WATER.test(id)||WATER.test(sl)){map.setLayoutProperty(l.id,"visibility","none");return;}
+        if(l.type==="background"){map.setPaintProperty(l.id,"background-color",LAND);return;}
+        if(l.type==="fill"){
+          if(/land(cover|use)|park|wood|grass|forest|garden|pitch|golf|cemetery|scrub|farm/i.test(id)){
+            map.setPaintProperty(l.id,"fill-color",SOFT);map.setPaintProperty(l.id,"fill-opacity",.55);
+          } else if(/building/i.test(id)){
+            map.setPaintProperty(l.id,"fill-color",BLDG);map.setPaintProperty(l.id,"fill-opacity",.4);
+          } else {
+            map.setPaintProperty(l.id,"fill-color",LAND);
+          }
+          return;
         }
-        else if(l.type==="line"){
-          if(/water|river|waterway/i.test(l.id)){map.setPaintProperty(l.id,"line-color","#9aabc2");}
-          else {map.setPaintProperty(l.id,"line-color","#e0d5bd");map.setPaintProperty(l.id,"line-width",0.6);}
+        if(l.type==="line"){
+          // hide minor/service roads and clutter, keep major roads as faint hints
+          if(HIDE_LINE.test(id)){map.setLayoutProperty(l.id,"visibility","none");return;}
+          map.setPaintProperty(l.id,"line-color",ROAD);
+          try{map.setPaintProperty(l.id,"line-width",0.7);}catch(_){}
+          try{map.setPaintProperty(l.id,"line-opacity",.7);}catch(_){}
+          return;
         }
-        else if(l.type==="symbol"){
-          if(!/place|city|town|settlement/i.test(l.id)){map.setLayoutProperty(l.id,"visibility","none");}
-          else{try{map.setPaintProperty(l.id,"text-color","#68635b");map.setPaintProperty(l.id,"text-halo-color","#f5efe3");}catch(_){}}
+        if(l.type==="symbol"){
+          if(KEEP_LABEL.test(id)){
+            try{map.setPaintProperty(l.id,"text-color",LABEL);}catch(_){}
+            try{map.setPaintProperty(l.id,"text-halo-color",HALO);}catch(_){}
+            try{map.setPaintProperty(l.id,"text-halo-width",1.2);}catch(_){}
+          } else {
+            map.setLayoutProperty(l.id,"visibility","none"); // hide POI + street labels
+          }
+          return;
         }
       }catch(_){}
     });
@@ -1251,13 +1465,39 @@ function buildMarkers(){
   markers.forEach(m=>m.marker.remove());markers=[];
   EVENTS.forEach(e=>{
     const el=document.createElement("div");
-    el.className="mk";
     const big=e.tier!=="standard";
-    el.innerHTML=diamondSVG(CATS[e.cat].hex,big,big);
+    el.className="mk-dot"+(big?" big":"");
+    el.style.background=CATS[e.cat].hex;
+    el.title=e.title;
     el.onclick=()=>openDrawer(e.id);
-    const marker=new maplibregl.Marker({element:el,anchor:"bottom"}).setLngLat([e.lng,e.lat]).addTo(map);
+    const marker=new maplibregl.Marker({element:el,anchor:"center"}).setLngLat([e.lng,e.lat]).addTo(map);
     markers.push({e,marker,el});
   });
+}
+
+/* sponsored business logo pins: appear only when zoomed in (zoom >= 13) */
+let adMarkers=[];
+const AD_ZOOM=13;
+function buildAdPins(){
+  adMarkers.forEach(m=>m.marker.remove());adMarkers=[];
+  ADVERTISERS.forEach(a=>{
+    const el=document.createElement("div");
+    el.className="ad-pin";
+    el.style.background=a.color;
+    el.textContent=a.mono;
+    el.title=a.name;
+    const pop=new maplibregl.Popup({offset:16,closeButton:false,className:"ad-popup"})
+      .setHTML(`<span class="ad-pop-mark">SPONSORED</span> · ${a.name}`);
+    const marker=new maplibregl.Marker({element:el,anchor:"center"}).setLngLat([a.lng,a.lat]).setPopup(pop).addTo(map);
+    el.onclick=()=>marker.togglePopup();
+    adMarkers.push({a,marker,el});
+  });
+  updateAdPinZoom();
+}
+function updateAdPinZoom(){
+  if(!map)return;
+  const show=map.getZoom()>=AD_ZOOM;
+  adMarkers.forEach(({el})=>{el.style.display=show?"flex":"none";});
 }
 function buildClosures(){
   closureMarkers.forEach(m=>m.remove());closureMarkers=[];
@@ -1274,8 +1514,9 @@ function refreshMarkers(){
     const dayOK=state.mapDay==="all"||e.dayName===state.mapDay;
     const catOK=state.catOn.has(e.cat);
     const typeOK=state.type==="All Events"||e.cat===state.type;
+    const rangeOK=inRange(e);
     const searchOK=!state.search.trim()||(e.title+e.cat+e.city+e.venue).toLowerCase().includes(state.search.toLowerCase());
-    el.style.display=(dayOK&&catOK&&typeOK&&searchOK)?"block":"none";
+    el.style.display=(dayOK&&catOK&&typeOK&&rangeOK&&searchOK)?"block":"none";
   });
   buildClosures();
 }
@@ -1296,7 +1537,8 @@ function renderLegend(){
     <div class="ml-divider"></div>
     <div class="ml-toggle ${state.closures?"on":""}" id="closureToggle">
       <span>Road Closures</span><span class="toggle-sw"></span>
-    </div>`;
+    </div>
+    <div class="ml-cap">Logos = sponsored locations (zoom in)</div>`;
   document.querySelectorAll("#mapLegend .ml-row").forEach(r=>{
     r.onclick=()=>{
       const c=r.dataset.cat;
@@ -1346,10 +1588,13 @@ function initMap(){
     map.on("load",()=>{
       recolorMap();
       buildMarkers();
+      buildAdPins();
       mapReady=true;
       refreshMarkers();
       setTimeout(()=>map.resize(),80);
     });
+    map.on("zoom",updateAdPinZoom);
+    map.on("zoomend",updateAdPinZoom);
     map.on("error",()=>{});
   }catch(err){fallbackMap();}
 }
@@ -1366,10 +1611,10 @@ function fallbackMap(){
   }
   EVENTS.forEach(e=>{
     const p=proj(e.lng,e.lat);
-    const d=document.createElement("div");d.className="mk";d.style.position="absolute";
-    d.style.left=p.x+"px";d.style.top=p.y+"px";d.style.transform="translate(-50%,-100%)";
     const big=e.tier!=="standard";
-    d.innerHTML=diamondSVG(CATS[e.cat].hex,big,big);
+    const d=document.createElement("div");d.className="mk-dot"+(big?" big":"");d.style.position="absolute";
+    d.style.left=p.x+"px";d.style.top=p.y+"px";d.style.transform="translate(-50%,-50%)";
+    d.style.background=CATS[e.cat].hex;
     d.onclick=()=>openDrawer(e.id);
     el.appendChild(d);
   });
