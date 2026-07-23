@@ -280,7 +280,7 @@ body.page-events .map-shell,body.page-events .event-page{display:none;}
 .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(288px,1fr));gap:26px 24px;}
 .ev-card{cursor:pointer;display:flex;flex-direction:column;transition:transform .28s cubic-bezier(.2,.7,.3,1);}
 .ev-card:hover{transform:translateY(-6px);}
-.ev-imgwrap{position:relative;aspect-ratio:4/3;border-radius:4px;overflow:hidden;background:var(--border);box-shadow:var(--shadow-sm);transition:box-shadow .28s;}
+.ev-imgwrap{position:relative;aspect-ratio:16/9;border-radius:4px;overflow:hidden;background:var(--border);box-shadow:var(--shadow-sm);transition:box-shadow .28s;}
 .ev-card:hover .ev-imgwrap{box-shadow:var(--shadow-lift);}
 .ev-imgwrap img{width:100%;height:100%;object-fit:cover;transition:transform .7s cubic-bezier(.2,.7,.3,1);}
 .ev-card:hover .ev-imgwrap img{transform:scale(1.06);}
@@ -603,15 +603,9 @@ body.page-map .map-shell{display:block;position:fixed;inset:0;height:auto;min-he
   .lw-time{font-size:18px;}
   .lw-date{font-size:10px;}
   .map-shell{height:calc(100vh - 118px);}
-  #map{bottom:48px;}
-  .map-title{display:none;}
-  .map-submit{display:none;}
-  .map-legend{display:none;}
-  .map-days{width:calc(100% - 28px);left:14px;top:14px;transform:none;justify-content:flex-start;overflow-x:auto;scrollbar-width:none;}
-  .map-days::-webkit-scrollbar{display:none;}
-  .map-newsletter{left:14px;right:14px;bottom:auto;top:60px;justify-content:center;padding:11px;font-size:12.5px;box-shadow:var(--shadow-lift);}
-  .map-adbanner{height:48px;padding:0 14px;gap:10px;}
-  .map-adbanner .ad-cta{display:none;}
+  /* mobile map: full-bleed map behind two slim fixed bars; all old floating furniture retires into the Filters sheet */
+  #map{top:0;bottom:0;}
+  .map-title,.map-submit,.map-legend,.map-days,.map-newsletter,.map-adbanner{display:none!important;}
   .range-seg{overflow-x:auto;max-width:100%;scrollbar-width:none;}
   .range-seg::-webkit-scrollbar{display:none;}
   .sticky-sponsor{display:flex;}
@@ -627,14 +621,73 @@ body.page-map .map-shell{display:block;position:fixed;inset:0;height:auto;min-he
   .ep-more .card-grid{grid-template-columns:1fr;}
 }
 
-/* mobile map bottom category bar */
-.map-mobile-bar{display:none;}
+/* ============ MOBILE MAP CHROME (<=640px): slim top + bottom bars + Filters sheet ============ */
+.map-mobile-bar{display:none;} /* legacy bottom category scroller retired on mobile */
+.mmap-top,.mmap-bot,.msheet,.msheet-scrim{display:none;}
+
 @media (max-width:640px){
-  .map-mobile-bar{display:flex;position:absolute;bottom:58px;left:0;right:0;gap:8px;padding:0 14px;overflow-x:auto;z-index:6;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
-  .map-mobile-bar::-webkit-scrollbar{display:none;}
-  .mmb-chip{font-family:var(--mono);font-size:11px;font-weight:600;white-space:nowrap;background:var(--cream);border:1px solid var(--border);border-radius:3px;padding:8px 12px;display:flex;align-items:center;gap:7px;color:var(--ink);box-shadow:var(--shadow-sm);}
-  .mmb-chip.off{opacity:.45;}
-  .mmb-chip .dot{width:8px;height:8px;border-radius:2px;}
+  /* slim fixed top bar over the map */
+  .mmap-top{display:flex;align-items:center;gap:10px;position:absolute;top:0;left:0;right:0;height:52px;z-index:9;
+    background:var(--cream);border-bottom:1px solid var(--border);padding:0 12px;box-shadow:var(--shadow-sm);}
+  .mtop-back{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--rust);display:inline-flex;align-items:center;gap:5px;flex:none;}
+  .mtop-title{font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.08em;color:var(--navy);flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .mtop-filters{position:relative;display:inline-flex;align-items:center;gap:7px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--navy);
+    background:var(--cream);border:1px solid var(--border);border-radius:3px;padding:8px 13px;flex:none;}
+  .mtop-filters:active{background:var(--cream-dark);}
+  .mtop-badge{position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;padding:0 4px;border-radius:3px;background:var(--rust);color:var(--cream);
+    font-family:var(--mono);font-size:10px;font-weight:700;display:none;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);}
+
+  /* slim fixed bottom bar: one sponsor strip + a small newsletter link */
+  .mmap-bot{display:flex;align-items:center;gap:10px;position:absolute;left:0;right:0;bottom:0;height:50px;z-index:9;
+    background:var(--navy);color:var(--cream);padding:0 14px;box-shadow:0 -4px 16px rgba(11,22,36,.25);}
+  .mbot-ad{display:flex;align-items:center;gap:10px;flex:1;min-width:0;}
+  .mbot-logo{width:30px;height:30px;border-radius:3px;background:var(--cream);color:var(--navy);font-family:var(--serif);font-weight:800;font-size:13px;
+    display:flex;align-items:center;justify-content:center;flex:none;}
+  .mbot-txt{flex:1;min-width:0;font-family:var(--sans);font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .mbot-mark{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.14em;color:var(--gold);}
+  .mbot-news{flex:none;font-family:var(--sans);font-size:12px;font-weight:600;color:var(--gold);display:inline-flex;align-items:center;gap:4px;
+    border-left:1px solid rgba(230,191,74,.32);padding-left:12px;}
+
+  /* keep MapLibre controls clear of the slim bars */
+  .maplibregl-ctrl-top-right{top:60px!important;}
+  .maplibregl-ctrl-bottom-right{bottom:58px!important;}
+
+  /* Filters bottom sheet (paper card over a dim scrim) */
+  .msheet-scrim{display:block;position:fixed;inset:0;background:rgba(11,22,36,.5);backdrop-filter:blur(2px);
+    opacity:0;pointer-events:none;transition:opacity .25s;z-index:110;}
+  .msheet-scrim.open{opacity:1;pointer-events:auto;}
+  .msheet{display:flex;flex-direction:column;position:fixed;left:0;right:0;bottom:0;z-index:111;max-height:82vh;
+    background:var(--cream);border-top:1px solid var(--border);border-radius:4px 4px 0 0;
+    box-shadow:0 -18px 40px -18px rgba(11,22,36,.5);transform:translateY(100%);transition:transform .28s cubic-bezier(.2,.7,.3,1);}
+  .msheet.open{transform:translateY(0);}
+  .msheet-handle{width:40px;height:4px;border-radius:2px;background:var(--border);margin:9px auto 3px;flex:none;}
+  .msheet-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:6px 18px 12px;border-bottom:1px solid var(--border);flex:none;}
+  .msheet-head h3{font-family:var(--serif);font-weight:800;font-size:20px;color:var(--navy);margin:0;letter-spacing:-.01em;}
+  .msheet-done{font-family:var(--sans);font-size:13px;font-weight:600;background:var(--ink);color:var(--cream);border-radius:3px;padding:8px 16px;flex:none;}
+  .msheet-body{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 18px 26px;}
+  .msheet-sec{margin-bottom:20px;}
+  .msheet-label{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.16em;color:var(--muted);text-transform:uppercase;margin-bottom:11px;}
+  .msheet-days{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
+  .msheet-days::-webkit-scrollbar{display:none;}
+  .msd-chip{flex:none;font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.04em;padding:9px 15px;
+    border:1px solid var(--border);border-radius:3px;background:var(--cream);color:var(--muted);}
+  .msd-chip.active{background:var(--ink);color:var(--cream);border-color:var(--ink);}
+  .msc-row{display:flex;align-items:center;gap:11px;padding:11px 3px;border-bottom:1px solid var(--border-soft);cursor:pointer;user-select:none;
+    font-family:var(--sans);font-size:14px;color:var(--ink);}
+  .msc-check{width:20px;height:20px;border:1px solid var(--border);border-radius:3px;display:flex;align-items:center;justify-content:center;flex:none;
+    background:var(--cream);transition:background .14s,border-color .14s;}
+  .msc-row.on .msc-check{background:var(--navy);border-color:var(--navy);}
+  .msc-check svg{opacity:0;transition:opacity .14s;}
+  .msc-row.on .msc-check svg{opacity:1;}
+  .msc-dot{width:11px;height:11px;border-radius:2px;flex:none;}
+  .msc-label{flex:1;}
+  .msc-row.off .msc-label{color:var(--muted);}
+  .msc-count{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--muted);}
+  .msheet-closure{margin-top:14px;padding-top:14px;border-top:1px solid var(--border-soft);}
+  .msheet-cap{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.03em;line-height:1.4;margin-top:12px;padding-top:11px;border-top:1px solid var(--border-soft);}
+  .msheet-submit{margin-top:20px;width:100%;font-family:var(--sans);font-size:14px;font-weight:600;background:var(--rust);color:var(--cream);
+    border-radius:3px;padding:13px;display:inline-flex;align-items:center;justify-content:center;gap:7px;}
+  .msheet-submit:active{background:var(--rust-deep);}
 }
 
 /* ============ PREMIUM EVENT BANNER (top of card view) ============ */
@@ -841,6 +894,49 @@ body.view-calendar .layout{grid-template-columns:1fr;}
   </div>
 
   <div class="map-mobile-bar" id="mapMobileBar"></div>
+
+  <!-- MOBILE-ONLY MAP CHROME (<=640px): slim top bar, slim bottom bar, Filters sheet -->
+  <div class="mmap-top">
+    <a class="mtop-back" id="mmapBack" href="#"><span aria-hidden="true">&larr;</span> Events</a>
+    <div class="mtop-title">WilCo Event Map</div>
+    <button class="mtop-filters" id="mmapFilters" aria-label="Filter the map">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18l-7 8v6l-4-2v-4z"/></svg>
+      Filters
+      <span class="mtop-badge" id="mmapBadge">0</span>
+    </button>
+  </div>
+
+  <div class="mmap-bot">
+    <div class="mbot-ad">
+      <div class="mbot-logo">HC</div>
+      <div class="mbot-txt"><span class="mbot-mark">SPONSOR</span> · Hill Country Bank</div>
+    </div>
+    <a href="#" class="mbot-news" id="mmapNews">Newsletter <span aria-hidden="true">&rarr;</span></a>
+  </div>
+
+  <div class="msheet-scrim" id="msheetScrim"></div>
+  <div class="msheet" id="msheet" role="dialog" aria-label="Filter the map">
+    <div class="msheet-handle"></div>
+    <div class="msheet-head">
+      <h3>Filter the map</h3>
+      <button class="msheet-done" id="msheetDone">Done</button>
+    </div>
+    <div class="msheet-body">
+      <div class="msheet-sec">
+        <div class="msheet-label">Days</div>
+        <div class="msheet-days" id="msheetDays"></div>
+      </div>
+      <div class="msheet-sec">
+        <div class="msheet-label">Categories</div>
+        <div class="msheet-cats" id="msheetCats"></div>
+        <div class="ml-toggle msheet-closure" id="msheetClosure">
+          <span>Road Closures</span><span class="toggle-sw"></span>
+        </div>
+        <div class="msheet-cap">Logos = sponsored locations (zoom in)</div>
+      </div>
+      <button class="msheet-submit" id="msheetSubmit">Submit an event <span aria-hidden="true">&#8599;</span></button>
+    </div>
+  </div>
 </div>
 
 <!-- FOOTER -->
@@ -1459,6 +1555,8 @@ window.addEventListener("hashchange",applyRoute);
 document.addEventListener("keydown",e=>{
   if(e.key!=="Escape")return;
   closeDayModal();
+  const sheet=document.getElementById("msheet");
+  if(sheet&&sheet.classList.contains("open")){closeMapSheet();return;}
   if(document.body.classList.contains("page-event")||document.body.classList.contains("page-map"))goEvents();
 });
 
@@ -1516,6 +1614,14 @@ document.getElementById("mapShare").onclick=()=>alert("Share this event map (pro
 document.getElementById("mapSubmit").onclick=()=>alert("Opens the greetform event submission (prototype)");
 document.getElementById("mapNews").onclick=()=>alert("Join the free WilCo Guide newsletter (prototype)");
 document.getElementById("mapAd").querySelector(".ad-cta").onclick=e=>{e.preventDefault();alert("Sponsored: Hill Country Bank (prototype)");};
+
+/* mobile map chrome: slim bars + Filters sheet (prototype actions) */
+document.getElementById("mmapBack").onclick=e=>{e.preventDefault();goEvents();};
+document.getElementById("mmapNews").onclick=e=>{e.preventDefault();alert("Join the free WilCo Guide newsletter (prototype)");};
+document.getElementById("mmapFilters").onclick=openMapSheet;
+document.getElementById("msheetDone").onclick=closeMapSheet;
+document.getElementById("msheetScrim").onclick=closeMapSheet;
+document.getElementById("msheetSubmit").onclick=()=>alert("Opens the greetform event submission (prototype)");
 
 /* ================= MAP ================= */
 let map=null, mapReady=false, markers=[], closureMarkers=[];
@@ -1658,42 +1764,75 @@ function renderLegend(){
     </div>
     <div class="ml-cap">Logos = sponsored locations (zoom in)</div>`;
   document.querySelectorAll("#mapLegend .ml-row").forEach(r=>{
-    r.onclick=()=>{
-      const c=r.dataset.cat;
-      if(state.catOn.has(c))state.catOn.delete(c);else state.catOn.add(c);
-      r.classList.toggle("on");r.classList.toggle("off");
-      refreshMarkers();syncMobileBar();
-    };
+    r.onclick=()=>toggleCat(r.dataset.cat);
   });
-  document.getElementById("closureToggle").onclick=()=>{
-    state.closures=!state.closures;
-    document.getElementById("closureToggle").classList.toggle("on");
-    buildClosures();
-  };
+  document.getElementById("closureToggle").onclick=()=>setClosures(!state.closures);
   const bar=document.getElementById("mapMobileBar");
   bar.innerHTML=Object.keys(CATS).map(cat=>`<button class="mmb-chip ${state.catOn.has(cat)?"":"off"}" data-cat="${cat}"><span class="dot" style="background:${CATS[cat].hex}"></span>${cat}</button>`).join("");
   bar.querySelectorAll(".mmb-chip").forEach(ch=>{
-    ch.onclick=()=>{
-      const c=ch.dataset.cat;
-      if(state.catOn.has(c))state.catOn.delete(c);else state.catOn.add(c);
-      ch.classList.toggle("off");refreshMarkers();syncLegend();
-    };
+    ch.onclick=()=>toggleCat(ch.dataset.cat);
   });
 }
 function syncMobileBar(){document.querySelectorAll("#mapMobileBar .mmb-chip").forEach(ch=>{ch.classList.toggle("off",!state.catOn.has(ch.dataset.cat));});}
 function syncLegend(){document.querySelectorAll("#mapLegend .ml-row").forEach(r=>{const on=state.catOn.has(r.dataset.cat);r.classList.toggle("on",on);r.classList.toggle("off",!on);});}
 
+/* ===== mobile map: Filters sheet + cross-surface filter sync ===== */
+function updateFilterBadge(){
+  const badge=document.getElementById("mmapBadge");
+  if(!badge)return;
+  const off=Object.keys(CATS).length-state.catOn.size;
+  const n=off+(state.mapDay!=="all"?1:0);
+  if(n>0){badge.textContent=n;badge.style.display="flex";}
+  else{badge.style.display="none";}
+}
+function syncSheetCats(){document.querySelectorAll("#msheetCats .msc-row").forEach(r=>{const on=state.catOn.has(r.dataset.cat);r.classList.toggle("on",on);r.classList.toggle("off",!on);});}
+function syncSheetDays(){document.querySelectorAll("#msheetDays .msd-chip").forEach(c=>c.classList.toggle("active",c.dataset.day===state.mapDay));}
+function setMapDay(day){
+  state.mapDay=day;
+  document.querySelectorAll("#mapDays button").forEach(x=>x.classList.toggle("active",x.dataset.day===day));
+  syncSheetDays();refreshMarkers();updateFilterBadge();
+}
+function toggleCat(cat){
+  if(state.catOn.has(cat))state.catOn.delete(cat);else state.catOn.add(cat);
+  syncLegend();syncMobileBar();syncSheetCats();refreshMarkers();updateFilterBadge();
+}
+function setClosures(v){
+  state.closures=v;
+  const dt=document.getElementById("closureToggle");if(dt)dt.classList.toggle("on",v);
+  const st=document.getElementById("msheetClosure");if(st)st.classList.toggle("on",v);
+  buildClosures();
+}
+function renderMobileSheet(){
+  const counts=countByCat();
+  const days=[["all","ALL"],["Mon","MON"],["Tue","TUE"],["Wed","WED"],["Thu","THU"],["Fri","FRI"],["Sat","SAT"],["Sun","SUN"]];
+  const daysEl=document.getElementById("msheetDays");
+  daysEl.innerHTML=days.map(([v,l])=>`<button class="msd-chip${state.mapDay===v?" active":""}" data-day="${v}">${l}</button>`).join("");
+  daysEl.querySelectorAll(".msd-chip").forEach(b=>{b.onclick=()=>setMapDay(b.dataset.day);});
+  const catsEl=document.getElementById("msheetCats");
+  catsEl.innerHTML=Object.keys(CATS).map(cat=>`
+    <div class="msc-row ${state.catOn.has(cat)?"on":"off"}" data-cat="${cat}">
+      <span class="msc-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#faf6ee" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+      <span class="msc-dot" style="background:${CATS[cat].hex}"></span>
+      <span class="msc-label">${cat}</span>
+      <span class="msc-count">${counts[cat]}</span>
+    </div>`).join("");
+  catsEl.querySelectorAll(".msc-row").forEach(r=>{r.onclick=()=>toggleCat(r.dataset.cat);});
+  const cl=document.getElementById("msheetClosure");
+  cl.classList.toggle("on",state.closures);
+  cl.onclick=()=>setClosures(!state.closures);
+  updateFilterBadge();
+}
+function openMapSheet(){document.getElementById("msheetScrim").classList.add("open");document.getElementById("msheet").classList.add("open");}
+function closeMapSheet(){document.getElementById("msheetScrim").classList.remove("open");document.getElementById("msheet").classList.remove("open");}
+
 document.querySelectorAll("#mapDays button").forEach(b=>{
-  b.onclick=()=>{
-    state.mapDay=b.dataset.day;
-    document.querySelectorAll("#mapDays button").forEach(x=>x.classList.toggle("active",x===b));
-    refreshMarkers();
-  };
+  b.onclick=()=>setMapDay(b.dataset.day);
 });
 
 function initMap(){
   if(map){setTimeout(()=>map.resize(),60);return;}
   renderLegend();
+  renderMobileSheet();
   try{
     map=new maplibregl.Map({
       container:"map",
