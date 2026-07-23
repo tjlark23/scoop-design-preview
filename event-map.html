@@ -301,7 +301,7 @@ body.view-map .layout{display:none;}
 .cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);border-left:1px solid var(--border);}
 .cal-weekdays div{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;padding:12px 10px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);text-align:left;}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);border-left:1px solid var(--border);}
-.cal-cell{min-height:120px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:8px;position:relative;background:var(--cream);transition:background .16s;}
+.cal-cell{min-height:132px;overflow:hidden;border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:8px;position:relative;background:var(--cream);transition:background .16s;}
 .cal-cell.out{background:var(--paper);}
 .cal-cell .c-num{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;}
 .cal-cell.out .c-num{opacity:.4;}
@@ -508,6 +508,78 @@ body.view-map .map-shell{display:block;}
   .mmb-chip.off{opacity:.45;}
   .mmb-chip .dot{width:8px;height:8px;border-radius:2px;}
 }
+
+/* ============ PREMIUM EVENT BANNER (top of card view) ============ */
+.premium-banner{
+  display:grid;grid-template-columns:40% 1fr;gap:0;margin-bottom:34px;
+  background:var(--navy);border-radius:4px;overflow:hidden;cursor:pointer;
+  min-height:186px;box-shadow:var(--shadow-lift);
+}
+.premium-banner .pb-img{position:relative;overflow:hidden;background:var(--navy-dark);min-height:186px;}
+.premium-banner .pb-img img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;transition:transform .8s cubic-bezier(.2,.7,.3,1);}
+.premium-banner:hover .pb-img img{transform:scale(1.05);}
+.premium-banner .pb-img::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(11,22,36,0) 68%,var(--navy));}
+.premium-banner .pb-body{padding:22px 28px;display:flex;flex-direction:column;justify-content:center;color:var(--cream);}
+.pb-kicker{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:11px;}
+.pb-title{font-family:var(--serif);font-weight:600;font-size:31px;line-height:1.03;color:#fff;margin:0 0 12px;letter-spacing:-.015em;}
+.pb-meta{font-family:var(--mono);font-size:12px;font-weight:500;color:#c7d2e0;letter-spacing:.03em;display:flex;align-items:center;gap:9px;margin-bottom:18px;}
+.pb-meta .dot{width:8px;height:8px;border-radius:2px;flex:none;}
+.pb-cta{align-self:flex-start;font-family:var(--sans);font-size:14px;font-weight:600;background:var(--rust);color:var(--cream);border-radius:3px;padding:11px 20px;transition:background .18s,transform .1s;}
+.premium-banner:hover .pb-cta{background:var(--rust-deep);}
+.premium-banner:active .pb-cta{transform:translateY(1px);}
+
+/* ============ GRID CARD TAGS ============ */
+.ev-tags{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px;}
+.ev-tag{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;border-radius:2px;padding:4px 8px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;line-height:1;}
+.ev-tag.city{border:1px solid var(--border);background:var(--cream-dark);color:var(--navy);}
+.ev-tag.type{border:1px solid;background:transparent;}
+.ev-tag.type .tdot{width:7px;height:7px;border-radius:2px;flex:none;}
+.ev-foot.foot-end{justify-content:flex-end;}
+
+/* ============ CALENDAR: hide rail + uniform cells ============ */
+body.view-calendar .rail{display:none;}
+body.view-calendar .layout{grid-template-columns:1fr;}
+.cal-cell.has-ev{cursor:pointer;}
+.cal-cell.has-ev:hover{background:var(--cream-dark);}
+.cal-chip .c-dot{width:7px;height:7px;border-radius:2px;flex:none;}
+
+/* ============ CALENDAR DAY MODAL ============ */
+.cal-scrim{position:fixed;inset:0;background:rgba(11,22,36,.5);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .25s;z-index:85;}
+.cal-scrim.open{opacity:1;pointer-events:auto;}
+.cal-modal{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-48%) scale(.98);
+  width:min(520px,calc(100vw - 32px));max-height:min(80vh,720px);overflow-y:auto;
+  background:var(--cream);border:1px solid var(--border);border-radius:4px;
+  box-shadow:var(--shadow-lift);z-index:86;opacity:0;pointer-events:none;
+  transition:opacity .25s,transform .25s;
+}
+.cal-modal.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1);}
+.cm-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:20px 22px 14px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--cream);z-index:2;}
+.cm-kicker{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.14em;color:var(--rust);text-transform:uppercase;}
+.cm-head h3{font-family:var(--serif);font-weight:800;font-size:24px;color:var(--navy);margin:6px 0 0;letter-spacing:-.01em;line-height:1.05;}
+.cm-close{width:34px;height:34px;border-radius:3px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--navy);flex:none;transition:background .16s;}
+.cm-close:hover{background:var(--cream-dark);}
+.cm-list{padding:6px 0 10px;}
+.cm-row{display:flex;align-items:center;gap:13px;padding:12px 22px;cursor:pointer;border-bottom:1px solid var(--border-soft);transition:background .14s;}
+.cm-row:last-child{border-bottom:none;}
+.cm-row:hover{background:var(--cream-dark);}
+.cm-time{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink);width:66px;flex:none;letter-spacing:.02em;}
+.cm-main{flex:1;min-width:0;}
+.cm-title{font-family:var(--serif);font-weight:600;font-size:17px;color:var(--navy);line-height:1.12;margin-bottom:3px;}
+.cm-venue{font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:.02em;}
+.cm-type{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border:1px solid;border-radius:2px;padding:4px 7px;display:inline-flex;align-items:center;gap:5px;flex:none;}
+.cm-type .tdot{width:6px;height:6px;border-radius:2px;flex:none;}
+
+@media (max-width:640px){
+  .premium-banner{grid-template-columns:1fr;min-height:0;}
+  .premium-banner .pb-img{min-height:170px;}
+  .premium-banner .pb-img::after{background:linear-gradient(180deg,rgba(11,22,36,0) 70%,var(--navy));}
+  .premium-banner .pb-body{padding:18px 18px 20px;}
+  .pb-title{font-size:25px;}
+  .cm-time{width:56px;font-size:10.5px;}
+  .cm-row{padding:12px 16px;gap:10px;}
+  .cm-head{padding:18px 16px 12px;}
+}
 </style>
 </head>
 <body class="view-card">
@@ -662,6 +734,10 @@ body.view-map .map-shell{display:block;}
 <div class="overlay" id="overlay"></div>
 <div class="drawer" id="drawer"></div>
 
+<!-- CALENDAR DAY MODAL -->
+<div class="cal-scrim" id="calScrim"></div>
+<div class="cal-modal" id="calModal"></div>
+
 <script>
 /* ================= DATA ================= */
 const CATS = {
@@ -779,24 +855,20 @@ document.addEventListener("click",()=>document.querySelectorAll(".dd.open").forE
 function catDot(cat){return `<span class="dot" style="background:${CATS[cat].hex}"></span>`;}
 
 function cardHTML(e,idx){
-  const tag = e.tier==="featured" ? `<span class="tag-featured">&#9733; FEATURED</span>`
-            : e.tier==="premium" ? `<span class="tag-premium">PREMIUM</span>` : "";
-  const saved=state.saved.has(e.id)?"saved":"";
+  const hex=CATS[e.cat].hex;
   return `
   <article class="ev-card reveal" style="animation-delay:${idx*45}ms" data-id="${e.id}">
     <div class="ev-imgwrap">
       <img src="${e.img}" alt="${e.title}" loading="lazy" />
-      ${tag}
-      <button class="ev-save ${saved}" data-save="${e.id}" aria-label="Save event">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="${saved?"currentColor":"none"}" stroke="currentColor" stroke-width="2"><path d="M5 3v18l7-5 7 5V3z"/></svg>
-      </button>
     </div>
     <div class="ev-body">
-      <div class="ev-kicker">${e.cat} · ${e.city}</div>
+      <div class="ev-tags">
+        <span class="ev-tag city">${e.city}</span>
+        <span class="ev-tag type" style="border-color:${hex};color:${hex}"><span class="tdot" style="background:${hex}"></span>${e.cat}</span>
+      </div>
       <h3 class="ev-title">${e.title}</h3>
       <div class="ev-meta">${e.dateShort} · ${e.time} · ${e.venue}</div>
-      <div class="ev-foot">
-        <span class="ev-cat">${catDot(e.cat)}${e.cat}</span>
+      <div class="ev-foot foot-end">
         <span class="ev-details">Details &rarr;</span>
       </div>
     </div>
@@ -809,18 +881,31 @@ function renderCard(){
   const el=document.getElementById("view-card");
   if(!list.length){el.innerHTML=`<div style="text-align:center;padding:80px 20px;font-family:var(--sans);color:var(--muted);">No events match those filters.</div>`;return;}
 
-  const big=list.find(e=>e.tier==="premium")||list.find(e=>e.tier==="featured")||list[0];
-  const sides=list.filter(e=>e.id!==big.id&&(e.tier==="featured"||e.tier==="premium")).slice(0,2);
-  while(sides.length<2){const f=list.find(e=>e.id!==big.id&&!sides.includes(e));if(!f)break;sides.push(f);}
+  // premium event gets the paid banner at the very top; hero excludes it
+  const premium=list.find(e=>e.tier==="premium");
+  const rest=premium?list.filter(e=>e.id!==premium.id):list;
+  const big=rest.find(e=>e.tier==="featured")||rest[0];
+  const sides=rest.filter(e=>e.id!==big.id&&e.tier==="featured").slice(0,2);
+  while(sides.length<2){const f=rest.find(e=>e.id!==big.id&&!sides.includes(e));if(!f)break;sides.push(f);}
 
-  const heroHTML = `
+  const bannerHTML = premium ? `
+    <div class="premium-banner reveal" data-id="${premium.id}">
+      <div class="pb-img"><img src="${premium.imgWide}" alt="${premium.title}" /></div>
+      <div class="pb-body">
+        <div class="pb-kicker">Premium Event</div>
+        <h2 class="pb-title">${premium.title}</h2>
+        <div class="pb-meta">${catDot(premium.cat)} ${premium.dateShort} · ${premium.time} · ${premium.venue}, ${premium.city}</div>
+        <span class="pb-cta">Get tickets</span>
+      </div>
+    </div>` : "";
+
+  const heroHTML = big ? `
     <div class="hero-row">
       <div class="hero-big reveal" data-id="${big.id}">
         <img src="${big.imgWide}" alt="${big.title}" />
         <div class="hero-scrim"></div>
         <div class="hero-content">
-          <span class="tag-featured">&#9733; ${big.tier==="premium"?"FEATURED · PREMIUM":"FEATURED"}</span>
-          <div class="h-kicker">${big.cat} · ${big.city}</div>
+          <div class="h-kicker">${big.city} · ${big.cat}</div>
           <h2>${big.title}</h2>
           <div class="h-date">${catDot(big.cat)} ${big.dateShort} · ${big.time} · ${big.venue}</div>
         </div>
@@ -830,15 +915,14 @@ function renderCard(){
           <div class="hero-side reveal" style="animation-delay:${(i+1)*70}ms" data-id="${s.id}">
             <img src="${s.img}" alt="${s.title}" />
             <div class="hero-scrim"></div>
-            ${s.tier==="featured"?`<span class="tag-featured">&#9733; FEATURED</span>`:""}
             <div class="hero-content">
-              <div class="h-kicker">${s.cat} · ${s.city}</div>
+              <div class="h-kicker">${s.city} · ${s.cat}</div>
               <h3>${s.title}</h3>
               <div class="h-date">${s.dateShort} · ${s.time}</div>
             </div>
           </div>`).join("")}
       </div>
-    </div>`;
+    </div>` : "";
 
   const gridHTML = `
     <div class="section-head">
@@ -850,7 +934,7 @@ function renderCard(){
     </div>
     <div class="card-grid">${list.map((e,i)=>cardHTML(e,i)).join("")}</div>`;
 
-  el.innerHTML=heroHTML+gridHTML;
+  el.innerHTML=bannerHTML+heroHTML+gridHTML;
 }
 
 /* ================= LIST VIEW ================= */
@@ -893,6 +977,7 @@ function renderList(){
 }
 
 /* ================= CALENDAR VIEW ================= */
+let calByDate={};
 function renderCalendar(){
   const list=getFiltered();
   const el=document.getElementById("view-calendar");
@@ -904,6 +989,7 @@ function renderCalendar(){
 
   const byDate={};
   list.forEach(e=>{(byDate[e.dayNum]=byDate[e.dayNum]||[]).push(e);});
+  calByDate=byDate;
 
   let cells="";
   const prevDays=new Date(year,month,0).getDate();
@@ -912,10 +998,11 @@ function renderCalendar(){
     const evs=(byDate[d]||[]).sort((a,b)=>timeMin(a.time)-timeMin(b.time));
     const shown=evs.slice(0,3);
     const more=evs.length-shown.length;
-    cells+=`<div class="cal-cell${d===today?" today":""}">
+    const hasEv=evs.length>0;
+    cells+=`<div class="cal-cell${d===today?" today":""}${hasEv?" has-ev":""}"${hasEv?` data-day="${d}"`:""}>
       <div class="c-num">${d}</div>
-      ${shown.map(e=>`<div class="cal-chip" data-id="${e.id}" style="border-left-color:${CATS[e.cat].hex}"><span>${e.title}</span><span class="c-time">${e.time.replace(/:00/,"").replace(" ","")}</span></div>`).join("")}
-      ${more>0?`<div class="cal-more" data-day="${d}">+${more} more</div>`:""}
+      ${shown.map(e=>`<div class="cal-chip"><span class="c-dot" style="background:${CATS[e.cat].hex}"></span><span>${e.title}</span><span class="c-time">${e.time.replace(/:00/,"").replace(" ","")}</span></div>`).join("")}
+      ${more>0?`<div class="cal-more">+${more} more</div>`:""}
     </div>`;
   }
   const total=startDay+daysInMonth;
@@ -930,10 +1017,50 @@ function renderCalendar(){
     <div class="cal-weekdays">${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d=>`<div>${d}</div>`).join("")}</div>
     <div class="cal-grid">${cells}</div>`;
 
-  el.querySelectorAll(".cal-more").forEach(m=>{
-    m.onclick=()=>{const d=+m.dataset.day;const evs=byDate[d];if(evs&&evs.length)openDrawer(evs[0].id);};
+  el.querySelectorAll(".cal-cell[data-day]").forEach(c=>{
+    c.onclick=()=>openDayModal(+c.dataset.day);
   });
 }
+
+/* ================= CALENDAR DAY MODAL ================= */
+function openDayModal(day){
+  const evs=(calByDate[day]||[]).slice().sort((a,b)=>timeMin(a.time)-timeMin(b.time));
+  if(!evs.length)return;
+  const dl=evs[0].dateLong.replace(/, \d{4}$/,"");
+  const modal=document.getElementById("calModal");
+  modal.innerHTML=`
+    <div class="cm-head">
+      <div>
+        <div class="cm-kicker">WILCO EVENTS</div>
+        <h3>${dl}</h3>
+      </div>
+      <button class="cm-close" id="cmClose" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="cm-list">
+      ${evs.map(e=>`
+        <div class="cm-row" data-id="${e.id}">
+          <div class="cm-time">${e.time}</div>
+          <div class="cm-main">
+            <div class="cm-title">${e.title}</div>
+            <div class="cm-venue">${e.venue}, ${e.city}</div>
+          </div>
+          <span class="cm-type" style="border-color:${CATS[e.cat].hex};color:${CATS[e.cat].hex}"><span class="tdot" style="background:${CATS[e.cat].hex}"></span>${e.cat}</span>
+        </div>`).join("")}
+    </div>`;
+  document.getElementById("cmClose").onclick=closeDayModal;
+  modal.querySelectorAll(".cm-row").forEach(r=>{
+    r.onclick=ev=>{ev.stopPropagation();closeDayModal();openDrawer(+r.dataset.id);};
+  });
+  document.getElementById("calScrim").classList.add("open");
+  modal.classList.add("open");
+}
+function closeDayModal(){
+  document.getElementById("calScrim").classList.remove("open");
+  document.getElementById("calModal").classList.remove("open");
+}
+document.getElementById("calScrim").onclick=closeDayModal;
 
 /* ================= RIGHT RAIL ================= */
 function railCards(){
@@ -993,12 +1120,11 @@ function openDrawer(id){
   const e=EVENTS.find(x=>x.id===id);
   if(!e)return;
   const saved=state.saved.has(e.id);
-  const tag=e.tier==="featured"?`<span class="tag-featured">&#9733; FEATURED</span>`:e.tier==="premium"?`<span class="tag-premium" style="position:absolute;top:16px;left:16px;">PREMIUM</span>`:"";
   document.getElementById("drawer").innerHTML=`
     <button class="dr-close" id="drClose" aria-label="Close">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
     </button>
-    <div class="dr-img"><img src="${e.imgWide}" alt="${e.title}"/>${tag}</div>
+    <div class="dr-img"><img src="${e.imgWide}" alt="${e.title}"/></div>
     <div class="dr-body">
       <div class="dr-kicker">${catDot(e.cat)} ${e.cat} · ${e.city}</div>
       <h1 class="dr-title">${e.title}</h1>
@@ -1027,7 +1153,7 @@ function closeDrawer(){
   document.getElementById("drawer").classList.remove("open");
 }
 document.getElementById("overlay").onclick=closeDrawer;
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDrawer();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeDrawer();closeDayModal();}});
 
 /* ================= SAVE ================= */
 function toggleSave(id){
