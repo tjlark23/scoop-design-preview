@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>lightbreak builder - RSS Raw News photo coverage, before and after</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --navy-dark: #0b1624;
+    --rust: #c24c32;
+    --gold: #e6bf4a;
+    --paper: #f5efe3;
+    --paper-2: #ede5d4;
+    --white: #fffaf0;
+    --ink: #171717;
+    --ink-3: #68635b;
+    --rule: #d8cdbb;
+    --display: "Fraunces", Georgia, serif;
+    --body: "Source Serif 4", Georgia, serif;
+    --sans: "Inter", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
+    --r-1: 2px;
+    --r-2: 3px;
+    --shadow-card-hover: 0 2px 10px rgba(20, 18, 30, 0.06);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 34px 30px 54px;
+    background: var(--paper);
+    font-family: var(--sans);
+    color: var(--ink);
+  }
+
+  h1 {
+    margin: 0 0 6px;
+    font-family: var(--display);
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .sub {
+    margin: 0 0 4px;
+    max-width: 108ch;
+    color: var(--ink-3);
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+
+  .stamp {
+    margin: 14px 0 26px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px;
+    align-items: start;
+  }
+
+  .panel {
+    border: 1px solid var(--rule);
+    border-radius: var(--r-2);
+    background: var(--white);
+    padding: 16px 16px 20px;
+  }
+
+  .panel__head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 3px;
+  }
+
+  .panel__head h2 {
+    margin: 0;
+    font-family: var(--display);
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    border-radius: var(--r-1);
+  }
+  .tag--before { background: color-mix(in srgb, var(--rust) 14%, transparent); color: var(--rust); }
+  .tag--after { background: color-mix(in srgb, var(--navy-dark) 10%, transparent); color: var(--navy-dark); }
+
+  .panel__note {
+    margin: 0 0 14px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--ink-3);
+  }
+
+  .count {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+    margin: 0 0 14px;
+    padding: 8px 10px;
+    border-radius: var(--r-1);
+    background: var(--paper-2);
+    box-shadow: inset 0 0 0 1px var(--rule);
+  }
+
+  /* ---- the real builder feed-card rules (src/phase1b/builder.css) ---- */
+  .fgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+
+  .fcard {
+    overflow: hidden;
+    border: 1px solid var(--rule);
+    border-radius: var(--r-2);
+    background: var(--white);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .fcard__thumb {
+    height: 96px;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding: 8px;
+    color: var(--white);
+    overflow: hidden;
+  }
+
+  .fcard__thumb-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+
+  .fcard__thumb--photo::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(20, 18, 30, 0) 30%, rgba(20, 18, 30, 0.55) 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .fcard__foot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px 10px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .fcard__time {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #8d8880;
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .fcard__body { padding: 10px 12px 8px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+
+  .fcard__cat-tag {
+    align-self: flex-start;
+    color: var(--ink-3);
+    font-family: var(--mono);
+    font-size: 8.5px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .fcard__title {
+    margin: 0;
+    font-family: var(--display);
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: -0.003em;
+    line-height: 1.22;
+    color: var(--ink);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* ---- BEFORE: the shipped no-photo placeholder ---- */
+  .thumbEmptyOld {
+    align-items: center;
+    justify-content: center;
+    color: var(--ink);
+    background-color: var(--paper-2);
+    background-image: repeating-linear-gradient(
+      135deg,
+      rgba(20, 18, 30, 0.05) 0,
+      rgba(20, 18, 30, 0.05) 1px,
+      transparent 1px,
+      transparent 8px
+    );
+    box-shadow: inset 0 0 0 1px var(--rule);
+  }
+  .noImageIconOld { display: grid; place-items: center; margin: 0 auto; opacity: 0.38; }
+
+  /* ---- AFTER: src/phase1b/FeedCardNoImage.module.css ---- */
+  .thumbEmpty {
+    align-items: center;
+    justify-content: center;
+    color: var(--ink);
+    background-color: var(--paper-2);
+    background-image:
+      linear-gradient(to right, var(--navy-dark) 0, var(--navy-dark) 3px, transparent 3px),
+      repeating-linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--navy-dark) 6%, transparent) 0,
+        color-mix(in srgb, var(--navy-dark) 6%, transparent) 1px,
+        transparent 1px,
+        transparent 6px
+      );
+    box-shadow: inset 0 0 0 1px var(--rule);
+  }
+
+  .noImageStack {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding-left: 3px;
+    text-align: center;
+  }
+
+  .noImageIcon { display: grid; place-items: center; color: var(--navy-dark); opacity: 0.42; }
+
+  .noImageLabel {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--navy-dark) 62%, transparent);
+    white-space: nowrap;
+  }
+
+  footer {
+    margin-top: 30px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    font-size: 11.5px;
+    line-height: 1.6;
+    color: var(--ink-3);
+    max-width: 120ch;
+  }
+  code { font-family: var(--mono); font-size: 10.5px; }
+</style>
+</head>
+<body>
+  <h1>RSS Raw News, photo coverage</h1>
+  <p class="sub">
+    Leander Scoop, builder Content panel. Both columns are the real feed query
+    (<code>listCandidates(publicationId, { limit: 60 })</code>) run against production on 2026-08-06,
+    rendered with the real card CSS. Left is what the panel returns on <code>main</code>. Right is the
+    same query after the source-exclusion fix, with the redesigned no-photo state.
+  </p>
+  <p class="stamp">measured 2026-08-06 &middot; publication ba9ea1f0 &middot; read-only</p>
+
+  <div class="cols">
+    <section class="panel">
+      <div class="panel__head"><h2>Before</h2><span class="tag tag--before">on main</span></div>
+      <p class="panel__note">
+        Every card whose photo exists is being filtered out of the feed. What survives is the
+        imageless Google News copy of the same story, labelled with the publisher's name.
+      </p>
+      <p class="count">8 cards rendered &nbsp;&middot;&nbsp; 2 with a photo &nbsp;&middot;&nbsp; 25%</p>
+      <div class="fgrid" id="before"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel__head"><h2>After</h2><span class="tag tag--after">this branch</span></div>
+      <p class="panel__note">
+        The publisher rows are back, each with the photo it always had. The stories that genuinely
+        ship without art now say so.
+      </p>
+      <p class="count">41 cards rendered &nbsp;&middot;&nbsp; 36 with a photo &nbsp;&middot;&nbsp; 88%</p>
+      <div class="fgrid" id="after"></div>
+    </section>
+  </div>
+
+  <footer>
+    Root cause: the publication's auto-derived self-exclusion domain <code>leanderscoop.com</code> was
+    being squashed to <code>leanderscoop</code> and matched against free-text feed names. The
+    publication's own rss.app bundle is named "Leander Scoop", so every row it produced was dropped as
+    "the publication sourcing from itself" - and that bundle was the single richest photo source it had
+    (132 of 133 rows carried a photo). Self domains are now matched by hostname only.
+  </footer>
+
+<script>
+const ICON_OLD = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>';
+
+const ICON_NEW = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="2" x2="22" y1="2" y2="22"/><path d="M10.41 10.41a2 2 0 1 1-2.83-2.83"/><line x1="13.5" x2="6" y1="13.5" y2="21"/><line x1="18" x2="21" y1="12" y2="15"/><path d="M3.59 3.59A1.99 1.99 0 0 0 3 5v14a2 2 0 0 0 2 2h14c.55 0 1.052-.22 1.41-.59"/><path d="M21 15V5a2 2 0 0 0-2-2H9"/></svg>';
+
+// Real rows from production, in the order the real query returns them.
+const BEFORE = [
+  { src: "patch.com", cat: "Community", title: "Arboretum Food and Artisan Market Over 55 Vendors!", img: "https://patch.com/img/cdn20/users/26169671/20260805/031224/arboretum-food-artisan-3___05151222972.jpg" },
+  { src: "kxan.com", cat: "Community", title: "Leander ISD Police Department faces state probe, high turnover in first year", img: null },
+  { src: "Leander ISD", cat: "Community", title: "Leander ISD’s Commitment to School Safety", img: null },
+  { src: "Leander Chamber of Commerce", cat: "Business", title: "Post 2 – Leander Is Not a Small Town Anymore — And Developers Are Starting to Notice", img: "https://leandercc.org/wp-content/uploads/2026/06/Blog-Post-Pictures-for-June-Power-Hour.png" },
+  { src: "mysanantonio.com", cat: "Community", title: "One of Texas' best suburbs is getting a major water park upgrade", img: null },
+  { src: "mysanantonio.com", cat: "Restaurant", title: "I finally shopped at Aldi instead of H-E-B. Here's my verdict.", img: null },
+  { src: "The Daily Texan", cat: "Community", title: "New North Loop mural reveals untold Austin story", img: null },
+  { src: "The Killeen Daily Herald", cat: "Community", title: "Liberty Hill ISD presents 2026-27 budget update", img: null },
+];
+
+const AFTER = [
+  { src: "patch.com", cat: "Community", title: "Arboretum Food and Artisan Market Over 55 Vendors!", img: "https://patch.com/img/cdn20/users/26169671/20260805/031224/arboretum-food-artisan-3___05151222972.jpg" },
+  { src: "kxan.com", cat: "Politics", title: "Leander ISD Police Department faces state probe, high turnover in first year", img: "https://www.kxan.com/wp-content/uploads/sites/40/2026/08/lisdpd.png?w=1280" },
+  { src: "Leander Chamber", cat: "Business", title: "Welcome to the Leander Chamber, Pixel Perfect World LLC! Congratulations to Marielle and Whitney Brandon", img: "https://scontent-lga3-3.xx.fbcdn.net/v/t39.30808-6/767051122_1639757708151635_8079756903625642543_n.jpg?stp=cp6_dst-jpg_s960x960_tt6&_nc_cat=106&ccb=1-7&_nc_sid=e5c1b6&_nc_ohc=7HAlvPcmT-cQ7kNvwGziCSD&_nc_oc=AdqznLH6YVRXYAtuJzlM-Nho8L_PDqqBHMkrTJJP_8bvMZT9MTzsCxT7Izw-RT_DqrA&_nc_zt=23&_nc_ht=scontent-lga3-3.xx&_nc_gid=lIDxmgoBLECKnx693F0TfQ&_nc_ss=7b289&oh=00_AQF3nWQeaSra-UyUlt5104JK6iEindyksKKBivn6HZemWw&oe=6A7A14DA" },
+  { src: "Leander ISD", cat: "Community", title: "Leander ISD’s Commitment to School Safety", img: null },
+  { src: "fox7austin.com", cat: "Restaurant", title: "Award-winning Pflugerville BBQ spot closing its doors due to high beef prices", img: "https://images.foxtv.com/static.fox7austin.com/www.fox7austin.com/content/uploads/2026/08/1280/720/47599623579.jpg?ve=1&tl=1" },
+  { src: "Leander Chamber of Commerce", cat: "Business", title: "Post 2 – Leander Is Not a Small Town Anymore — And Developers Are Starting to Notice", img: "https://leandercc.org/wp-content/uploads/2026/06/Blog-Post-Pictures-for-June-Power-Hour.png" },
+  { src: "kxan.com", cat: "Politics", title: "Pflugerville woman sentenced to prison for nearly $44K in fraudulent PPP loans", img: "https://www.kxan.com/wp-content/uploads/sites/40/2026/03/GettyImages-1438794367-3.jpg?w=1280" },
+  { src: "lhindependent.com", cat: "Community", title: "New utility district to hold organizational meeting for proposed Liberty Hill development", img: "https://bloximages.newyork1.vip.townnews.com/lhindependent.com/content/tncms/assets/v3/editorial/2/8f/28fd20c4-a13e-4c76-83f6-2a0ba1bb2770/6a73b343ed11b.image.png?crop=1070%2C562%2C0%2C42" },
+  { src: "mysanantonio.com", cat: "Community", title: "One of Texas' best suburbs is getting a major water park upgrade", img: null },
+  { src: "mysanantonio.com", cat: "Community", title: "Cedar Park building $10.5M wave pool and splash park", img: "https://s.hdnux.com/photos/01/67/00/10/31195708/3/rawImage.jpg" },
+  { src: "lhindependent.com", cat: "Business", title: "Chamber Corner: Why now is the best time to join the Chamber of Commerce", img: "https://bloximages.newyork1.vip.townnews.com/lhindependent.com/content/tncms/assets/v3/editorial/0/f4/0f47cc8f-1500-4dbc-8d9f-25101ddd61bc/696bdf90a97a7.image.png?crop=512%2C269%2C0%2C121&resize=438%2C230&order=crop%2Cresize" },
+  { src: "cbsaustin.com", cat: "Community", title: "Blushing Belle Boutique shares winning game day fashion for fall and Ruby models!", img: "https://cbsaustin.com/resources/media2/16x9/4032/1320/0x1/90/3c983226-c09f-43d7-ab61-26eedac63c0c-IMG_6732.JPG" },
+  { src: "statesman.com", cat: "Community", title: "City Arts Center unveils new Chihuly glass installation", img: "https://s.hdnux.com/photos/01/66/72/35/31172445/3/rawImage.jpg" },
+  { src: "kxan.com", cat: "Politics", title: "Police identify suspect killed after stabbing parents in Round Rock", img: "https://www.kxan.com/wp-content/uploads/sites/40/2026/08/IMG_3293.jpg?w=1280" },
+];
+
+function card(item, mode) {
+  const thumb = item.img
+    ? `<div class="fcard__thumb fcard__thumb--photo">
+         <img class="fcard__thumb-img" src="${item.img}" alt="" referrerpolicy="no-referrer" />
+       </div>`
+    : mode === "before"
+      ? `<div class="fcard__thumb thumbEmptyOld">
+           <span class="noImageIconOld">${ICON_OLD}</span>
+         </div>`
+      : `<div class="fcard__thumb thumbEmpty">
+           <span class="noImageStack">
+             <span class="noImageIcon">${ICON_NEW}</span>
+             <span class="noImageLabel">No photo in article</span>
+           </span>
+         </div>`;
+  return `<article class="fcard">
+    ${thumb}
+    <div class="fcard__body">
+      <span class="fcard__cat-tag">${item.cat}</span>
+      <h3 class="fcard__title">${item.title}</h3>
+    </div>
+    <div class="fcard__foot"><span class="fcard__time">${item.src}</span></div>
+  </article>`;
+}
+
+document.getElementById("before").innerHTML = BEFORE.map((i) => card(i, "before")).join("");
+document.getElementById("after").innerHTML = AFTER.map((i) => card(i, "after")).join("");
+</script>
+</body>
+</html>
