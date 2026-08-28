@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WilCo Guide — Social Taste Check (Day 1)</title>
+<style>
+  :root { color-scheme: light; }
+  body { margin: 0; background: #f4f2ed; font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; }
+  header { padding: 40px 24px 8px; text-align: center; }
+  h1 { font-size: 28px; margin: 0 0 6px; }
+  .sub { font-family: Helvetica, Arial, sans-serif; color: #666; font-size: 14px; max-width: 720px; margin: 0 auto 8px; line-height: 1.5; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 24px; max-width: 1280px; margin: 0 auto; }
+  figure { margin: 0; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+  figure img { width: 100%; display: block; }
+  figcaption { font-family: Helvetica, Arial, sans-serif; font-size: 13px; padding: 10px 14px 14px; color: #444; line-height: 1.45; }
+  figcaption b { color: #1a1a1a; }
+  .flag { color: #b0532e; font-weight: 600; }
+  footer { text-align: center; font-family: Helvetica, Arial, sans-serif; font-size: 12px; color: #999; padding: 20px 0 40px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>WilCo Guide — Instagram Carousel Taste Check</h1>
+  <p class="sub">Day-1 validation, 2026-08-28. Every slide below was rendered by the EXISTING production compositor at 1080&times;1350 (Instagram portrait) with REAL upcoming events pulled from the prod database. No new engine code — just an inline template in the "photo + white text box" style. This is a direction check, not the final design.</p>
+</header>
+<div class="grid">
+  <figure><img src="01-hook.jpg" alt="Hook slide"><figcaption><b>1 — Hook.</b> Real Round Rock aerial photo from the event feed. This is the whatsongoldy-style direction.</figcaption></figure>
+  <figure><img src="02-event.jpg" alt="Mystery Night"><figcaption><b>2 — Mystery Night 2026.</b> Penfold Theatre, Round Rock. Source image is the organizer's header graphic.</figcaption></figure>
+  <figure><img src="03-event.jpg" alt="Round Rock Market Days"><figcaption><b>3 — Round Rock Market Days.</b> <span class="flag">Source image is a promo poster</span> — text-on-text. This is why the image picker + AI images matter.</figcaption></figure>
+  <figure><img src="04-event.jpg" alt="Taste of Leander"><figcaption><b>4 — Taste of Leander 2026.</b> <span class="flag">Also a poster.</span> Same lesson.</figcaption></figure>
+  <figure><img src="05-event.jpg" alt="The Market LHTX"><figcaption><b>5 — The Market LHTX.</b> Organizer cover photo.</figcaption></figure>
+  <figure><img src="06-event.jpg" alt="Mainly Art"><figcaption><b>6 — Mainly Art Fall Festival.</b> Real downtown Round Rock photo — this is what a good slide looks like with a real photo behind it.</figcaption></figure>
+  <figure><img src="07-event.jpg" alt="Navratri Festival"><figcaption><b>7 — Navratri Festival 2026.</b> Round Rock Sports Center.</figcaption></figure>
+  <figure><img src="08-cta.jpg" alt="CTA slide"><figcaption><b>8 — Closing CTA.</b> <span class="flag">Two known bugs on display:</span> the compositor flattens the logo's transparency to black bars, and the navy wordmark is invisible on navy. Logged for Phase 1. Your Canva closing card replaces this slide anyway.</figcaption></figure>
+</div>
+<footer>Rendered through src/server/media (Sharp + resvg) &middot; real content_candidates rows &middot; lightbreak-v2</footer>
+</body>
+</html>
