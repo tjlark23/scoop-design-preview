@@ -34,6 +34,15 @@
   <figure><img src="07-event.jpg" alt="Navratri Festival"><figcaption><b>7 — Navratri Festival 2026.</b> Round Rock Sports Center.</figcaption></figure>
   <figure><img src="08-cta.jpg" alt="CTA slide"><figcaption><b>8 — Closing CTA.</b> <span class="flag">Two known bugs on display:</span> the compositor flattens the logo's transparency to black bars, and the navy wordmark is invisible on navy. Logged for Phase 1. Your Canva closing card replaces this slide anyway.</figcaption></figure>
 </div>
+<header>
+  <h1>AI Image Test (V3)</h1>
+  <p class="sub">Same prompt to three models via OpenRouter: "photorealistic small-town Texas public library, no people, no text." This is the fallback lane for civic events (which have zero real photos) and news. Costs and speeds measured live.</p>
+</header>
+<div class="grid">
+  <figure><img src="imggen-google_gemini-3_1-flash-image.png" alt="Gemini flash"><figcaption><b>Gemini 3.1 Flash Image</b> — $0.067/image, 10 seconds. My pick for the default events/civic model.</figcaption></figure>
+  <figure><img src="imggen-google_gemini-3-pro-image.png" alt="Gemini pro"><figcaption><b>Gemini 3 Pro Image</b> — $0.139/image, 20 seconds. Note the sign says "PUBLIC LIBRARX" — image models still fumble baked-in text, which is fine for us because our system stamps all text itself.</figcaption></figure>
+  <figure><img src="imggen-openai_gpt-5_4-image-2.png" alt="GPT image"><figcaption><b>GPT-5.4 Image 2</b> — $0.182/image, 121 seconds. Too slow for an interactive re-roll loop.</figcaption></figure>
+</div>
 <footer>Rendered through src/server/media (Sharp + resvg) &middot; real content_candidates rows &middot; lightbreak-v2</footer>
 </body>
 </html>
