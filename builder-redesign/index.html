@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Builder Page — Complete Redesign (Proposal)</title>
+<style>
+  :root {
+    --navy: #1E2A4A; --gold: #E7C24F; --rust: #B0532E; --forest: #2E5D45;
+    --cream: #f3efe6; --paper: #fdfbf7; --ink: #1a1a1a; --ink2: #4a4a4a; --ink3: #6b6557;
+    --rule: #ddd6c8; --rule2: #cfc8b8;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #e7e2d6; font-family: Helvetica, Arial, sans-serif; color: var(--ink); }
+  .pagehead { text-align: center; padding: 44px 20px 8px; }
+  .pagehead h1 { font-family: Georgia, serif; font-size: 31px; margin: 0 0 8px; }
+  .pagehead p { color: var(--ink2); max-width: 780px; margin: 0 auto; font-size: 14.5px; line-height: 1.55; }
+  .frameWrap { max-width: 1340px; margin: 34px auto; padding: 0 16px; }
+  .frameWrap > h2 { font-family: Georgia, serif; font-size: 21px; margin: 0 0 4px; }
+  .frameWrap > p.note { font-size: 13.5px; color: var(--ink2); margin: 0 0 14px; line-height: 1.55; max-width: 900px; }
+
+  /* ============ the app frame ============ */
+  .app { background: var(--cream); border: 1px solid var(--rule2); border-radius: 12px; overflow: hidden; box-shadow: 0 6px 24px rgba(0,0,0,.10); }
+
+  /* ONE top bar */
+  .bar { display: flex; align-items: center; gap: 14px; background: var(--paper); border-bottom: 1px solid var(--rule); padding: 10px 18px; }
+  .brandpick { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; }
+  .brandpick .logo { width: 26px; height: 26px; border-radius: 6px; background: var(--navy); color: #fff; display: grid; place-items: center; font-size: 11px; font-family: Georgia, serif; }
+  .brandpick .sub { color: var(--ink3); font-weight: 500; font-size: 11.5px; display: block; }
+  .caret { color: var(--ink3); font-size: 10px; }
+  .modeSeg { display: flex; background: var(--cream); border: 1px solid var(--rule2); border-radius: 999px; padding: 3px; margin-left: 10px; }
+  .modeSeg span { padding: 6px 18px; border-radius: 999px; font-size: 13px; font-weight: 700; color: var(--ink2); }
+  .modeSeg .on { background: var(--navy); color: #fff; }
+  .barRight { margin-left: auto; display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--ink3); }
+  .barBtn { border: 1px solid var(--rule2); background: #fff; border-radius: 8px; padding: 7px 14px; font-size: 12.5px; font-weight: 700; color: var(--ink); }
+
+  .cols { display: flex; min-height: 780px; }
+
+  /* ============ FEED column ============ */
+  .feed { width: 46%; min-width: 430px; border-right: 1px solid var(--rule); background: var(--cream); padding: 14px 16px; }
+  .feedHead { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+  .search { flex: 1; display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--rule2); border-radius: 9px; padding: 9px 12px; color: var(--ink3); font-size: 13px; }
+  .iconBtn { border: 1px solid var(--rule2); background: #fff; border-radius: 9px; padding: 9px 12px; font-size: 12.5px; font-weight: 700; color: var(--ink2); white-space: nowrap; }
+  .iconBtn.badge::after { content: "2"; background: var(--navy); color: #fff; border-radius: 999px; font-size: 9.5px; padding: 1px 5px; margin-left: 6px; }
+  .tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; }
+  .tab { white-space: nowrap; border-radius: 999px; padding: 7px 14px; font-size: 12.5px; font-weight: 700; color: var(--ink2); background: transparent; border: 1px solid transparent; }
+  .tab.on { background: var(--navy); color: #fff; }
+  .tab .n { opacity: .55; font-weight: 500; margin-left: 4px; font-size: 11px; }
+  .cardgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card { background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; position: relative; }
+  .card .img { height: 108px; background: #ccc center/cover; position: relative; }
+  .card .img .date { position: absolute; top: 8px; left: 8px; background: rgba(20,24,35,.82); color: #fff; font-size: 10px; letter-spacing: .06em; padding: 3px 7px; border-radius: 5px; }
+  .card .body { padding: 10px 12px 12px; }
+  .card .cat { font-size: 9.5px; letter-spacing: .12em; color: var(--rust); text-transform: uppercase; font-weight: 700; }
+  .card h4 { font-family: Georgia, serif; font-size: 14px; line-height: 1.3; margin: 3px 0 6px; font-weight: 700; padding-right: 34px; }
+  .card .src { font-size: 10.5px; color: var(--ink3); }
+  .card .use { position: absolute; right: 10px; bottom: 10px; width: 30px; height: 30px; border-radius: 8px; background: var(--navy); color: #fff; display: grid; place-items: center; font-size: 16px; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,.18); }
+  .card.used { outline: 2px solid var(--forest); }
+  .card.used .use { background: var(--forest); }
+  .card.used .use::after { content: "✓"; } .card .use::after { content: "+"; }
+  .card .noimg { height: 108px; display: grid; place-items: center; background: linear-gradient(180deg,#eef0f4,#e2e6ee); color: var(--navy); font-family: Georgia, serif; text-align: center; }
+  .noimg b { font-size: 22px; display: block; }
+  .noimg span { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+  .collapsedRow { grid-column: 1 / -1; border: 1px dashed var(--rule2); border-radius: 10px; background: transparent; padding: 12px 14px; font-size: 12.5px; color: var(--ink2); display: flex; justify-content: space-between; align-items: center; }
+  .collapsedRow b { color: var(--ink); }
+  .collapsedRow .chev { color: var(--ink3); }
+
+  /* filter sheet */
+  .filterSheet { background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+  .filterSheet .frow { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .fchip { border: 1.5px solid var(--rule2); border-radius: 999px; padding: 6px 13px; font-size: 12px; font-weight: 600; color: var(--ink2); background: #fff; }
+  .fchip.on { border-color: var(--navy); background: var(--navy); color: #fff; }
+  .filterSheet .flabel { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink3); margin: 2px 0 6px; font-weight: 700; }
+  .filterSheet .apply { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--rule); padding-top: 10px; margin-top: 2px; font-size: 12px; color: var(--ink3); }
+  .applyBtn { background: var(--navy); color: #fff; border-radius: 8px; padding: 8px 18px; font-size: 12.5px; font-weight: 700; }
+
+  /* ============ COMPOSER column ============ */
+  .composer { flex: 1; background: var(--paper); padding: 18px 22px; }
+  .postHead { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .chip { background: var(--navy); color: #fff; font-size: 10.5px; padding: 3px 10px; border-radius: 999px; letter-spacing: .05em; font-weight: 700; }
+  .postHead b { font-family: Georgia, serif; font-size: 16.5px; line-height: 1.25; flex: 1; }
+  .newPost { border: 1px solid var(--rule2); background: #fff; border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 700; color: var(--ink2); white-space: nowrap; }
+  .tracker { display: flex; align-items: center; margin: 16px 0 4px; }
+  .dot { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 800; border: 2px solid var(--rule2); background: #fff; color: var(--ink3); }
+  .dot.done { border-color: var(--forest); background: var(--forest); color: #fff; }
+  .dot.cur { border-color: var(--navy); background: var(--navy); color: #fff; }
+  .dotLabel { font-size: 11px; font-weight: 700; color: var(--ink2); margin: 0 10px 0 7px; }
+  .track { flex: 1; height: 2px; background: var(--rule2); margin-right: 10px; }
+  .track.done { background: var(--forest); }
+  .nextline { font-size: 12.5px; color: var(--ink2); margin: 6px 0 14px; }
+  .nextline b { color: var(--navy); }
+  .stageRow { display: flex; gap: 18px; }
+  .slideBig { width: 300px; aspect-ratio: 4/5; border-radius: 10px; overflow: hidden; position: relative; background: #222 center/cover; box-shadow: 0 3px 12px rgba(0,0,0,.18); flex-shrink: 0; }
+  .whitebox { position: absolute; left: 7%; right: 7%; background: rgba(255,255,255,.97); text-align: center; padding: 13px 11px; }
+  .whitebox.mid { top: 32%; } .whitebox.low { bottom: 7%; }
+  .wb-t { font-family: Georgia, serif; font-weight: 700; font-size: 18px; line-height: 1.25; }
+  .wb-s { color: #555; font-size: 11px; margin-top: 6px; line-height: 1.45; }
+  .sideCol { flex: 1; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .hookBlock h5, .capBlock h5 { margin: 0 0 7px; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink3); }
+  .hookOpt { border: 1.5px solid var(--rule2); border-radius: 9px; background: #fff; padding: 9px 11px; font-size: 12px; margin-bottom: 7px; display: flex; gap: 8px; align-items: baseline; }
+  .hookOpt b { font-family: Georgia, serif; font-size: 12.5px; }
+  .hookOpt.sel { border-color: var(--navy); box-shadow: 0 0 0 1px var(--navy); }
+  .hookOpt .tag { margin-left: auto; font-size: 10px; font-weight: 800; color: var(--navy); white-space: nowrap; }
+  .capBlock textarea-mock { display: block; border: 1.5px solid var(--rule2); border-radius: 9px; background: #fff; padding: 10px 12px; font-size: 12px; color: var(--ink2); line-height: 1.5; }
+  .underRow { display: flex; align-items: center; justify-content: space-between; margin: 10px 0 8px; font-size: 12px; color: var(--ink2); }
+  .thumbs { display: flex; gap: 8px; margin-bottom: 14px; }
+  .thumb { width: 84px; aspect-ratio: 4/5; border-radius: 7px; border: 2px solid transparent; background: #bbb center/cover; position: relative; }
+  .thumb.sel { border-color: var(--navy); }
+  .thumb.text { background: var(--cream); display: grid; place-items: center; font-family: Georgia, serif; font-size: 9px; text-align: center; padding: 6px; color: var(--ink); border-top: 3px solid var(--navy); }
+  .thumb.navy { background: var(--navy); }
+  .bigBtn { display: block; width: 100%; border-radius: 10px; padding: 13px; text-align: center; font-weight: 800; font-size: 15px; border: 1px solid transparent; box-shadow: 0 3px 8px rgba(0,0,0,.14); }
+  .bigBtn.navy { background: var(--navy); color: #fff; }
+  .bigBtn.gold { background: var(--gold); color: var(--navy); }
+  .bigBtn small { display: block; font-weight: 500; font-size: 11px; opacity: .78; margin-top: 3px; }
+  .ghost { display: block; width: 100%; border: 1.5px solid var(--rule2); background: #fff; border-radius: 9px; padding: 9px; text-align: center; font-size: 13px; font-weight: 700; color: var(--ink2); margin-top: 8px; }
+  .settingsRows { border: 1px solid var(--rule); border-radius: 10px; background: #fff; margin-top: 14px; }
+  .srow { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--rule); font-size: 12.5px; }
+  .srow:last-child { border-bottom: 0; }
+  .srow .sl { width: 105px; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink3); font-weight: 800; }
+  .srow .sv { color: var(--ink2); }
+  .pill { border: 1px solid var(--rule2); border-radius: 999px; padding: 4px 11px; font-size: 11.5px; background: var(--paper); }
+  .pill.on { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+  /* callouts */
+  .callouts { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 16px; }
+  .co { background: var(--paper); border: 1px solid var(--rule); border-left: 4px solid var(--navy); border-radius: 8px; padding: 12px 14px; font-size: 13px; line-height: 1.5; color: var(--ink2); }
+  .co b { color: var(--ink); display: block; margin-bottom: 3px; font-size: 13.5px; }
+  .num { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--navy); color: #fff; font-size: 11px; font-weight: 800; margin-right: 6px; }
+  .marker { position: absolute; z-index: 5; width: 24px; height: 24px; border-radius: 50%; background: var(--rust); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 800; box-shadow: 0 2px 6px rgba(0,0,0,.3); }
+  footer { text-align: center; color: #999; font-size: 12px; padding: 26px 0 44px; }
+</style>
+</head>
+<body>
+<header class="pagehead">
+  <h1>The Builder Page, Redesigned</h1>
+  <p>Complete rethink of the page internals, keeping the strategy you called right: big content feed on the left, the post you're building on the right. One rule everywhere: <b>show the work, hide the machinery.</b> Real WilCo content throughout.</p>
+</header>
+
+<!-- ================= FRAME 1 ================= -->
+<div class="frameWrap">
+  <h2>1 · The whole page — Social mode, news post built</h2>
+  <p class="note">One top bar instead of three. The feed shows content, not controls. The composer reads top-to-bottom: what am I making → where am I → the work → the one next action.</p>
+  <div class="app">
+    <div class="bar">
+      <div class="brandpick"><span class="logo">W</span><span>WilCo Guide<span class="sub">Leander Scoop · change ▾</span></span></div>
+      <div class="modeSeg"><span>Newsletter</span><span class="on">Social</span></div>
+      <div class="barRight"><span>Saved just now</span><span class="barBtn">Help</span></div>
+    </div>
+    <div class="cols">
+      <div class="feed" style="position:relative">
+        <div class="marker" style="top:12px; right:14px;">2</div>
+        <div class="feedHead">
+          <div class="search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" style="flex-shrink:0"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg> Search Leander &amp; Cedar Park content…</div>
+          <span class="iconBtn badge">Filters</span>
+        </div>
+        <div class="tabs">
+          <span class="tab on">News <span class="n">24</span></span>
+          <span class="tab">Events <span class="n">31</span></span>
+          <span class="tab">Places <span class="n">168</span></span>
+          <span class="tab">Homes <span class="n">12</span></span>
+          <span class="tab">Videos</span>
+          <span class="tab">Jobs</span>
+          <span class="tab">More ▾</span>
+        </div>
+        <div class="cardgrid">
+          <div class="card used">
+            <div class="img" style="background-image:url('https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=500')"><span class="date">AUG 27</span></div>
+            <div class="body"><div class="cat">Government</div><h4>Flock cameras: Liberty Hill weighs future with license plate readers</h4><div class="src">FOX7AUSTIN.COM</div></div>
+            <div class="use"></div>
+          </div>
+          <div class="card">
+            <div class="img" style="background-image:url('https://images.unsplash.com/photo-1601758124510-52d02ddb7cbd?w=500')"><span class="date">AUG 27</span></div>
+            <div class="body"><div class="cat">Government</div><h4>Cedar Park Police welcome first wellness K9</h4><div class="src">KXAN</div></div>
+            <div class="use"></div>
+          </div>
+          <div class="card">
+            <div class="noimg"><div><b>AUG 26</b><span>City of Leander</span></div></div>
+            <div class="body"><div class="cat">Traffic</div><h4>Single vehicle fatal crash on Ronald Reagan</h4><div class="src">LEANDERTX.GOV</div></div>
+            <div class="use"></div>
+          </div>
+          <div class="card">
+            <div class="img" style="background-image:url('https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?w=500')"><span class="date">AUG 26</span></div>
+            <div class="body"><div class="cat">Community</div><h4>Second mosquito sample tests positive for West Nile</h4><div class="src">LEANDERTX.GOV</div></div>
+            <div class="use"></div>
+          </div>
+          <div class="collapsedRow"><span><b>9 more</b> from Facebook pages &amp; press releases</span><span class="chev">Show ▾</span></div>
+        </div>
+      </div>
+      <div class="composer" style="position:relative">
+        <div class="marker" style="top:12px; left:-12px;">1</div>
+        <div class="postHead">
+          <span class="chip">NEWS</span>
+          <b>Flock cameras: Liberty Hill weighs future with license plate readers</b>
+          <span class="newPost">+ New post</span>
+        </div>
+        <div class="tracker">
+          <span class="dot done">✓</span><span class="dotLabel">Copy</span><span class="track done"></span>
+          <span class="dot done">✓</span><span class="dotLabel">Images</span><span class="track done"></span>
+          <span class="dot cur">3</span><span class="dotLabel">Download</span>
+        </div>
+        <div class="nextline">Ready — <b>download your post</b> and it's Instagram-ready.</div>
+        <div class="stageRow">
+          <div class="slideBig" style="background-image:url('https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=700')">
+            <div class="whitebox mid">
+              <div class="wb-t">Liberty Hill is watching the watchers</div>
+              <div class="wb-s">Why license plate cameras have the whole town talking</div>
+            </div>
+          </div>
+          <div class="sideCol">
+            <div class="hookBlock" style="position:relative">
+              <div class="marker" style="top:-6px; right:0;">3</div>
+              <h5>Your hook — pick one or edit</h5>
+              <div class="hookOpt sel"><b>Liberty Hill is watching the watchers</b><span class="tag">✓ ON THE POST</span></div>
+              <div class="hookOpt"><b>Cameras on every corner?</b><span class="tag">USE</span></div>
+              <div class="hookOpt"><b>Your plate, their database</b><span class="tag">USE</span></div>
+            </div>
+            <div class="capBlock">
+              <h5>Caption — tap to edit</h5>
+              <textarea-mock>Liberty Hill leaders are weighing whether Flock license plate readers belong in town after pushback across Central Texas. The council takes it up next month. #LibertyHillTX #WilCo</textarea-mock>
+            </div>
+          </div>
+        </div>
+        <div class="underRow"><span>Slide 1 of 4</span><span class="pill">4 slides ▾</span></div>
+        <div class="thumbs" style="position:relative">
+          <div class="marker" style="top:-8px; left:-12px;">4</div>
+          <div class="thumb sel" style="background-image:url('https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=200')"></div>
+          <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=200'); filter:saturate(.7)"></div>
+          <div class="thumb text">WHAT'S NEXT<br><b style="font-size:11px">No vote was taken</b></div>
+          <div class="thumb navy"></div>
+        </div>
+        <a class="bigBtn navy">⬇ Download post<small>4 images + caption.txt, ready for Instagram</small></a>
+        <span class="ghost">↻ Rewrite the copy</span>
+        <div class="settingsRows" style="position:relative">
+          <div class="marker" style="top:-10px; right:-10px;">5</div>
+          <div class="srow"><span class="sl">Design</span><span class="pill on">Photo + white box</span><span class="pill">Brand color</span><span class="pill">Text story</span></div>
+          <div class="srow"><span class="sl">Closing slide</span><span class="sv">Your uploaded card · <b>on</b></span></div>
+          <div class="srow"><span class="sl">Saved posts</span><span class="sv">Open a saved post ▾</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="callouts">
+    <div class="co"><b><span class="num">1</span>One top bar</b>Workspace/brand/publication collapse into a single compact picker; the admin banner and newsletter toolbar rows are gone from social mode. The mode switch is one clean segmented control.</div>
+    <div class="co"><b><span class="num">2</span>Feed shows content, not controls</b>Search + one Filters button (with an active-count badge). Tabs are one row with counts, renamed in your language: News, Events, Places, Homes. Manage sources / Refresh / AI search all live inside Filters or More.</div>
+    <div class="co"><b><span class="num">3</span>Hooks live next to the slide</b>The hook options and caption sit beside the preview instead of below the fold, so choosing the hook is part of looking at the slide, not homework afterwards.</div>
+    <div class="co"><b><span class="num">4</span>Slides read as a set</b>Bigger thumbs, and the news carousel is visibly varied: photo hook, photo story slide, text-design slide, your closing card. No tripled image.</div>
+    <div class="co"><b><span class="num">5</span>Settings are rows, not a junk drawer</b>Design, closing slide, and saved posts are three labeled rows, always in the same place. Nothing called "More."</div>
+  </div>
+</div>
+
+<!-- ================= FRAME 2 ================= -->
+<div class="frameWrap">
+  <h2>2 · The feed, decluttered — filters open, quality states calmed</h2>
+  <p class="note">Every filter still exists — behind one button. Cards get one consistent anatomy with ONE action. "Needs verification" stops shouting in red mono-caps; unready items group themselves out of the way.</p>
+  <div class="app">
+    <div class="cols" style="min-height:0">
+      <div class="feed" style="width:100%; min-width:0; border-right:0;">
+        <div class="feedHead">
+          <div class="search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" style="flex-shrink:0"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg> Search events…</div>
+          <span class="iconBtn badge" style="border-color:var(--navy); color:var(--navy)">Filters</span>
+        </div>
+        <div class="tabs">
+          <span class="tab">News <span class="n">24</span></span>
+          <span class="tab on">Events <span class="n">31</span></span>
+          <span class="tab">Places <span class="n">168</span></span>
+          <span class="tab">Homes <span class="n">12</span></span>
+          <span class="tab">Videos</span><span class="tab">Jobs</span><span class="tab">More ▾</span>
+        </div>
+        <div class="filterSheet">
+          <div class="flabel">When</div>
+          <div class="frow"><span class="fchip on">This weekend</span><span class="fchip">Next 7 days</span><span class="fchip">Next 30 days</span></div>
+          <div class="flabel">City</div>
+          <div class="frow"><span class="fchip on">Leander</span><span class="fchip on">Cedar Park</span><span class="fchip">Liberty Hill</span><span class="fchip">Round Rock</span></div>
+          <div class="flabel">Only show</div>
+          <div class="frow"><span class="fchip">With photos</span><span class="fchip">Family friendly</span><span class="fchip">Free</span></div>
+          <div class="apply"><span>Manage sources · Find events with AI</span><span class="applyBtn">Show 14 events</span></div>
+        </div>
+        <div class="cardgrid" style="grid-template-columns: 1fr 1fr 1fr;">
+          <div class="card">
+            <div class="img" style="background-image:url('https://images.unsplash.com/photo-1472653431158-6364773b2a56?w=500')"><span class="date">SAT AUG 29</span></div>
+            <div class="body"><div class="cat">Music</div><h4>Dreams: A Tribute to Fleetwood Mac</h4><div class="src">Haute Spot · Cedar Park</div></div>
+            <div class="use"></div>
+          </div>
+          <div class="card">
+            <div class="img" style="background-image:url('https://images.unsplash.com/photo-1533900298318-6b8da08a523e?w=500')"><span class="date">SAT AUG 29</span></div>
+            <div class="body"><div class="cat">Fitness</div><h4>Sloth Run 5K/10K/13.1</h4><div class="src">Old Settlers Park · Round Rock</div></div>
+            <div class="use"></div>
+          </div>
+          <div class="card">
+            <div class="noimg"><div><b>AUG 29</b><span>Leander Library</span></div></div>
+            <div class="body"><div class="cat">Family</div><h4>Bilingual Storytime (2–6 years)</h4><div class="src">Leander Public Library</div></div>
+            <div class="use"></div>
+          </div>
+          <div class="collapsedRow"><span><b>12 events still being verified</b> — we're confirming dates &amp; details before they're postable</span><span class="chev">Review ▾</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="callouts">
+    <div class="co"><b>Filters are chips, not five dropdowns</b>Tap Filters → chip groups in plain language (When / City / Only show) → one "Show 14 events" button. Shuffle, pagination, view toggles: gone. Manage sources and AI search live in the sheet's footer.</div>
+    <div class="co"><b>Quality states stop shouting</b>"EXTRACTION INCOMPLETE, UNQUALIFIED, STALE" becomes one calm collapsed group: "12 events still being verified." Open it if you want; it never buries the good stuff. Imageless civic items get a designed date card, not a broken-image apology.</div>
+    <div class="co"><b>One action per card</b>The whole card drags; the + adds. "Read" moves to a hover affordance. The green ✓ replaces the "YOU'VE DRAGGED THIS IN" stamp.</div>
+  </div>
+</div>
+
+<!-- ================= FRAME 3 ================= -->
+<div class="frameWrap">
+  <h2>3 · The composer's three moments</h2>
+  <p class="note">Same stepped flow you've been using, tightened: hooks beside the slide, settings as fixed rows, one big action per moment. Nothing you saw before is lost — it's just in one calm order.</p>
+  <div class="app" style="padding: 18px;">
+    <div style="display:flex; gap:16px; flex-wrap:wrap;">
+      <div style="flex:1; min-width:280px; background:var(--cream); border:1px solid var(--rule); border-radius:10px; padding:16px;">
+        <div style="font-size:10.5px; letter-spacing:.12em; color:var(--ink3); font-weight:800; margin-bottom:10px;">MOMENT 1 · EMPTY</div>
+        <div style="border:2px dashed var(--rule2); border-radius:10px; background:#fff; padding:44px 18px; text-align:center;">
+          <div style="font-family:Georgia,serif; font-size:18px; font-weight:700; margin-bottom:6px;">Drag anything from the left</div>
+          <div style="font-size:12.5px; color:var(--ink2); line-height:1.55;">We build the whole post: slides, copy, caption.<br>You review, tweak, download, post.</div>
+        </div>
+        <div style="text-align:center; font-size:12px; color:var(--ink3); margin-top:10px;">Open a recent post ▾</div>
+      </div>
+      <div style="flex:1; min-width:280px; background:var(--cream); border:1px solid var(--rule); border-radius:10px; padding:16px;">
+        <div style="font-size:10.5px; letter-spacing:.12em; color:var(--ink3); font-weight:800; margin-bottom:10px;">MOMENT 2 · BUILT, COPY NEXT</div>
+        <div class="tracker" style="margin-top:0"><span class="dot cur">1</span><span class="dotLabel">Copy</span><span class="track"></span><span class="dot done">✓</span><span class="dotLabel">Images</span><span class="track"></span><span class="dot">3</span><span class="dotLabel">Download</span></div>
+        <div class="nextline">Next: <b>hit Write the copy</b> below.</div>
+        <div class="thumbs"><div class="thumb sel" style="background-image:url('https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=200')"></div><div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=200'); filter:saturate(.6)"></div><div class="thumb text">STORY SLIDE</div><div class="thumb navy"></div></div>
+        <a class="bigBtn gold">Write the copy<small>AI drafts 3 hooks, the slides, and your caption</small></a>
+      </div>
+      <div style="flex:1; min-width:280px; background:var(--cream); border:1px solid var(--rule); border-radius:10px; padding:16px;">
+        <div style="font-size:10.5px; letter-spacing:.12em; color:var(--ink3); font-weight:800; margin-bottom:10px;">MOMENT 3 · IF SOMETHING FAILS</div>
+        <div style="border:1.5px solid var(--rust); background:#fdf3ef; border-radius:10px; padding:14px; margin-bottom:12px;">
+          <div style="font-weight:800; font-size:13.5px; color:var(--rust); margin-bottom:4px;">The AI draft came back unusable</div>
+          <div style="font-size:12px; color:var(--ink2); line-height:1.5;">This is usually temporary. Nothing was posted or lost.</div>
+          <span style="display:inline-block; margin-top:10px; background:var(--rust); color:#fff; border-radius:8px; padding:8px 16px; font-size:12.5px; font-weight:800;">Try again</span>
+        </div>
+        <div style="font-size:12px; color:var(--ink2); line-height:1.55;">Failures are cards with a button, never a small red line. Same treatment for a slide image that won't load: the thumb shows a badge, tapping it opens the picker.</div>
+      </div>
+    </div>
+  </div>
+  <div class="callouts">
+    <div class="co"><b>What this costs</b>This is a rebuild of the page's two columns (layout + feed presentation + composer arrangement), not of the engine underneath — templates, generation, picker, downloads all stay as-is. Estimate: 3–4 focused days, shipped behind the same verification screenshots as the last batch.</div>
+    <div class="co"><b>What I need from you</b>A yes/no on this direction, and any specifics: tab names (News / Events / Places / Homes?), what belongs in the feed's "More" tab, and whether the hook-beside-slide layout beats hooks-below.</div>
+  </div>
+</div>
+
+<footer>Design proposal · lightbreak-v2 builder redesign · 2026-08-29</footer>
+</body>
+</html>
